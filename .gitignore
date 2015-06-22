@@ -214,3 +214,10 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+Engine/Debug/vc120.pdb
+*.idb
+Engine/Debug/vc120.pdb
+*.idb
+Debug/Engine.ilk
+*.ilk
+Engine/Debug/graphicsclass.obj
