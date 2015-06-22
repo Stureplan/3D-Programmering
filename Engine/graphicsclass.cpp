@@ -166,7 +166,10 @@ bool GraphicsClass::Frame()
 	{
 		rotation -= 360.0f;
 	}
-	
+
+	if (m_Camera->GetPosition().z <= -1.5f)
+		m_Camera->SetPosition (0.0f, 0.0f, m_Camera->GetPosition().z + 0.01f);
+
 	// Render the graphics scene.
 	result = Render(rotation);		//Calls the GraphicsClass::Render function every frame.
 	if(!result)

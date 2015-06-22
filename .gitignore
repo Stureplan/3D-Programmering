@@ -221,3 +221,4 @@ Engine/Debug/vc120.pdb
 Debug/Engine.ilk
 *.ilk
 Engine/Debug/graphicsclass.obj
+*.pdb
