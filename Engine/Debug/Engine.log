@@ -1,10 +1,10 @@
-﻿Build started 2015-06-22 18:46:40.
-     1>Project "C:\Users\Linus\Documents\3D-Uppgifter\Engine\Engine\Engine.vcxproj" on node 2 (Build target(s)).
+﻿Build started 2015-06-22 19:02:14.
+     1>Project "C:\Users\Linus\Documents\3D-Programmering\Engine\Engine.vcxproj" on node 2 (Build target(s)).
      1>FxCompile:
-         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\fxc.exe /nologo /E"main" /T fx_4_0 /Fo "C:\Users\Linus\Documents\3D-Uppgifter\Engine\Debug\light.cso" /Od /Zi light.fx 
+         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\fxc.exe /nologo /E"main" /T fx_4_0 /Fo "C:\Users\Linus\Documents\3D-Programmering\Debug\light.cso" /Od /Zi light.fx 
      1>FXC : warning X4717: Effects deprecated for D3DCompiler_47
          
-         compilation object save succeeded; see C:\Users\Linus\Documents\3D-Uppgifter\Engine\Debug\light.cso
+         compilation object save succeeded; see C:\Users\Linus\Documents\3D-Programmering\Debug\light.cso
        ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt cameraclass.cpp converter.cpp lightclass.cpp textureclass.cpp lightshaderclass.cpp d3dclass.cpp graphicsclass.cpp inputclass.cpp main.cpp modelclass.cpp systemclass.cpp
          systemclass.cpp
@@ -401,7 +401,7 @@
      1>c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND' : macro redefinition
                  c:\program files (x86)\windows kits\8.1\include\shared\winerror.h(50364) : see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
          converter.cpp
-     1>c:\users\linus\documents\3d-uppgifter\engine\engine\converter.cpp(24): warning C4101: 'garbage' : unreferenced local variable
+     1>c:\users\linus\documents\3d-programmering\engine\converter.cpp(24): warning C4101: 'garbage' : unreferenced local variable
          cameraclass.cpp
      1>c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED' : macro redefinition
                  c:\program files (x86)\windows kits\8.1\include\shared\winerror.h(50002) : see previous definition of 'DXGI_STATUS_OCCLUDED'
@@ -453,7 +453,7 @@
                  c:\program files (x86)\windows kits\8.1\include\shared\winerror.h(50364) : see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
          Generating Code...
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Linus\Documents\3D-Uppgifter\Engine\Debug\Engine.exe" /INCREMENTAL /NOLOGO d3dx10.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Linus\Documents\3D-Uppgifter\Engine\Debug\Engine.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Linus\Documents\3D-Uppgifter\Engine\Debug\Engine.lib" /MACHINE:X86 Debug\cameraclass.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Linus\Documents\3D-Programmering\Debug\Engine.exe" /INCREMENTAL /NOLOGO d3dx10.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Linus\Documents\3D-Programmering\Debug\Engine.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Linus\Documents\3D-Programmering\Debug\Engine.lib" /MACHINE:X86 Debug\cameraclass.obj
          Debug\converter.obj
          Debug\lightclass.obj
          Debug\textureclass.obj
@@ -464,9 +464,9 @@
          Debug\main.obj
          Debug\modelclass.obj
          Debug\systemclass.obj
-         Engine.vcxproj -> C:\Users\Linus\Documents\3D-Uppgifter\Engine\Debug\Engine.exe
-     1>Done Building Project "C:\Users\Linus\Documents\3D-Uppgifter\Engine\Engine\Engine.vcxproj" (Build target(s)).
+         Engine.vcxproj -> C:\Users\Linus\Documents\3D-Programmering\Debug\Engine.exe
+     1>Done Building Project "C:\Users\Linus\Documents\3D-Programmering\Engine\Engine.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:50.25
+Time Elapsed 00:00:40.43
