@@ -38,9 +38,11 @@ public:
 	bool Initialize(int, int, HWND);
 	void Shutdown();
 	bool Frame();
+	void Move (int);
 
 private:
 	bool Render(float);
+
 
 private:
 	D3DClass* m_D3D;

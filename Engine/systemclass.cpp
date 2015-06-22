@@ -138,6 +138,26 @@ bool SystemClass::Frame()
 		return false;
 	}
 
+	if (m_Input->IsKeyDown (VK_UP))
+	{
+		m_Graphics->Move (1);
+	}
+
+	if (m_Input->IsKeyDown (VK_LEFT))
+	{
+		m_Graphics->Move (2);
+	}
+
+	if (m_Input->IsKeyDown (VK_DOWN))
+	{
+		m_Graphics->Move (3);
+	}
+
+	if (m_Input->IsKeyDown (VK_RIGHT))
+	{
+		m_Graphics->Move (4);
+	}
+
 	// Do the frame processing for the graphics object.
 	result = m_Graphics->Frame();
 	if(!result)

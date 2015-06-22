@@ -167,8 +167,8 @@ bool GraphicsClass::Frame()
 		rotation -= 360.0f;
 	}
 
-	if (m_Camera->GetPosition().z <= -1.5f)
-		m_Camera->SetPosition (0.0f, 0.0f, m_Camera->GetPosition().z + 0.02f);
+	/*if (m_Camera->GetPosition().z <= -1.5f)
+		m_Camera->SetPosition (0.0f, 0.0f, m_Camera->GetPosition().z + 0.02f);*/
 
 	// Render the graphics scene.
 	result = Render(rotation);		//Calls the GraphicsClass::Render function every frame.
@@ -178,6 +178,41 @@ bool GraphicsClass::Frame()
 	}
 
 	return true;
+}
+
+void GraphicsClass::Move (int dir)
+{
+	if (dir == 1)	//MOVE FWD
+	{
+		m_Camera->SetPosition 
+	   (m_Camera->GetPosition ().x,
+		m_Camera->GetPosition ().y,
+		m_Camera->GetPosition ().z + 0.02f);
+	}
+
+	if (dir == 2)	//MOVE LEFT
+	{
+		m_Camera->SetPosition
+	   (m_Camera->GetPosition ().x - 0.02f,
+		m_Camera->GetPosition ().y,
+		m_Camera->GetPosition ().z);
+	}
+
+	if (dir == 3)	//MOVE BACK
+	{
+		m_Camera->SetPosition
+	   (m_Camera->GetPosition ().x,
+		m_Camera->GetPosition ().y,
+		m_Camera->GetPosition ().z - 0.02f);
+	}
+
+	if (dir == 4)	//MOVE RIGHT
+	{
+		m_Camera->SetPosition
+	   (m_Camera->GetPosition ().x + 0.02f,
+	    m_Camera->GetPosition ().y,
+		m_Camera->GetPosition ().z);
+	}
 }
 
 
