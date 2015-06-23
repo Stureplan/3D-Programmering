@@ -58,12 +58,14 @@ bool ModelClass::InitializeObjects()
 	m_objectCount = 2;
 	m_Objects = new Objects[m_objectCount];
 
+	//This is the gun object
 	m_Objects[0].position.x =  0.5f;
 	m_Objects[0].position.y = -0.5f;
-	m_Objects[0].position.z = -3.0f;
+	m_Objects[0].position.z = -3.5f;
 
+	//This is the object in the middle
 	m_Objects[1].position.x = 0.0f;
-	m_Objects[1].position.y = 0.5f;
+	m_Objects[1].position.y = 0.0f;
 	m_Objects[1].position.z = 0.0f;
 
 	return true;

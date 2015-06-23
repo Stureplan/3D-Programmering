@@ -39,6 +39,7 @@ public:
 	void Shutdown();
 	bool Frame();
 	void Move (int);
+	void Launch ();
 
 private:
 	bool Render(float);

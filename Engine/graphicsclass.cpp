@@ -189,7 +189,7 @@ void GraphicsClass::Move (int dir)
 {
 	if (dir == 1)	//MOVE FWD
 	{
-		m_Camera->SetPosition 
+		m_Camera->SetPosition
 	   (m_Camera->GetPosition ().x,
 		m_Camera->GetPosition ().y,
 		m_Camera->GetPosition ().z + 0.02f);
@@ -240,6 +240,11 @@ void GraphicsClass::Move (int dir)
 	}
 }
 
+void GraphicsClass::Launch ()
+{
+
+}
+
 
 bool GraphicsClass::Render(float rotation)
 {
@@ -259,9 +264,9 @@ bool GraphicsClass::Render(float rotation)
 	m_Camera->Render();
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
-	m_Camera->GetViewMatrix(viewMatrix);
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
+	m_Camera ->GetViewMatrix(viewMatrix);
+	m_D3D	 ->GetWorldMatrix(worldMatrix);
+	m_D3D	 ->GetProjectionMatrix(projectionMatrix);
 
 	//--OLD ROTATION TESTS, OBSOLETE BUT WILL CONTINUE TESTING--//
 	/*D3DXMatrixScaling(&scaleMatrix, 1.0f, 1.0f, 1.0f);
@@ -281,7 +286,6 @@ bool GraphicsClass::Render(float rotation)
 			m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
 
 		m_D3D->GetWorldMatrix (worldMatrix);
-
 	}
 
 	// Present the rendered scene to the screen.

@@ -132,12 +132,13 @@ bool SystemClass::Frame()
 	bool result;
 
 
-	// Check if the user pressed escape and wants to exit the application.
+	//Escape quits the program
 	if(m_Input->IsKeyDown(VK_ESCAPE))
 	{
 		return false;
 	}
 
+	//---	MOVEMENT	---//
 	if (m_Input->IsKeyDown (VK_UP))
 	{
 		m_Graphics->Move (1);
@@ -157,6 +158,16 @@ bool SystemClass::Frame()
 	{
 		m_Graphics->Move (4);
 	}
+	//---END OF MOVEMENT---//
+
+
+	//---SHOOTING---//
+	if (m_Input->IsKeyDown (VK_SPACE))
+	{
+		m_Graphics->Launch ();
+	}
+	//---END OF SHOOTING---//
+
 
 	// Do the frame processing for the graphics object.
 	result = m_Graphics->Frame();
