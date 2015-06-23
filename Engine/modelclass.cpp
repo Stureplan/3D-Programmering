@@ -12,9 +12,10 @@ ModelClass::ModelClass()
 	m_model = 0;
 	m_Object = 0;
 
-	//These are the default POSITIONS for each object in the scene
+	//These are the POSITIONS for each object in the scene
 	gun  = D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
-	cube = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
+	cube = D3DXVECTOR3 (0.0f, 0.5f, 0.0f);
+	def  = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
 }
 
 
@@ -63,7 +64,8 @@ bool ModelClass::Initialize(ID3D10Device* device, int obj, char* modelFilename, 
 		m_Object->position = cube;
 		break;
 
-	default:
+	default:		//If the object is out of scope/undefined
+		m_Object->position = def;
 		break;
 	}
 	return true;

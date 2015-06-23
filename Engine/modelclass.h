@@ -74,7 +74,7 @@ private:
 	ModelType* m_model;
 	Object* m_Object;
 
-	D3DXVECTOR3 gun, cube;
+	D3DXVECTOR3 gun, cube, def;
 };
 
 #endif

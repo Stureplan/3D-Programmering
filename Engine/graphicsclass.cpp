@@ -58,18 +58,9 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	// Set the initial position of the camera.
 	m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
 	
-	// Create the model object.
-	m_Gun = new ModelClass;
-	if(!m_Gun)
-	{
-		return false;
-	}
-
+	// Create the model objects.
+	m_Gun  = new ModelClass;
 	m_Cube = new ModelClass;
-	if (!m_Cube)
-	{
-		return false;
-	}
 
 	m_Convert = new ConverterClass;
 	if (!m_Convert)
@@ -82,24 +73,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Convert->Convert(2);	//Convert model02
 
 	// Initialize the gun object.
-	result = m_Gun->Initialize(m_D3D->GetDevice(), 1,
+	m_Gun->Initialize  (m_D3D->GetDevice(), 1,
 		"../Engine/data/model01.txt",
 		L"../Engine/data/dog.jpg");
-	if(!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the model01 object.", L"Error", MB_OK);
-		return false;
-	}
 
 	// Initialize the cube object.
-	result = m_Cube->Initialize (m_D3D->GetDevice (), 2,
+	m_Cube->Initialize (m_D3D->GetDevice (), 2,
 		"../Engine/data/model02.txt",
 		L"../Engine/data/dog.jpg");
-	if (!result)
-	{
-		MessageBox (hwnd, L"Could not initialize the model01 object.", L"Error", MB_OK);
-		return false;
-	}
 
 	//Create the light shader object
 	m_LightShader = new LightShaderClass;
