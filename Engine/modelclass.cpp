@@ -10,6 +10,7 @@ ModelClass::ModelClass()
 	m_indexBuffer = 0;
 	m_Texture = 0;
 	m_model = 0;
+	m_Objects = 0;
 }
 
 
@@ -52,6 +53,47 @@ bool ModelClass::Initialize(ID3D10Device* device, char* modelFilename, WCHAR* te
 	return true;
 }
 
+bool ModelClass::InitializeObjects()
+{
+	m_objectCount = 2;
+	m_Objects = new Objects[m_objectCount];
+
+	m_Objects[0].position.x =  0.5f;
+	m_Objects[0].position.y = -0.5f;
+	m_Objects[0].position.z = -3.0f;
+
+	m_Objects[1].position.x = 0.0f;
+	m_Objects[1].position.y = 0.5f;
+	m_Objects[1].position.z = 0.0f;
+
+	return true;
+}
+
+D3DXVECTOR3 ModelClass::GetGunPosition ()
+{
+	return D3DXVECTOR3 (m_Objects[0].position.x, m_Objects[0].position.y, m_Objects[0].position.z);
+}
+
+void ModelClass::SetGunPosition(float x, float y, float z)
+{
+	m_Objects[0].position.x = x;
+	m_Objects[0].position.y = y;
+	m_Objects[0].position.z = z;
+}
+
+int ModelClass::GetObjectCount()
+{
+	return m_objectCount;
+}
+
+void ModelClass::GetObjectData(int index, float& pos_x, float& pos_y, float& pos_z)
+{
+	pos_x = m_Objects[index].position.x;
+	pos_y = m_Objects[index].position.y;
+	pos_z = m_Objects[index].position.z;
+
+	return;
+}
 
 void ModelClass::Shutdown()
 {
@@ -116,25 +158,6 @@ bool ModelClass::InitializeBuffers(ID3D10Device* device)
 
 		indices[i] = i;
 	}
-
-
-	// Load the vertex array with data.
-	/*vertices[0].position = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);  // Bottom left (UV).
-	vertices[0].texture = D3DXVECTOR2(0.0f, 1.0f);
-	vertices[0].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
-
-	vertices[1].position = D3DXVECTOR3(0.0f, 1.0f, 0.0f);  // Top middle (UV).
-	vertices[1].texture = D3DXVECTOR2(0.5f, 0.0f);
-	vertices[1].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
-
-	vertices[2].position = D3DXVECTOR3(1.0f, -1.0f, 0.0f);  // Bottom right (UV).
-	vertices[2].texture = D3DXVECTOR2(1.0f, 1.0f);
-	vertices[2].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);*/
-
-	// Load the index array with data.
-	/*indices[0] = 0;  // Bottom left.
-	indices[1] = 1;  // Top middle.
-	indices[2] = 2;  // Bottom right.*/
 
 	// Set up the description of the vertex buffer.
     vertexBufferDesc.Usage = D3D10_USAGE_DEFAULT;

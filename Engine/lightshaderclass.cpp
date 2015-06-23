@@ -16,6 +16,7 @@ LightShaderClass::LightShaderClass()
 	m_texturePtr = 0;				
 
 	m_lightDirectionPtr = 0;
+	m_ambientColorPtr = 0;
 	m_diffuseColorPtr = 0;
 }
 
@@ -58,11 +59,11 @@ void LightShaderClass::Shutdown()
 
 void LightShaderClass::Render(ID3D10Device* device, int indexCount, D3DXMATRIX worldMatrix, 
 	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D10ShaderResourceView* texture, 
-	D3DXVECTOR3 lightDirection, D3DXVECTOR4 diffuseColor)
+	D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor)
 {
 	// Set the shader parameters that it will use for rendering.
 	SetShaderParameters(worldMatrix, viewMatrix, projectionMatrix, texture,
-						lightDirection, diffuseColor);
+						lightDirection, ambientColor, diffuseColor);
 
 	// Now render the prepared buffers with the shader.
 	RenderShader(device, indexCount);
@@ -162,6 +163,7 @@ bool LightShaderClass::InitializeShader(ID3D10Device* device, HWND hwnd, WCHAR* 
 	//Now when we get light data passed into this class we can use the pointers to send
 	//the data into the shader.
 	m_lightDirectionPtr = m_effect->GetVariableByName("lightDirection")->AsVector();
+	m_ambientColorPtr = m_effect->GetVariableByName ("ambientColor")->AsVector ();
 	m_diffuseColorPtr = m_effect->GetVariableByName("diffuseColor")->AsVector();
 
 	return true;
@@ -172,6 +174,7 @@ void LightShaderClass::ShutdownShader()
 {
 	//Release the light pointers
 	m_lightDirectionPtr = 0;
+	m_ambientColorPtr = 0;
 	m_diffuseColorPtr = 0;
 
 
@@ -242,7 +245,7 @@ void LightShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND h
 
 void LightShaderClass::SetShaderParameters(D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix,
 							D3DXMATRIX projectionMatrix, ID3D10ShaderResourceView* texture,
-							D3DXVECTOR3 lightDirection, D3DXVECTOR4 diffuseColor)
+							D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor)
 {
 	// Set the world matrix variable inside the shader.
 	m_worldMatrixPtr->SetMatrix((float*)&worldMatrix);
@@ -258,6 +261,9 @@ void LightShaderClass::SetShaderParameters(D3DXMATRIX worldMatrix, D3DXMATRIX vi
 
 	//Sets the direction of the light inside the shader.
 	m_lightDirectionPtr->SetFloatVector((float*)&lightDirection);
+
+	// Set the ambient color of the light.
+	m_ambientColorPtr->SetFloatVector ((float*) &ambientColor);
 
 	//Sets the diffuse color of the light inside the shader.
 	m_diffuseColorPtr->SetFloatVector((float*)&diffuseColor);

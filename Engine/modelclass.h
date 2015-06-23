@@ -33,12 +33,24 @@ private:
 		float nx, ny, nz;
 	};
 
+	struct Objects
+	{
+		D3DXVECTOR3 position;
+		D3DXVECTOR3 rotation;
+		D3DXVECTOR3 scale;
+	};
+
 public:
 	ModelClass();
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
 	bool Initialize(ID3D10Device*, char*, WCHAR*);
+	bool InitializeObjects();
+	D3DXVECTOR3 GetGunPosition();
+	void SetGunPosition(float x, float y, float z);
+	int GetObjectCount();
+	void GetObjectData(int, float&, float&, float&);
 	void Shutdown();
 	void Render(ID3D10Device*);
 	int GetIndexCount();
@@ -57,9 +69,10 @@ private:
 
 private:
 	ID3D10Buffer *m_vertexBuffer, *m_indexBuffer;
-	int m_vertexCount, m_indexCount;
+	int m_vertexCount, m_indexCount, m_objectCount;
 	TextureClass* m_Texture;
 	ModelType* m_model;
+	Objects* m_Objects;
 };
 
 #endif

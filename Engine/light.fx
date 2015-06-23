@@ -10,6 +10,7 @@ matrix worldMatrix;
 matrix viewMatrix;
 matrix projectionMatrix;
 Texture2D shaderTexture;
+float4 ambientColor;
 float4 diffuseColor;
 float3 lightDirection;
 
@@ -90,15 +91,23 @@ float4 LightPixelShader(PixelInputType input) : SV_Target
 	// Sample the pixel color from the texture using the sampler at this texture coordinate location.
 	textureColor = shaderTexture.Sample(SampleType, input.tex);
 
+	//Default color value for all pixels
+	color = ambientColor;
+
 	//Invert the light direction for calc
 	lightDir = -lightDirection;
 
 	//Calculate the amount of light on this pixel.
 	lightIntensity = saturate(dot(input.normal, lightDir));
 
+	if (lightIntensity > 0.0f)
+	{
+		color += (diffuseColor * lightIntensity);
+	}
+
 	//Determine the final amount of diffuse color based on the diffuse color combined with
 	//the light intensity.
-	color = saturate(diffuseColor * lightIntensity);
+	color = saturate(color);
 
 	//Multiply the texture pixel and the final diffuse color to get the final pixel color result.
 	color = color * textureColor;

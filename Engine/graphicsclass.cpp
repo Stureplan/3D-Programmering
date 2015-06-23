@@ -79,6 +79,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+	result = m_Model->InitializeObjects();
+	if (!result)
+	{
+		MessageBox (hwnd, L"Could not initialize objects.", L"Error", MB_OK);
+		return false;
+	}
+
 	//Create the light shader object
 	m_LightShader = new LightShaderClass;
 	if (!m_LightShader)
@@ -102,8 +109,9 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	//Initialize the light object.
-	m_Light->SetDiffuseColor(1.0f, 0.0f, 1.0f, 1.0f);
-	m_Light->SetDirection(0.0f, 1.0f, 1.0f);
+	m_Light->SetAmbientColor(0.3f, 0.3f, 0.3f, 1.0f);
+	m_Light->SetDiffuseColor(1.0f, 0.0f, 0.0f, 1.0f);
+	m_Light->SetDirection(1.0f, 0.0f, 0.0f);
 
 	return true;
 }
@@ -185,6 +193,11 @@ void GraphicsClass::Move (int dir)
 	   (m_Camera->GetPosition ().x,
 		m_Camera->GetPosition ().y,
 		m_Camera->GetPosition ().z + 0.02f);
+
+		m_Model->SetGunPosition
+	   (m_Model->GetGunPosition ().x,
+		m_Model->GetGunPosition ().y,
+		m_Model->GetGunPosition ().z + 0.02f);
 	}
 
 	if (dir == 2)	//MOVE LEFT
@@ -193,6 +206,11 @@ void GraphicsClass::Move (int dir)
 	   (m_Camera->GetPosition ().x - 0.02f,
 		m_Camera->GetPosition ().y,
 		m_Camera->GetPosition ().z);
+
+		m_Model->SetGunPosition
+	   (m_Model->GetGunPosition ().x - 0.02f,
+		m_Model->GetGunPosition ().y,
+		m_Model->GetGunPosition ().z);
 	}
 
 	if (dir == 3)	//MOVE BACK
@@ -201,6 +219,11 @@ void GraphicsClass::Move (int dir)
 	   (m_Camera->GetPosition ().x,
 		m_Camera->GetPosition ().y,
 		m_Camera->GetPosition ().z - 0.02f);
+
+		m_Model->SetGunPosition
+	   (m_Model->GetGunPosition ().x,
+		m_Model->GetGunPosition ().y,
+		m_Model->GetGunPosition ().z - 0.02f);
 	}
 
 	if (dir == 4)	//MOVE RIGHT
@@ -209,15 +232,25 @@ void GraphicsClass::Move (int dir)
 	   (m_Camera->GetPosition ().x + 0.02f,
 	    m_Camera->GetPosition ().y,
 		m_Camera->GetPosition ().z);
+
+		m_Model->SetGunPosition
+	   (m_Model->GetGunPosition ().x + 0.02f,
+		m_Model->GetGunPosition ().y,
+		m_Model->GetGunPosition ().z);
 	}
 }
 
 
 bool GraphicsClass::Render(float rotation)
 {
-	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
+	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	D3DXMATRIX scaleMatrix, rotationMatrix;
 	D3DXMATRIX translationMatrix;
+
+	int objCount, index;
+	float pos_x, pos_y, pos_z;
+
+	
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
@@ -230,19 +263,26 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	D3DXMatrixScaling(&scaleMatrix, 1.0f, 1.0f, 1.0f);
+	//--OLD ROTATION TESTS, OBSOLETE BUT WILL CONTINUE TESTING--//
+	/*D3DXMatrixScaling(&scaleMatrix, 1.0f, 1.0f, 1.0f);
 	D3DXMatrixRotationY(&rotationMatrix, rotation);
 	D3DXMatrixTranslation(&translationMatrix, 0.0f, 0.0f, 0.0f);
-	D3DXMatrixMultiply(&worldMatrix, &scaleMatrix, &rotationMatrix);
+	D3DXMatrixMultiply(&worldMatrix, &scaleMatrix, &rotationMatrix);*/
 
-	//worldMatrix = scaleMatrix * rotationMatrix * translationMatrix;
+	objCount = m_Model->GetObjectCount();
+	for (int i = 0; i < objCount; i++)
+	{
+		m_Model->GetObjectData(i, pos_x, pos_y, pos_z);
+		D3DXMatrixTranslation (&worldMatrix, pos_x, pos_y, pos_z);
+		m_Model->Render (m_D3D->GetDevice ());
+		
+		m_LightShader->Render (m_D3D->GetDevice(), m_Model->GetIndexCount(), 
+			worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture(), 
+			m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
 
-	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	m_Model->Render(m_D3D->GetDevice());
+		m_D3D->GetWorldMatrix (worldMatrix);
 
-	// Render the model using the texture shader.
-	m_LightShader->Render(m_D3D->GetDevice(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, 
-	projectionMatrix, m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetDiffuseColor());
+	}
 
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
