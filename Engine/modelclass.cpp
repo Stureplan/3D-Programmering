@@ -12,7 +12,7 @@ ModelClass::ModelClass()
 	m_model = 0;
 	m_Objects = 0;
 
-	//These are the default POSITION values for each object in the scene
+	//These are the default POSITIONS for each object in the scene
 	gun  = D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
 	cube = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
 }
@@ -33,7 +33,7 @@ bool ModelClass::Initialize(ID3D10Device* device, char* modelFilename, WCHAR* te
 	bool result;
 
 	//Load in the model data
-	result = LoadModel(modelFilename);
+	result = LoadModel (modelFilename);
 	if (!result)
 	{
 		return false;
@@ -47,12 +47,11 @@ bool ModelClass::Initialize(ID3D10Device* device, char* modelFilename, WCHAR* te
 	}
 
 	// Load the texture for this model.
-	result = LoadTexture(device, textureFilename);
+	result = LoadTexture (device, textureFilename);
 	if (!result)
 	{
 		return false;
 	}
-
 
 	return true;
 }
@@ -72,30 +71,12 @@ bool ModelClass::InitializeObjects(int objCount)
 
 void ModelClass::SetPosition (int obj, float x, float y, float z)
 {
-	switch (obj)
-	{
-	case 1:			//If the int type was = 1 (gun)
-		m_Objects[0].position = D3DXVECTOR3 (x, y, z);
-		break;
-	case 2:			//If the int type was = 2 (cube)
-		m_Objects[1].position = D3DXVECTOR3 (x, y, z);
-		break;
-
-	default:
-		break;
-	}
+	m_Objects[obj-1].position = D3DXVECTOR3 (x, y, z);
 }
 
 D3DXVECTOR3 ModelClass::GetPosition (int obj)
 {
-	switch (obj)
-	{
-	case 1:			//If the int type was = 1 (gun)
-		return m_Objects[0].position;
-	case 2:			//If the int type was = 2 (cube)
-		return m_Objects[1].position;
-		break;
-	}
+	return m_Objects[obj-1].position;
 }
 
 int ModelClass::GetObjectCount()

@@ -2,6 +2,7 @@
 // Filename: graphicsclass.cpp
 ////////////////////////////////////////////////////////////////////////////////
 #include "graphicsclass.h"
+#define WM_MOUSEMOVE
 
 
 GraphicsClass::GraphicsClass()
@@ -80,7 +81,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		L"../Engine/data/dog.jpg");
 	if(!result)
 	{
-		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		MessageBox(hwnd, L"Could not initialize the model01 object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -116,7 +117,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//Initialize the light object.
 	m_Light->SetAmbientColor(0.3f, 0.3f, 0.3f, 1.0f);
 	m_Light->SetDiffuseColor(1.0f, 0.0f, 0.0f, 1.0f);
-	m_Light->SetDirection(1.0f, 0.0f, 0.0f);
+	m_Light->SetDirection   (1.0f, 0.0f, 0.0f);
 
 	return true;
 }
@@ -130,8 +131,6 @@ void GraphicsClass::Shutdown()
 		delete m_Light;
 		m_Light = 0;
 	}
-
-
 
 	// Release the texture shader object.
 	if(m_LightShader)
@@ -197,7 +196,7 @@ void GraphicsClass::Move (int dir)
 	if (dir == 1)	//MOVE FWD
 	{
 		pos = m_Camera->GetPosition ();
-		m_Camera->SetPosition (pos.x, pos.y, pos.z + movespeed);
+		m_Camera->SetPosition    (pos.x, pos.y, pos.z + movespeed);
 
 		pos = m_Models->GetPosition (1);
 		m_Models->SetPosition (1, pos.x, pos.y, pos.z + movespeed);
@@ -206,7 +205,7 @@ void GraphicsClass::Move (int dir)
 	if (dir == 2)	//MOVE LEFT
 	{
 		pos = m_Camera->GetPosition ();
-		m_Camera->SetPosition (pos.x - movespeed, pos.y, pos.z);
+		m_Camera->SetPosition    (pos.x - movespeed, pos.y, pos.z);
 
 		pos = m_Models->GetPosition (1);
 		m_Models->SetPosition (1, pos.x - movespeed, pos.y, pos.z);
@@ -215,7 +214,7 @@ void GraphicsClass::Move (int dir)
 	if (dir == 3)	//MOVE BACK
 	{
 		pos = m_Camera->GetPosition ();
-		m_Camera->SetPosition (pos.x, pos.y, pos.z - movespeed);
+		m_Camera->SetPosition    (pos.x, pos.y, pos.z - movespeed);
 
 		pos = m_Models->GetPosition (1);
 		m_Models->SetPosition (1, pos.x, pos.y, pos.z - movespeed);
@@ -224,7 +223,7 @@ void GraphicsClass::Move (int dir)
 	if (dir == 4)	//MOVE RIGHT
 	{
 		pos = m_Camera->GetPosition ();
-		m_Camera->SetPosition (pos.x + movespeed, pos.y, pos.z);
+		m_Camera->SetPosition    (pos.x + movespeed, pos.y, pos.z);
 
 		pos = m_Models->GetPosition (1);
 		m_Models->SetPosition (1, pos.x + movespeed, pos.y, pos.z);
@@ -245,8 +244,6 @@ bool GraphicsClass::Render(float rotation)
 
 	int index;
 	float pos_x, pos_y, pos_z;
-
-	
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
@@ -272,8 +269,9 @@ bool GraphicsClass::Render(float rotation)
 		m_Models->Render (m_D3D->GetDevice ());
 		
 		m_LightShader->Render (m_D3D->GetDevice(), m_Models->GetIndexCount(), 
-			worldMatrix, viewMatrix, projectionMatrix, m_Models->GetTexture(), 
-			m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
+							   worldMatrix, viewMatrix, projectionMatrix, 
+							   m_Models->GetTexture(), m_Light->GetDirection(), 
+							   m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
 
 		m_D3D->GetWorldMatrix (worldMatrix);
 	}
