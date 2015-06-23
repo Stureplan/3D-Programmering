@@ -48,6 +48,9 @@
     <ClCompile Include="converter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="terrainclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cameraclass.h">
@@ -78,6 +81,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="terrainclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
