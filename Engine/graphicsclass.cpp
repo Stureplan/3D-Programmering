@@ -8,7 +8,7 @@ GraphicsClass::GraphicsClass()
 {
 	m_D3D = 0;
 	m_Camera = 0;
-	m_Model = 0;
+	m_Models = 0;
 	m_LightShader = 0;
 	m_Light = 0;
 }
@@ -55,8 +55,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
 	
 	// Create the model object.
-	m_Model = new ModelClass;
-	if(!m_Model)
+	m_Models = new ModelClass;
+	if(!m_Models)
 	{
 		return false;
 	}
@@ -66,11 +66,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	{
 		return false;
 	}
+
+	
 	m_Convert->Convert(1);	//Convert model01
 	m_Convert->Convert(2);	//Convert model02
+	objCount = 2;
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), 
+	result = m_Models->Initialize(m_D3D->GetDevice(), 
 		"../Engine/data/model01.txt",
 		L"../Engine/data/dog.jpg");
 	if(!result)
@@ -79,7 +82,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	result = m_Model->InitializeObjects();
+	result = m_Models->InitializeObjects(objCount);
 	if (!result)
 	{
 		MessageBox (hwnd, L"Could not initialize objects.", L"Error", MB_OK);
@@ -137,11 +140,11 @@ void GraphicsClass::Shutdown()
 	}
 
 	// Release the model object.
-	if(m_Model)
+	if(m_Models)
 	{
-		m_Model->Shutdown();
-		delete m_Model;
-		m_Model = 0;
+		m_Models->Shutdown();
+		delete m_Models;
+		m_Models = 0;
 	}
 
 	// Release the camera object.
@@ -194,10 +197,10 @@ void GraphicsClass::Move (int dir)
 		m_Camera->GetPosition ().y,
 		m_Camera->GetPosition ().z + 0.02f);
 
-		m_Model->SetGunPosition
-	   (m_Model->GetGunPosition ().x,
-		m_Model->GetGunPosition ().y,
-		m_Model->GetGunPosition ().z + 0.02f);
+		m_Models->SetGunPosition
+	   (m_Models->GetGunPosition ().x,
+		m_Models->GetGunPosition ().y,
+		m_Models->GetGunPosition ().z + 0.02f);
 	}
 
 	if (dir == 2)	//MOVE LEFT
@@ -207,10 +210,10 @@ void GraphicsClass::Move (int dir)
 		m_Camera->GetPosition ().y,
 		m_Camera->GetPosition ().z);
 
-		m_Model->SetGunPosition
-	   (m_Model->GetGunPosition ().x - 0.02f,
-		m_Model->GetGunPosition ().y,
-		m_Model->GetGunPosition ().z);
+		m_Models->SetGunPosition
+	   (m_Models->GetGunPosition ().x - 0.02f,
+		m_Models->GetGunPosition ().y,
+		m_Models->GetGunPosition ().z);
 	}
 
 	if (dir == 3)	//MOVE BACK
@@ -220,10 +223,10 @@ void GraphicsClass::Move (int dir)
 		m_Camera->GetPosition ().y,
 		m_Camera->GetPosition ().z - 0.02f);
 
-		m_Model->SetGunPosition
-	   (m_Model->GetGunPosition ().x,
-		m_Model->GetGunPosition ().y,
-		m_Model->GetGunPosition ().z - 0.02f);
+		m_Models->SetGunPosition
+	   (m_Models->GetGunPosition ().x,
+		m_Models->GetGunPosition ().y,
+		m_Models->GetGunPosition ().z - 0.02f);
 	}
 
 	if (dir == 4)	//MOVE RIGHT
@@ -233,10 +236,10 @@ void GraphicsClass::Move (int dir)
 	    m_Camera->GetPosition ().y,
 		m_Camera->GetPosition ().z);
 
-		m_Model->SetGunPosition
-	   (m_Model->GetGunPosition ().x + 0.02f,
-		m_Model->GetGunPosition ().y,
-		m_Model->GetGunPosition ().z);
+		m_Models->SetGunPosition
+	   (m_Models->GetGunPosition ().x + 0.02f,
+		m_Models->GetGunPosition ().y,
+		m_Models->GetGunPosition ().z);
 	}
 }
 
@@ -252,7 +255,7 @@ bool GraphicsClass::Render(float rotation)
 	D3DXMATRIX scaleMatrix, rotationMatrix;
 	D3DXMATRIX translationMatrix;
 
-	int objCount, index;
+	int index;
 	float pos_x, pos_y, pos_z;
 
 	
@@ -274,15 +277,14 @@ bool GraphicsClass::Render(float rotation)
 	D3DXMatrixTranslation(&translationMatrix, 0.0f, 0.0f, 0.0f);
 	D3DXMatrixMultiply(&worldMatrix, &scaleMatrix, &rotationMatrix);*/
 
-	objCount = m_Model->GetObjectCount();
 	for (int i = 0; i < objCount; i++)
 	{
-		m_Model->GetObjectData(i, pos_x, pos_y, pos_z);
+		m_Models->GetObjectData(i, pos_x, pos_y, pos_z);
 		D3DXMatrixTranslation (&worldMatrix, pos_x, pos_y, pos_z);
-		m_Model->Render (m_D3D->GetDevice ());
+		m_Models->Render (m_D3D->GetDevice ());
 		
-		m_LightShader->Render (m_D3D->GetDevice(), m_Model->GetIndexCount(), 
-			worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture(), 
+		m_LightShader->Render (m_D3D->GetDevice(), m_Models->GetIndexCount(), 
+			worldMatrix, viewMatrix, projectionMatrix, m_Models->GetTexture(), 
 			m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
 
 		m_D3D->GetWorldMatrix (worldMatrix);

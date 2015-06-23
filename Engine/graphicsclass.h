@@ -48,10 +48,12 @@ private:
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
-	ModelClass* m_Model;
+	ModelClass* m_Models;
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
 	ConverterClass* m_Convert;
+
+	int objCount;
 };
 
 #endif
