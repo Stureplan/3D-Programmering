@@ -54,6 +54,7 @@ private:
 	ConverterClass* m_Convert;
 
 	int objCount;
+	float movespeed;
 };
 
 #endif

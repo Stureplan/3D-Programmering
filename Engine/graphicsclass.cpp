@@ -11,6 +11,8 @@ GraphicsClass::GraphicsClass()
 	m_Models = 0;
 	m_LightShader = 0;
 	m_Light = 0;
+
+	movespeed = 0.03f;
 }
 
 
@@ -190,56 +192,42 @@ bool GraphicsClass::Frame()
 
 void GraphicsClass::Move (int dir)
 {
+	D3DXVECTOR3 pos;
+
 	if (dir == 1)	//MOVE FWD
 	{
-		m_Camera->SetPosition
-	   (m_Camera->GetPosition ().x,
-		m_Camera->GetPosition ().y,
-		m_Camera->GetPosition ().z + 0.02f);
+		pos = m_Camera->GetPosition ();
+		m_Camera->SetPosition (pos.x, pos.y, pos.z + movespeed);
 
-		m_Models->SetGunPosition
-	   (m_Models->GetGunPosition ().x,
-		m_Models->GetGunPosition ().y,
-		m_Models->GetGunPosition ().z + 0.02f);
+		pos = m_Models->GetPosition (1);
+		m_Models->SetPosition (1, pos.x, pos.y, pos.z + movespeed);
 	}
 
 	if (dir == 2)	//MOVE LEFT
 	{
-		m_Camera->SetPosition
-	   (m_Camera->GetPosition ().x - 0.02f,
-		m_Camera->GetPosition ().y,
-		m_Camera->GetPosition ().z);
+		pos = m_Camera->GetPosition ();
+		m_Camera->SetPosition (pos.x - movespeed, pos.y, pos.z);
 
-		m_Models->SetGunPosition
-	   (m_Models->GetGunPosition ().x - 0.02f,
-		m_Models->GetGunPosition ().y,
-		m_Models->GetGunPosition ().z);
+		pos = m_Models->GetPosition (1);
+		m_Models->SetPosition (1, pos.x - movespeed, pos.y, pos.z);
 	}
 
 	if (dir == 3)	//MOVE BACK
 	{
-		m_Camera->SetPosition
-	   (m_Camera->GetPosition ().x,
-		m_Camera->GetPosition ().y,
-		m_Camera->GetPosition ().z - 0.02f);
+		pos = m_Camera->GetPosition ();
+		m_Camera->SetPosition (pos.x, pos.y, pos.z - movespeed);
 
-		m_Models->SetGunPosition
-	   (m_Models->GetGunPosition ().x,
-		m_Models->GetGunPosition ().y,
-		m_Models->GetGunPosition ().z - 0.02f);
+		pos = m_Models->GetPosition (1);
+		m_Models->SetPosition (1, pos.x, pos.y, pos.z - movespeed);
 	}
 
 	if (dir == 4)	//MOVE RIGHT
 	{
-		m_Camera->SetPosition
-	   (m_Camera->GetPosition ().x + 0.02f,
-	    m_Camera->GetPosition ().y,
-		m_Camera->GetPosition ().z);
+		pos = m_Camera->GetPosition ();
+		m_Camera->SetPosition (pos.x + movespeed, pos.y, pos.z);
 
-		m_Models->SetGunPosition
-	   (m_Models->GetGunPosition ().x + 0.02f,
-		m_Models->GetGunPosition ().y,
-		m_Models->GetGunPosition ().z);
+		pos = m_Models->GetPosition (1);
+		m_Models->SetPosition (1, pos.x + movespeed, pos.y, pos.z);
 	}
 }
 

@@ -11,6 +11,9 @@ ModelClass::ModelClass()
 	m_Texture = 0;
 	m_model = 0;
 	m_Objects = 0;
+
+	gun  = D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
+	cube = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
 }
 
 
@@ -53,34 +56,45 @@ bool ModelClass::Initialize(ID3D10Device* device, char* modelFilename, WCHAR* te
 	return true;
 }
 
-bool ModelClass::InitializeObjects()
+bool ModelClass::InitializeObjects(int objCount)
 {
-	m_objectCount = 2;
-	m_Objects = new Objects[m_objectCount];
+	m_Objects = new Object[objCount];
 
 	//This is the gun object
-	m_Objects[0].position.x =  0.5f;
-	m_Objects[0].position.y = -0.5f;
-	m_Objects[0].position.z = -3.5f;
+	m_Objects[0].position = gun;
 
 	//This is the object in the middle
-	m_Objects[1].position.x = 0.0f;
-	m_Objects[1].position.y = 0.0f;
-	m_Objects[1].position.z = 0.0f;
+	m_Objects[1].position = cube;
 
 	return true;
 }
 
-D3DXVECTOR3 ModelClass::GetGunPosition ()
+void ModelClass::SetPosition (int obj, float x, float y, float z)
 {
-	return D3DXVECTOR3 (m_Objects[0].position.x, m_Objects[0].position.y, m_Objects[0].position.z);
+	switch (obj)
+	{
+	case 1:			//If the int type was = 1 (gun)
+		m_Objects[0].position = D3DXVECTOR3 (x, y, z);
+		break;
+	case 2:			//If the int type was = 2 (cube)
+		m_Objects[1].position = D3DXVECTOR3 (x, y, z);
+		break;
+
+	default:
+		break;
+	}
 }
 
-void ModelClass::SetGunPosition(float x, float y, float z)
+D3DXVECTOR3 ModelClass::GetPosition (int obj)
 {
-	m_Objects[0].position.x = x;
-	m_Objects[0].position.y = y;
-	m_Objects[0].position.z = z;
+	switch (obj)
+	{
+	case 1:			//If the int type was = 1 (gun)
+		return m_Objects[0].position;
+	case 2:			//If the int type was = 2 (cube)
+		return m_Objects[1].position;
+		break;
+	}
 }
 
 int ModelClass::GetObjectCount()
