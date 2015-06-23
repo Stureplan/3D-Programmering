@@ -10,7 +10,7 @@ ModelClass::ModelClass()
 	m_indexBuffer = 0;
 	m_Texture = 0;
 	m_model = 0;
-	m_Objects = 0;
+	m_Object = 0;
 
 	//These are the default POSITIONS for each object in the scene
 	gun  = D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
@@ -28,7 +28,7 @@ ModelClass::~ModelClass()
 }
 
 
-bool ModelClass::Initialize(ID3D10Device* device, char* modelFilename, WCHAR* textureFilename)
+bool ModelClass::Initialize(ID3D10Device* device, int obj, char* modelFilename, WCHAR* textureFilename)
 {
 	bool result;
 
@@ -53,30 +53,43 @@ bool ModelClass::Initialize(ID3D10Device* device, char* modelFilename, WCHAR* te
 		return false;
 	}
 
+	m_Object = new Object;
+	switch (obj)
+	{
+	case 1:			//If the object is Gun
+		m_Object->position = gun;
+		break;
+	case 2:			//If the object is Cube
+		m_Object->position = cube;
+		break;
+
+	default:
+		break;
+	}
 	return true;
 }
 
-bool ModelClass::InitializeObjects(int objCount)
+/*bool ModelClass::InitializeObjects(int objCount)
 {
-	m_Objects = new Object[objCount];
+	m_Object = new Object[objCount];
 
 	//This is the gun object
-	m_Objects[0].position = gun;
+	m_Object.position = gun;
 
 	//This is the object in the middle
-	m_Objects[1].position = cube;
+	m_Object.position = cube;
 
 	return true;
+}*/
+
+void ModelClass::SetPosition (float x, float y, float z)
+{
+	m_Object->position = D3DXVECTOR3 (x, y, z);
 }
 
-void ModelClass::SetPosition (int obj, float x, float y, float z)
+D3DXVECTOR3 ModelClass::GetPosition ()
 {
-	m_Objects[obj-1].position = D3DXVECTOR3 (x, y, z);
-}
-
-D3DXVECTOR3 ModelClass::GetPosition (int obj)
-{
-	return m_Objects[obj-1].position;
+	return m_Object->position;
 }
 
 int ModelClass::GetObjectCount()
@@ -334,10 +347,10 @@ void ModelClass::ReleaseModel()
 		m_model = 0;
 	}
 
-	if (m_Objects)
+	if (m_Object)
 	{
-		delete[] m_Objects;
-		m_Objects = 0;
+		delete[] m_Object;
+		m_Object = 0;
 	}
 
 	return;

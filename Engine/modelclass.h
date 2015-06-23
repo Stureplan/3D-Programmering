@@ -31,6 +31,8 @@ private:
 		float x, y, z;
 		float tu, tv;
 		float nx, ny, nz;
+
+
 	};
 
 	struct Object
@@ -45,10 +47,9 @@ public:
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
-	bool Initialize(ID3D10Device*, char*, WCHAR*);
-	bool InitializeObjects(int);
-	void SetPosition (int, float, float, float);
-	D3DXVECTOR3 GetPosition (int);
+	bool Initialize(ID3D10Device*, int, char*, WCHAR*);
+	void SetPosition (float, float, float);
+	D3DXVECTOR3 GetPosition();
 	int GetObjectCount();
 	void Shutdown();
 	void Render(ID3D10Device*);
@@ -71,7 +72,7 @@ private:
 	int m_vertexCount, m_indexCount, m_objectCount;
 	TextureClass* m_Texture;
 	ModelType* m_model;
-	Object* m_Objects;
+	Object* m_Object;
 
 	D3DXVECTOR3 gun, cube;
 };

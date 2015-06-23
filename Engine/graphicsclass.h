@@ -48,12 +48,12 @@ private:
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
-	ModelClass* m_Models;
+	ModelClass* m_Gun;
+	ModelClass* m_Cube;
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
 	ConverterClass* m_Convert;
 
-	int objCount;
 	float movespeed;
 };
 

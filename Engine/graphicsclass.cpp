@@ -9,7 +9,8 @@ GraphicsClass::GraphicsClass()
 {
 	m_D3D = 0;
 	m_Camera = 0;
-	m_Models = 0;
+	m_Gun = 0;
+	m_Cube = 0;
 	m_LightShader = 0;
 	m_Light = 0;
 
@@ -58,8 +59,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
 	
 	// Create the model object.
-	m_Models = new ModelClass;
-	if(!m_Models)
+	m_Gun = new ModelClass;
+	if(!m_Gun)
+	{
+		return false;
+	}
+
+	m_Cube = new ModelClass;
+	if (!m_Cube)
 	{
 		return false;
 	}
@@ -73,10 +80,9 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	
 	m_Convert->Convert(1);	//Convert model01
 	m_Convert->Convert(2);	//Convert model02
-	objCount = 2;
 
-	// Initialize the model object.
-	result = m_Models->Initialize(m_D3D->GetDevice(), 
+	// Initialize the gun object.
+	result = m_Gun->Initialize(m_D3D->GetDevice(), 1,
 		"../Engine/data/model01.txt",
 		L"../Engine/data/dog.jpg");
 	if(!result)
@@ -85,10 +91,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	result = m_Models->InitializeObjects(objCount);
+	// Initialize the cube object.
+	result = m_Cube->Initialize (m_D3D->GetDevice (), 2,
+		"../Engine/data/model02.txt",
+		L"../Engine/data/dog.jpg");
 	if (!result)
 	{
-		MessageBox (hwnd, L"Could not initialize objects.", L"Error", MB_OK);
+		MessageBox (hwnd, L"Could not initialize the model01 object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -140,12 +149,20 @@ void GraphicsClass::Shutdown()
 		m_LightShader = 0;
 	}
 
-	// Release the model object.
-	if(m_Models)
+	// Release the gun object.
+	if(m_Gun)
 	{
-		m_Models->Shutdown();
-		delete m_Models;
-		m_Models = 0;
+		m_Gun->Shutdown();
+		delete m_Gun;
+		m_Gun = 0;
+	}
+
+	// Release the cube object.
+	if (m_Cube)
+	{
+		m_Cube->Shutdown ();
+		delete m_Cube;
+		m_Cube = 0;
 	}
 
 	// Release the camera object.
@@ -196,37 +213,37 @@ void GraphicsClass::Move (int dir)
 	if (dir == 1)	//MOVE FWD
 	{
 		pos = m_Camera->GetPosition ();
-		m_Camera->SetPosition    (pos.x, pos.y, pos.z + movespeed);
+		m_Camera->SetPosition (pos.x, pos.y, pos.z + movespeed);
 
-		pos = m_Models->GetPosition (1);
-		m_Models->SetPosition (1, pos.x, pos.y, pos.z + movespeed);
+		pos = m_Gun->GetPosition ();
+		m_Gun->SetPosition	  (pos.x, pos.y, pos.z + movespeed);
 	}
 
 	if (dir == 2)	//MOVE LEFT
 	{
 		pos = m_Camera->GetPosition ();
-		m_Camera->SetPosition    (pos.x - movespeed, pos.y, pos.z);
+		m_Camera->SetPosition (pos.x - movespeed, pos.y, pos.z);
 
-		pos = m_Models->GetPosition (1);
-		m_Models->SetPosition (1, pos.x - movespeed, pos.y, pos.z);
+		pos = m_Gun->GetPosition ();
+		m_Gun->SetPosition	  (pos.x - movespeed, pos.y, pos.z);
 	}
 
 	if (dir == 3)	//MOVE BACK
 	{
 		pos = m_Camera->GetPosition ();
-		m_Camera->SetPosition    (pos.x, pos.y, pos.z - movespeed);
+		m_Camera->SetPosition (pos.x, pos.y, pos.z - movespeed);
 
-		pos = m_Models->GetPosition (1);
-		m_Models->SetPosition (1, pos.x, pos.y, pos.z - movespeed);
+		pos = m_Gun->GetPosition ();
+		m_Gun->SetPosition	  (pos.x, pos.y, pos.z - movespeed);
 	}
 
 	if (dir == 4)	//MOVE RIGHT
 	{
 		pos = m_Camera->GetPosition ();
-		m_Camera->SetPosition    (pos.x + movespeed, pos.y, pos.z);
+		m_Camera->SetPosition (pos.x + movespeed, pos.y, pos.z);
 
-		pos = m_Models->GetPosition (1);
-		m_Models->SetPosition (1, pos.x + movespeed, pos.y, pos.z);
+		pos = m_Gun->GetPosition ();
+		m_Gun->SetPosition	  (pos.x + movespeed, pos.y, pos.z);
 	}
 }
 
@@ -242,6 +259,8 @@ bool GraphicsClass::Render(float rotation)
 	D3DXMATRIX scaleMatrix, rotationMatrix;
 	D3DXMATRIX translationMatrix;
 
+	D3DXVECTOR3 pos;
+
 	int index;
 	float pos_x, pos_y, pos_z;
 
@@ -256,25 +275,36 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D	 ->GetWorldMatrix(worldMatrix);
 	m_D3D	 ->GetProjectionMatrix(projectionMatrix);
 
-	//--OLD ROTATION TESTS, OBSOLETE BUT WILL CONTINUE TESTING--//
-	/*D3DXMatrixScaling(&scaleMatrix, 1.0f, 1.0f, 1.0f);
-	D3DXMatrixRotationY(&rotationMatrix, rotation);
-	D3DXMatrixTranslation(&translationMatrix, 0.0f, 0.0f, 0.0f);
-	D3DXMatrixMultiply(&worldMatrix, &scaleMatrix, &rotationMatrix);*/
 
-	for (int i = 0; i < objCount; i++)
-	{
-		D3DXVECTOR3 pos = m_Models->GetPosition (i+1);
-		D3DXMatrixTranslation (&worldMatrix, pos.x, pos.y, pos.z);
-		m_Models->Render (m_D3D->GetDevice ());
+	//-->OBJECT HANDLING-->
+
+	//1. Gun
+	//-------------------------------------------------------------------------//
+	pos = m_Gun->GetPosition ();
+	D3DXMatrixTranslation (&worldMatrix, pos.x, pos.y, pos.z);
+	m_Gun->Render (m_D3D->GetDevice ());
 		
-		m_LightShader->Render (m_D3D->GetDevice(), m_Models->GetIndexCount(), 
-							   worldMatrix, viewMatrix, projectionMatrix, 
-							   m_Models->GetTexture(), m_Light->GetDirection(), 
-							   m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
+	m_LightShader->Render (m_D3D->GetDevice(), m_Gun->GetIndexCount (),
+							worldMatrix, viewMatrix, projectionMatrix, 
+							m_Gun->GetTexture (), m_Light->GetDirection (),
+							m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
 
-		m_D3D->GetWorldMatrix (worldMatrix);
-	}
+	m_D3D->GetWorldMatrix (worldMatrix);
+	//-------------------------------------------------------------------------//
+
+	//2. Cube
+	//-------------------------------------------------------------------------//
+	pos = m_Cube->GetPosition ();
+	D3DXMatrixTranslation (&worldMatrix, pos.x, pos.y, pos.z);
+	m_Cube->Render (m_D3D->GetDevice ());
+
+	m_LightShader->Render (m_D3D->GetDevice (), m_Cube->GetIndexCount (),
+						   worldMatrix, viewMatrix, projectionMatrix,
+						   m_Cube->GetTexture (), m_Light->GetDirection (),
+						   m_Light->GetAmbientColor (), m_Light->GetDiffuseColor ());
+
+	m_D3D->GetWorldMatrix (worldMatrix);
+	//-------------------------------------------------------------------------//
 
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
