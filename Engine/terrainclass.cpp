@@ -79,6 +79,12 @@ bool TerrainClass::InitializeBuffers(ID3D10Device* device)
 		return false;
 	}
 
+	indices = new unsigned long[m_indexCount];
+	if (!indices)
+	{
+		return false;
+	}
+
 	// Initialize the index to the vertex array
 	index = 0;
 

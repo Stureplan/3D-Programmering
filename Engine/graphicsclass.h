@@ -14,6 +14,7 @@
 #include "lightshaderclass.h"
 #include "lightclass.h"
 #include "converter.h"
+#include "terrainclass.h"
 
 
 /////////////
@@ -52,7 +53,7 @@ private:
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
 	ConverterClass* m_Convert;
-
+	TerrainClass* m_Terrain;
 	int objCount;
 	float movespeed;
 };

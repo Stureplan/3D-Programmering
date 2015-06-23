@@ -11,6 +11,7 @@ GraphicsClass::GraphicsClass()
 	m_Models = 0;
 	m_LightShader = 0;
 	m_Light = 0;
+	m_Terrain = 0;
 
 	movespeed = 0.03f;
 }
@@ -56,6 +57,22 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	// Set the initial position of the camera.
 	m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
 	
+
+	// Create the terrain object
+	m_Terrain = new TerrainClass;
+	if (!m_Terrain)
+	{
+		return false;
+	}
+
+	// Initialize terrain object
+	result = m_Terrain->Initialize(m_D3D->GetDevice());
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize terrain object", L"Error", MB_OK);
+		return false;
+	}
+
 	// Create the model object.
 	m_Models = new ModelClass;
 	if(!m_Models)
@@ -139,6 +156,14 @@ void GraphicsClass::Shutdown()
 		m_LightShader->Shutdown();
 		delete m_LightShader;
 		m_LightShader = 0;
+	}
+
+	// Release the terrain object
+	if (m_Terrain)
+	{
+		m_Terrain->Shutdown();
+		delete m_Terrain;
+		m_Terrain = 0;
 	}
 
 	// Release the model object.
@@ -259,11 +284,13 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D	 ->GetWorldMatrix(worldMatrix);
 	m_D3D	 ->GetProjectionMatrix(projectionMatrix);
 
-	//--OLD ROTATION TESTS, OBSOLETE BUT WILL CONTINUE TESTING--//
-	/*D3DXMatrixScaling(&scaleMatrix, 1.0f, 1.0f, 1.0f);
-	D3DXMatrixRotationY(&rotationMatrix, rotation);
-	D3DXMatrixTranslation(&translationMatrix, 0.0f, 0.0f, 0.0f);
-	D3DXMatrixMultiply(&worldMatrix, &scaleMatrix, &rotationMatrix);*/
+	// Render the terrain
+	m_Terrain->Render(m_D3D->GetDevice());
+
+	// Render the model using the light shader
+	m_LightShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	
 
 	for (int i = 0; i < objCount; i++)
 	{

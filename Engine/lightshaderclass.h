@@ -28,6 +28,7 @@ public:
 	void Shutdown();
 	void Render(ID3D10Device*, int, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
 					ID3D10ShaderResourceView*, D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4);
+	void Render(ID3D10Device*, int, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX);
 
 private:
 	bool InitializeShader(ID3D10Device*, HWND, WCHAR*);
@@ -36,6 +37,7 @@ private:
 
 	void SetShaderParameters(D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
 			ID3D10ShaderResourceView*, D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4);
+	void SetShaderParameters(D3DXMATRIX, D3DXMATRIX, D3DXMATRIX);
 	void RenderShader(ID3D10Device*, int);
 
 private:
