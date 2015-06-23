@@ -34,12 +34,12 @@ public:
 	ConverterClass(const ConverterClass&);
 	~ConverterClass();
 
-	int Convert();
+	int Convert(int);
 
 private:
-	void GetModelFilename(char*);
+	void GetModelFilename(char*, int);
 	bool ReadFileCounts(char*, int&, int&, int&, int&);
-	bool LoadDataStructures(char*, int, int, int, int);
+	bool LoadDataStructures(char*, int, int, int, int, int);
 };
 
 

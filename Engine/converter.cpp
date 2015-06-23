@@ -16,15 +16,16 @@ ConverterClass::~ConverterClass()
 
 }
 
-int ConverterClass::Convert()
+int ConverterClass::Convert(int type)
 {
 	bool result;
-	char filename[29];
+	char filename[27];
+
 	int vertexCount, textureCount, normalCount, faceCount;
 	char garbage;
 
 	//Read the name of the model file
-	GetModelFilename(filename);
+	GetModelFilename(filename, type);
 
 
 	//Read the number of vvertices, texture coords, normals and faces
@@ -36,16 +37,9 @@ int ConverterClass::Convert()
 		return -1;
 	}
 
-	//Display the counts to the screen for information purposes.
-	cout << endl;
-	cout << "Vertices: " << vertexCount << endl;
-	cout << "UVs: " << textureCount << endl;
-	cout << "Normals: " << normalCount << endl;
-	cout << "Faces: " << faceCount << endl;
-
 	//Now read the data from the file into the data structures and then
 	//output it in our model format, (x, y, z, U, V, nx, ny, nz)
-	result = LoadDataStructures(filename, vertexCount, textureCount,
+	result = LoadDataStructures(filename, type, vertexCount, textureCount,
 											normalCount, faceCount);
 	if (!result)
 	{
@@ -55,11 +49,25 @@ int ConverterClass::Convert()
 	return 0;
 }
 
-void ConverterClass::GetModelFilename(char* filename)
+void ConverterClass::GetModelFilename(char* filename, int type)
 {
 	ifstream fin;
-	char localFilename[] = "../Engine/data/doggycube.obj";
-	for (int i = 0; i < 29; i++)
+	char* localFilename;
+
+	switch (type)
+	{
+	case 1:			//If the int type was = 1
+		localFilename = "../Engine/data/model01.obj";
+		break;
+	case 2:			//If the int type was = 2
+		localFilename = "../Engine/data/model02.obj";
+		break;
+
+	default:
+		break;
+	}
+
+	for (int i = 0; i < 27; i++)
 	{
 		filename[i] = localFilename[i];
 	}
@@ -134,8 +142,8 @@ bool ConverterClass::ReadFileCounts(char* filename, int& vertexCount,
 	return true;
 }
 
-bool ConverterClass::LoadDataStructures(char* filename, int vertexCount,
-						int textureCount, int normalCount, int faceCount)
+bool ConverterClass::LoadDataStructures(char* filename, int type, int vertexCount,
+										int textureCount, int normalCount, int faceCount)
 {
 	VertexType *vertices, *texcoords, *normals;
 	FaceType *faces;
@@ -254,7 +262,18 @@ bool ConverterClass::LoadDataStructures(char* filename, int vertexCount,
 	fin.close();
 
 	//Open the output file.
-	fout.open("../Engine/data/dogbox.txt");
+	switch (type)
+	{
+	case 1:			//If the int type was = 1
+		fout.open ("../Engine/data/model01.txt");
+		break;
+	case 2:			//If the int type was = 2
+		fout.open ("../Engine/data/model02.txt");
+		break;
+
+	default:
+		break;
+	}
 
 	//Write out the file header that our model format uses.
 	fout << "Vertex Count: " << (faceCount * 3) << endl;

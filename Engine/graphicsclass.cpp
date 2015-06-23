@@ -61,17 +61,17 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	//FunctionGo <--- EXECUTE EXPORTER FUNCTION HERE
 	m_Convert = new ConverterClass;
 	if (!m_Convert)
 	{
 		return false;
 	}
-	m_Convert->Convert();
+	m_Convert->Convert(1);	//Convert model01
+	m_Convert->Convert(2);	//Convert model02
 
 	// Initialize the model object.
 	result = m_Model->Initialize(m_D3D->GetDevice(), 
-		"../Engine/data/dogbox.txt", 
+		"../Engine/data/model01.txt",
 		L"../Engine/data/dog.jpg");
 	if(!result)
 	{

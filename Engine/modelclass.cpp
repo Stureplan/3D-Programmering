@@ -25,8 +25,8 @@ ModelClass::~ModelClass()
 
 
 bool ModelClass::Initialize(ID3D10Device* device, char* modelFilename, WCHAR* textureFilename)
-{																			//^--- Takes a .dds texture
-	bool result;															//as filename on initialize
+{
+	bool result;
 
 	//Load in the model data
 	result = LoadModel(modelFilename);
