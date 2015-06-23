@@ -12,6 +12,7 @@ ModelClass::ModelClass()
 	m_model = 0;
 	m_Objects = 0;
 
+	//These are the default POSITION values for each object in the scene
 	gun  = D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
 	cube = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
 }
@@ -100,15 +101,6 @@ D3DXVECTOR3 ModelClass::GetPosition (int obj)
 int ModelClass::GetObjectCount()
 {
 	return m_objectCount;
-}
-
-void ModelClass::GetObjectData(int index, float& pos_x, float& pos_y, float& pos_z)
-{
-	pos_x = m_Objects[index].position.x;
-	pos_y = m_Objects[index].position.y;
-	pos_z = m_Objects[index].position.z;
-
-	return;
 }
 
 void ModelClass::Shutdown()
@@ -359,6 +351,12 @@ void ModelClass::ReleaseModel()
 	{
 		delete[] m_model;
 		m_model = 0;
+	}
+
+	if (m_Objects)
+	{
+		delete[] m_Objects;
+		m_Objects = 0;
 	}
 
 	return;

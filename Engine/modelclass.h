@@ -50,7 +50,6 @@ public:
 	void SetPosition (int, float, float, float);
 	D3DXVECTOR3 GetPosition (int);
 	int GetObjectCount();
-	void GetObjectData(int, float&, float&, float&);
 	void Shutdown();
 	void Render(ID3D10Device*);
 	int GetIndexCount();

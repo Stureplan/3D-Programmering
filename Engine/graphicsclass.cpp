@@ -181,7 +181,7 @@ bool GraphicsClass::Frame()
 	}
 
 	// Render the graphics scene.
-	result = Render(rotation);		//Calls the GraphicsClass::Render function every frame.
+	result = Render(rotation);
 	if(!result)
 	{
 		return false;
@@ -267,8 +267,8 @@ bool GraphicsClass::Render(float rotation)
 
 	for (int i = 0; i < objCount; i++)
 	{
-		m_Models->GetObjectData(i, pos_x, pos_y, pos_z);
-		D3DXMatrixTranslation (&worldMatrix, pos_x, pos_y, pos_z);
+		D3DXVECTOR3 pos = m_Models->GetPosition (i+1);
+		D3DXMatrixTranslation (&worldMatrix, pos.x, pos.y, pos.z);
 		m_Models->Render (m_D3D->GetDevice ());
 		
 		m_LightShader->Render (m_D3D->GetDevice(), m_Models->GetIndexCount(), 
