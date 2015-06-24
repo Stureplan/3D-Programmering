@@ -11,6 +11,8 @@ ModelClass::ModelClass()
 	m_Texture = 0;
 	m_model = 0;
 	m_Object = 0;
+
+	defaultpos = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
 }
 
 
@@ -18,7 +20,7 @@ ModelClass::ModelClass(const ModelClass& other)
 {
 }
 
-ModelClass::ModelClass (D3DXVECTOR3 pos)
+ModelClass::ModelClass (D3DXVECTOR3 pos, ID3D10Device* device, char* model, WCHAR* texture)
 {
 	m_vertexBuffer = 0;
 	m_indexBuffer = 0;
@@ -26,8 +28,11 @@ ModelClass::ModelClass (D3DXVECTOR3 pos)
 	m_model = 0;
 	m_Object = 0;
 
-	int test = 1;
-	def = pos;
+	defaultpos = pos;
+	m_Object = new Object;
+	m_Object->position = defaultpos;
+
+	Initialize (device, model, texture);
 }
 
 
@@ -36,12 +41,12 @@ ModelClass::~ModelClass()
 }
 
 
-bool ModelClass::Initialize(ID3D10Device* device, char* modelFilename, WCHAR* textureFilename)
+bool ModelClass::Initialize(ID3D10Device* device, char* model, WCHAR* texture)
 {
 	bool result;
 
 	//Load in the model data
-	result = LoadModel (modelFilename);
+	result = LoadModel (model);
 	if (!result)
 	{
 		return false;
@@ -55,14 +60,13 @@ bool ModelClass::Initialize(ID3D10Device* device, char* modelFilename, WCHAR* te
 	}
 
 	// Load the texture for this model.
-	result = LoadTexture (device, textureFilename);
+	result = LoadTexture (device, texture);
 	if (!result)
 	{
 		return false;
 	}
 
-	m_Object = new Object;
-	m_Object->position = def;
+
 
 	return true;
 }

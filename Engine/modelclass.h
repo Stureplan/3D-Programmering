@@ -45,7 +45,7 @@ private:
 public:
 	ModelClass();
 	ModelClass(const ModelClass&);
-	ModelClass(D3DXVECTOR3);
+	ModelClass(D3DXVECTOR3, ID3D10Device*, char*, WCHAR*);
 	~ModelClass();
 
 	bool Initialize(ID3D10Device*, char*, WCHAR*);
@@ -75,7 +75,7 @@ private:
 	ModelType* m_model;
 	Object* m_Object;
 
-	D3DXVECTOR3 def;
+	D3DXVECTOR3 defaultpos;
 };
 
 #endif

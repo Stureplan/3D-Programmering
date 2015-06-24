@@ -16,9 +16,9 @@ GraphicsClass::GraphicsClass()
 
 	movespeed = 0.03f;
 	//These are the POSITIONS for each object in the scene
-	gun = D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
+	gun  = D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
 	cube = D3DXVECTOR3 (0.0f, 0.5f, 0.0f);
-	def = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
+	def  = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
 }
 
 
@@ -62,12 +62,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	// Set the initial position of the camera.
 	m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
 	
-	// Create the model objects.
-	m_Gun  = new ModelClass(gun);
-	m_Cube = new ModelClass(cube);
-	//TODO: Make sure Initialize is being run from constructor
-	//instead of separate function. This allows for cleaner, 
-	//better code and less confusion.
 
 	m_Convert = new ConverterClass;
 	if (!m_Convert)
@@ -75,19 +69,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	
-	m_Convert->Convert(1);	//Convert model01
-	m_Convert->Convert(2);	//Convert model02
+	m_Convert->Convert (1);	//Convert model01
+	m_Convert->Convert (2);	//Convert model02
 
-	// Initialize the gun object.
-	m_Gun->Initialize  (m_D3D->GetDevice(),
-		 "../Engine/data/model01.txt",
-		L"../Engine/data/dog.jpg");
+	// Create the model objects.
+	m_Gun  = new ModelClass (gun, m_D3D->GetDevice (),  "../Engine/data/model01.txt", L"../Engine/data/dog.jpg");
+	m_Cube = new ModelClass (cube, m_D3D->GetDevice (), "../Engine/data/model02.txt", L"../Engine/data/dog.jpg");
 
-	// Initialize the cube object.
-	m_Cube->Initialize (m_D3D->GetDevice(),
-		 "../Engine/data/model02.txt",
-		L"../Engine/data/dog.jpg");
 
 	//Create the light shader object
 	m_LightShader = new LightShaderClass;
