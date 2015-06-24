@@ -55,6 +55,7 @@ private:
 	ConverterClass* m_Convert;
 
 	float movespeed;
+	D3DXVECTOR3 gun, cube, def;
 };
 
 #endif

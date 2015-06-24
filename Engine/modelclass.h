@@ -45,9 +45,10 @@ private:
 public:
 	ModelClass();
 	ModelClass(const ModelClass&);
+	ModelClass(D3DXVECTOR3);
 	~ModelClass();
 
-	bool Initialize(ID3D10Device*, int, char*, WCHAR*);
+	bool Initialize(ID3D10Device*, char*, WCHAR*);
 	void SetPosition (float, float, float);
 	D3DXVECTOR3 GetPosition();
 	int GetObjectCount();
@@ -74,7 +75,7 @@ private:
 	ModelType* m_model;
 	Object* m_Object;
 
-	D3DXVECTOR3 gun, cube, def;
+	D3DXVECTOR3 def;
 };
 
 #endif

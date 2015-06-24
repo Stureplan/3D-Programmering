@@ -11,16 +11,23 @@ ModelClass::ModelClass()
 	m_Texture = 0;
 	m_model = 0;
 	m_Object = 0;
-
-	//These are the POSITIONS for each object in the scene
-	gun  = D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
-	cube = D3DXVECTOR3 (0.0f, 0.5f, 0.0f);
-	def  = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
 }
 
 
 ModelClass::ModelClass(const ModelClass& other)
 {
+}
+
+ModelClass::ModelClass (D3DXVECTOR3 pos)
+{
+	m_vertexBuffer = 0;
+	m_indexBuffer = 0;
+	m_Texture = 0;
+	m_model = 0;
+	m_Object = 0;
+
+	int test = 1;
+	def = pos;
 }
 
 
@@ -29,7 +36,7 @@ ModelClass::~ModelClass()
 }
 
 
-bool ModelClass::Initialize(ID3D10Device* device, int obj, char* modelFilename, WCHAR* textureFilename)
+bool ModelClass::Initialize(ID3D10Device* device, char* modelFilename, WCHAR* textureFilename)
 {
 	bool result;
 
@@ -55,34 +62,11 @@ bool ModelClass::Initialize(ID3D10Device* device, int obj, char* modelFilename, 
 	}
 
 	m_Object = new Object;
-	switch (obj)
-	{
-	case 1:			//If the object is Gun
-		m_Object->position = gun;
-		break;
-	case 2:			//If the object is Cube
-		m_Object->position = cube;
-		break;
+	m_Object->position = def;
 
-	default:		//If the object is out of scope/undefined
-		m_Object->position = def;
-		break;
-	}
 	return true;
 }
 
-/*bool ModelClass::InitializeObjects(int objCount)
-{
-	m_Object = new Object[objCount];
-
-	//This is the gun object
-	m_Object.position = gun;
-
-	//This is the object in the middle
-	m_Object.position = cube;
-
-	return true;
-}*/
 
 void ModelClass::SetPosition (float x, float y, float z)
 {
