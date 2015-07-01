@@ -76,7 +76,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Gun  = new ModelClass (gun, m_D3D->GetDevice (),  "../Engine/data/model01.txt", L"../Engine/data/dog.jpg");
 	m_Cube = new ModelClass (cube, m_D3D->GetDevice (), "../Engine/data/model02.txt", L"../Engine/data/dog.jpg");
 
-
 	//Create the light shader object
 	m_LightShader = new LightShaderClass;
 	if (!m_LightShader)
@@ -184,7 +183,6 @@ bool GraphicsClass::Frame()
 
 void GraphicsClass::Move (int dir)
 {
-	D3DXVECTOR3 pos;
 
 	if (dir == 1)	//MOVE FWD
 	{

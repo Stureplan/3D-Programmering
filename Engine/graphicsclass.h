@@ -56,6 +56,7 @@ private:
 
 	float movespeed;
 	D3DXVECTOR3 gun, cube, def;
+	D3DXVECTOR3 pos;
 };
 
 #endif
