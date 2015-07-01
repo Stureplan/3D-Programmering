@@ -65,11 +65,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	// Initialize terrain object
-	result = m_Terrain->Initialize(m_D3D->GetDevice());
+	// Initialize the terrain object
+	result = m_Terrain->Initialize(m_D3D->GetDevice(), "../Engine/data/heightmap01.bmp");
 	if (!result)
 	{
-		MessageBox(hwnd, L"Could not initialize terrain object", L"Error", MB_OK);
+		MessageBox(hwnd, L"Could not initialize the terrain object.", L"Error", MB_OK);
 		return false;
 	}
 

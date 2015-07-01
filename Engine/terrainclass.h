@@ -7,6 +7,7 @@
 
 #include <D3D10.h>
 #include <D3DX10math.h>
+#include <stdio.h>
 
 class TerrainClass
 {
@@ -17,18 +18,27 @@ private:
 		D3DXVECTOR4 color;
 	};
 
+	struct HeightMapType
+	{
+		float x, y, z;
+	};
+
 public:
 	TerrainClass();
 	TerrainClass(const TerrainClass&);
 	~TerrainClass();
 
-	bool Initialize(ID3D10Device*);
+	bool Initialize(ID3D10Device*, char*);
 	void Shutdown();
 	void Render(ID3D10Device*);
 
 	int GetIndexCount();
 
 private:
+	bool LoadHeightMap(char*);
+	void NormalizeHeightMap();
+	void ShutdownHeightMap();
+
 	bool InitializeBuffers(ID3D10Device*);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D10Device*);
@@ -37,6 +47,8 @@ public:
 	int m_terrainWidth, m_terrainHeight;
 	int m_vertexCount, m_indexCount;
 	ID3D10Buffer *m_vertexBuffer, *m_indexBuffer;
+
+	HeightMapType* m_heightMap;
 
 };
 

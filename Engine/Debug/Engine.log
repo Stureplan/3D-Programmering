@@ -1,4 +1,4 @@
-﻿Build started 2015-06-28 21:08:10.
+﻿Build started 2015-07-01 22:03:32.
      1>Project "G:\3D Programmering\3D-Programmering\Engine\Engine.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          G:\Visual Studio 2015\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt terrainclass.cpp
@@ -51,7 +51,8 @@
          c:\program files (x86)\windows kits\8.1\include\shared\winerror.h(50445): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
      1>c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
          c:\program files (x86)\windows kits\8.1\include\shared\winerror.h(50454): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
-     1>g:\3d programmering\3d-programmering\engine\terrainclass.cpp(66): warning C4101: 'vertedData': unreferenced local variable
+     1>g:\3d programmering\3d-programmering\engine\terrainclass.cpp(205): warning C4101: 'positionX': unreferenced local variable
+     1>g:\3d programmering\3d-programmering\engine\terrainclass.cpp(205): warning C4101: 'positionZ': unreferenced local variable
        Link:
          G:\Visual Studio 2015\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"G:\3D Programmering\3D-Programmering\Debug\Engine.exe" /INCREMENTAL /NOLOGO d3dx10.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"G:\3D Programmering\3D-Programmering\Debug\Engine.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"G:\3D Programmering\3D-Programmering\Debug\Engine.lib" /MACHINE:X86 Debug\cameraclass.obj
          Debug\converter.obj
@@ -70,4 +71,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.45
+Time Elapsed 00:00:01.79
