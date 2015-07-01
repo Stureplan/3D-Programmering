@@ -1,4 +1,4 @@
-﻿Build started 2015-06-23 22:10:36.
+﻿Build started 2015-06-28 21:08:10.
      1>Project "G:\3D Programmering\3D-Programmering\Engine\Engine.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          G:\Visual Studio 2015\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt terrainclass.cpp
@@ -70,4 +70,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.37
+Time Elapsed 00:00:01.45

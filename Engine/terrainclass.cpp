@@ -180,10 +180,18 @@ bool TerrainClass::InitializeBuffers(ID3D10Device* device)
 	vertexBufferDesc.MiscFlags = 0;
 	//vertexBufferDesc.StructureByteStride = 0;
 
+
 	// Give the subresource structure a pointer to the index data.
 	indexData.pSysMem = indices;
 	indexData.SysMemPitch = 0;
 	indexData.SysMemSlicePitch = 0;
+
+	indexBufferDesc.Usage = D3D10_USAGE_DEFAULT;
+	indexBufferDesc.ByteWidth = sizeof(DWORD) * m_vertexCount;
+	indexBufferDesc.BindFlags = D3D10_BIND_INDEX_BUFFER;
+	indexBufferDesc.CPUAccessFlags = 0;
+	indexBufferDesc.MiscFlags = 0;
+	
 
 	// Create the index buffer
 	result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
