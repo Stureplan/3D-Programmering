@@ -9,16 +9,28 @@ GraphicsClass::GraphicsClass()
 {
 	m_D3D = 0;
 	m_Camera = 0;
-	m_Gun = 0;
-	m_Cube = 0;
-	m_LightShader = 0;
 	m_Light = 0;
 
+	m_Gun = 0;
+	m_Cube = 0;
+	m_GroundCube = 0;
+
+	m_ShadowShader = 0;
+	m_DepthShader = 0;
+	m_RenderTexture = 0;
+	m_NormalMapShader = 0;
+
 	movespeed = 0.03f;
+
 	//These are the POSITIONS for each object in the scene
-	gun  = D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
-	cube = D3DXVECTOR3 (0.0f, 0.5f, 0.0f);
-	def  = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
+	gun		= D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
+	cube	= D3DXVECTOR3 (0.0f, 0.5f, 0.0f);
+	def		= D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
+	ground	= D3DXVECTOR3 (0.0f, -1.0f, 0.0f);
+	cube2	= D3DXVECTOR3 (1.5f, -0.3f, 0.0f);
+
+
+	D3DXMatrixIdentity(&rot);
 }
 
 
@@ -69,27 +81,16 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	m_Convert->Convert (1);	//Convert model01
-	m_Convert->Convert (2);	//Convert model02
+	m_Convert->Convert (1);	//Convert model01 (gun)
+	m_Convert->Convert (2);	//Convert model02 (cube)
+	m_Convert->Convert (3); //Convert model03 (ground plane)
 
 	// Create the model objects.
-	m_Gun  = new ModelClass (gun, m_D3D->GetDevice (),  "../Engine/data/model01.txt", L"../Engine/data/dog.jpg");
-	m_Cube = new ModelClass (cube, m_D3D->GetDevice (), "../Engine/data/model02.txt", L"../Engine/data/dog.jpg");
-
-	//Create the light shader object
-	m_LightShader = new LightShaderClass;
-	if (!m_LightShader)
-	{
-		return false;
-	}
-
-	//Initialize the texture shader object
-	result = m_LightShader->Initialize(m_D3D->GetDevice(), hwnd);
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the light shader object.", L"Error", MB_OK);
-		return false;
-	}
+	m_Gun		 = new ModelClass (gun,    m_D3D->GetDevice (), "../Engine/data/model01.txt", L"../Engine/data/dog.jpg", false);
+	m_Cube		 = new ModelClass (cube,   m_D3D->GetDevice (), "../Engine/data/model02.txt", L"../Engine/data/dog.jpg", false);
+	m_GroundCube = new ModelClass (ground, m_D3D->GetDevice (), "../Engine/data/model03.txt", L"../Engine/data/dog.jpg", false);
+	m_NormalCube = new ModelClass (cube2,  m_D3D->GetDevice (), "../Engine/data/model02.txt", L"../Engine/data/dog.jpg", true);
+	m_NormalCube->SetRotation(0.0f, 0.0f, 0.0f);
 
 	//Create the new light object.
 	m_Light = new LightClass;
@@ -98,10 +99,22 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	//Initialize the light object.
-	m_Light->SetAmbientColor(0.3f, 0.3f, 0.3f, 1.0f);
-	m_Light->SetDiffuseColor(1.0f, 0.0f, 0.0f, 1.0f);
-	m_Light->SetDirection   (1.0f, 0.0f, 0.0f);
+	m_Light->SetAmbientColor	 (0.05f, 0.05f, 0.05f, 1.0f);
+	m_Light->SetDiffuseColor	 (1.0f, 1.0f, 1.0f, 1.0f);
+	m_Light->SetLookAt			 (0.0f, -1.5f, 1.0f);
+	m_Light->GenerateOrthoMatrix (20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
+	m_Light->SetPosition		 (0.0f, 5.0f, 0.0f);
+	m_Light->SetDirection		 (0.0f, -1.5f, 2.0f);
+
+	m_RenderTexture	  = new RenderTextureClass;
+	m_DepthShader	  = new DepthShaderClass;
+	m_ShadowShader	  = new ShadowShaderClass;
+	m_NormalMapShader = new NormalMapShaderClass;
+
+	m_RenderTexture	 ->Initialize (m_D3D->GetDevice (), SHADOWMAP_WIDTH, SHADOWMAP_HEIGHT, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
+	m_DepthShader	 ->Initialize (m_D3D->GetDevice (), hwnd);
+	m_ShadowShader	 ->Initialize (m_D3D->GetDevice (), hwnd);
+	m_NormalMapShader->Initialize (m_D3D->GetDevice (), hwnd);
 
 	return true;
 }
@@ -109,22 +122,41 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
-	//Release the light object
+	//Release objects
 	if (m_Light)
 	{
 		delete m_Light;
 		m_Light = 0;
 	}
 
-	// Release the texture shader object.
-	if(m_LightShader)
+	if (m_ShadowShader)
 	{
-		m_LightShader->Shutdown();
-		delete m_LightShader;
-		m_LightShader = 0;
+		m_ShadowShader->Shutdown ();
+		delete m_ShadowShader;
+		m_ShadowShader = 0;
 	}
 
-	// Release the gun object.
+	if (m_DepthShader)
+	{
+		m_DepthShader->Shutdown ();
+		delete m_DepthShader;
+		m_DepthShader = 0;
+	}
+
+	if (m_RenderTexture)
+	{
+		m_RenderTexture->Shutdown ();
+		delete m_RenderTexture;
+		m_RenderTexture = 0;
+	}
+
+	if (m_NormalMapShader)
+	{
+		m_NormalMapShader->Shutdown ();
+		delete m_NormalMapShader;
+		m_NormalMapShader = 0;
+	}
+
 	if(m_Gun)
 	{
 		m_Gun->Shutdown();
@@ -132,7 +164,6 @@ void GraphicsClass::Shutdown()
 		m_Gun = 0;
 	}
 
-	// Release the cube object.
 	if (m_Cube)
 	{
 		m_Cube->Shutdown ();
@@ -140,14 +171,19 @@ void GraphicsClass::Shutdown()
 		m_Cube = 0;
 	}
 
-	// Release the camera object.
+	if (m_GroundCube)
+	{
+		m_GroundCube->Shutdown ();
+		delete m_GroundCube;
+		m_GroundCube = 0;
+	}
+
 	if(m_Camera)
 	{
 		delete m_Camera;
 		m_Camera = 0;
 	}
 
-	// Release the D3D object.
 	if(m_D3D)
 	{
 		m_D3D->Shutdown();
@@ -162,21 +198,19 @@ void GraphicsClass::Shutdown()
 bool GraphicsClass::Frame()			
 {
 	bool result;
-
 	static float rotation = 0.0f;
-
-	rotation += (float)D3DX_PI * 0.01f;
+	rotation += (float) D3DX_PI * 0.005f;
 	if (rotation > 360.0f)
 	{
 		rotation -= 360.0f;
 	}
 
+	//D3DXVECTOR3 pos = m_Cube->GetPosition();
+	//m_Cube->SetPosition(pos.x+0.01f, pos.y, pos.z);
+
+	
 	// Render the graphics scene.
-	result = Render(rotation);
-	if(!result)
-	{
-		return false;
-	}
+	Render(rotation);
 
 	return true;
 }
@@ -226,6 +260,53 @@ void GraphicsClass::Launch ()
 
 }
 
+bool GraphicsClass::RenderSceneToTexture ()
+{
+	D3DXMATRIX worldMatrix, lightViewMatrix, lightOrthoMatrix, translateMatrix;
+	D3DXVECTOR3 xyz;
+
+	m_RenderTexture->SetRenderTarget   (m_D3D->GetDevice ());
+	m_RenderTexture->ClearRenderTarget (m_D3D->GetDevice (), 0.0f, 0.0f, 0.0f, 1.0f);
+
+	m_Light->GenerateViewMatrix ();
+	m_D3D  ->GetWorldMatrix (worldMatrix);
+	m_Light->GetViewMatrix	(lightViewMatrix);
+	m_Light->GetOrthoMatrix (lightOrthoMatrix);
+
+	//Render cube shadow
+	xyz = m_Cube->GetPosition ();
+	D3DXMatrixTranslation (&worldMatrix, xyz.x, xyz.y, xyz.z);
+	m_Cube		 ->Render (m_D3D->GetDevice ());
+	m_DepthShader->Render (m_D3D->GetDevice (), m_Cube->GetIndexCount (), worldMatrix, lightViewMatrix, lightOrthoMatrix);
+
+	//Reset
+	m_D3D->GetWorldMatrix (worldMatrix);
+
+	//Render ground shadow
+	xyz = m_GroundCube->GetPosition ();
+	D3DXMatrixTranslation (&worldMatrix, xyz.x, xyz.y, xyz.z);
+	m_GroundCube ->Render (m_D3D->GetDevice ());
+	m_DepthShader->Render (m_D3D->GetDevice (), m_GroundCube->GetIndexCount (), worldMatrix, lightViewMatrix, lightOrthoMatrix);
+
+	//Reset
+	m_D3D->GetWorldMatrix (worldMatrix);
+
+	//Render normal cube shadow
+	xyz = m_NormalCube->GetPosition ();
+	D3DXMatrixTranslation (&worldMatrix, xyz.x, xyz.y, xyz.z);
+
+	D3DXMatrixMultiply(&worldMatrix, &rot, &worldMatrix);
+	
+	m_NormalCube ->Render (m_D3D->GetDevice ());
+	m_DepthShader->Render (m_D3D->GetDevice (), m_NormalCube->GetIndexCount (), worldMatrix, lightViewMatrix, lightOrthoMatrix);
+
+	//Set rendering target to normal
+	m_D3D->SetBackBufferRenderTarget ();
+	m_D3D->ResetViewport ();
+
+	return true;
+}
+
 
 bool GraphicsClass::Render(float rotation)
 {
@@ -233,10 +314,14 @@ bool GraphicsClass::Render(float rotation)
 	D3DXMATRIX scaleMatrix, rotationMatrix;
 	D3DXMATRIX translationMatrix;
 
+	D3DXMATRIX lightViewMatrix, lightOrthoMatrix;
+
 	D3DXVECTOR3 pos;
 
 	int index;
 	float pos_x, pos_y, pos_z;
+	
+	RenderSceneToTexture ();
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
@@ -244,41 +329,99 @@ bool GraphicsClass::Render(float rotation)
 	// Generate the view matrix based on the camera's position.
 	m_Camera->Render();
 
+	m_Light->GenerateViewMatrix ();
+
 	// Get the world, view, and projection matrices from the camera and d3d objects.
 	m_Camera ->GetViewMatrix(viewMatrix);
 	m_D3D	 ->GetWorldMatrix(worldMatrix);
 	m_D3D	 ->GetProjectionMatrix(projectionMatrix);
 
+	m_Light->GetViewMatrix  (lightViewMatrix);
+	m_Light->GetOrthoMatrix (lightOrthoMatrix);
 
-	//-->OBJECT HANDLING-->
 
+	//					--v-- OBJECT HANDLING --v--
 	//1. Gun
 	//-------------------------------------------------------------------------//
 	pos = m_Gun->GetPosition ();
 	D3DXMatrixTranslation (&worldMatrix, pos.x, pos.y, pos.z);
-	m_Gun->Render (m_D3D->GetDevice ());
-		
-	m_LightShader->Render (m_D3D->GetDevice(), m_Gun->GetIndexCount (),
-							worldMatrix, viewMatrix, projectionMatrix, 
-							m_Gun->GetTexture (), m_Light->GetDirection (),
-							m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
 
-	m_D3D->GetWorldMatrix (worldMatrix);
+	m_Gun		  ->Render (m_D3D->GetDevice ());
+	m_ShadowShader->Render (m_D3D->GetDevice(), m_Gun->GetIndexCount (),
+							worldMatrix, viewMatrix, projectionMatrix,
+							lightViewMatrix, lightOrthoMatrix,
+							m_Gun->GetTexture (), m_RenderTexture->GetShaderResourceView (),
+							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Light->GetDiffuseColor ());
 	//-------------------------------------------------------------------------//
+
+
+
 
 	//2. Cube
 	//-------------------------------------------------------------------------//
+	m_D3D->GetWorldMatrix (worldMatrix);
 	pos = m_Cube->GetPosition ();
 	D3DXMatrixTranslation (&worldMatrix, pos.x, pos.y, pos.z);
-	m_Cube->Render (m_D3D->GetDevice ());
 
-	m_LightShader->Render (m_D3D->GetDevice (), m_Cube->GetIndexCount (),
-						   worldMatrix, viewMatrix, projectionMatrix,
-						   m_Cube->GetTexture (), m_Light->GetDirection (),
-						   m_Light->GetAmbientColor (), m_Light->GetDiffuseColor ());
 
-	m_D3D->GetWorldMatrix (worldMatrix);
+	//rotation
+	D3DXMatrixRotationY(&worldMatrix, rotation);
+	D3DXMatrixRotationY(&rot, rotation);
+
+	D3DXMatrixTranslation(&translationMatrix, pos.x, pos.y, pos.z);
+	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
+
+
+
+
+	m_Cube		  ->Render (m_D3D->GetDevice ());
+	m_ShadowShader->Render (m_D3D->GetDevice (), m_Cube->GetIndexCount (),
+							worldMatrix, viewMatrix, projectionMatrix,
+							lightViewMatrix, lightOrthoMatrix,
+							m_Cube->GetTexture (), m_RenderTexture->GetShaderResourceView (),
+							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Light->GetDiffuseColor ());
 	//-------------------------------------------------------------------------//
+
+
+
+
+	//3. GroundCube
+	//-------------------------------------------------------------------------//
+	m_D3D->GetWorldMatrix (worldMatrix);
+	pos = m_GroundCube->GetPosition ();
+	D3DXMatrixTranslation (&worldMatrix, pos.x, pos.y, pos.z);
+
+	m_GroundCube  ->Render (m_D3D->GetDevice ());
+	m_ShadowShader->Render (m_D3D->GetDevice (), m_Cube->GetIndexCount (),
+							worldMatrix, viewMatrix, projectionMatrix,
+							lightViewMatrix, lightOrthoMatrix,
+							m_Cube->GetTexture (), m_RenderTexture->GetShaderResourceView (),
+							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Light->GetDiffuseColor ());
+	//-------------------------------------------------------------------------//
+
+
+
+
+	//3. NormalCube
+	//-------------------------------------------------------------------------//
+	m_D3D->GetWorldMatrix (worldMatrix);
+	pos = m_NormalCube->GetPosition ();
+	D3DXMatrixTranslation (&worldMatrix, pos.x, pos.y, pos.z);
+
+	//rotation
+	D3DXMatrixRotationY (&worldMatrix, rotation);
+	D3DXMatrixRotationY(&rot, rotation);
+	
+	D3DXMatrixTranslation (&translationMatrix, pos.x, pos.y, pos.z);
+	D3DXMatrixMultiply	  (&worldMatrix, &worldMatrix, &translationMatrix);
+
+	m_NormalCube	 ->Render (m_D3D->GetDevice ());
+	m_NormalMapShader->Render (m_D3D->GetDevice (), m_NormalCube->GetIndexCount (),
+							   worldMatrix, viewMatrix, projectionMatrix,
+							   m_NormalCube->GetTexture (), m_NormalCube->GetNormalmap (),
+							   m_Light->GetDirection (), m_Light->GetDiffuseColor ());
+	//-------------------------------------------------------------------------//
+
 
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();

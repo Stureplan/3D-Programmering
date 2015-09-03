@@ -138,7 +138,7 @@ bool SystemClass::Frame()
 		return false;
 	}
 
-	//---	MOVEMENT	---//
+	//---MOVEMENT---//
 	if (m_Input->IsKeyDown (VK_UP))
 	{
 		m_Graphics->Move (1);

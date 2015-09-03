@@ -56,13 +56,14 @@ void ConverterClass::GetModelFilename(char* filename, int type)
 
 	switch (type)
 	{
-	case 1:			//If the int type was = 1
+	case 1:			//If the int type was = 1 (gun)
 		localFilename = "../Engine/data/model01.obj";
 		break;
-	case 2:			//If the int type was = 2
+	case 2:			//If the int type was = 2 (cube)
 		localFilename = "../Engine/data/model02.obj";
 		break;
-
+	case 3:			//If the int type was = 3 (ground plane)
+		localFilename = "../Engine/data/model03.obj";
 	default:
 		break;
 	}
@@ -264,11 +265,14 @@ bool ConverterClass::LoadDataStructures(char* filename, int type, int vertexCoun
 	//Open the output file.
 	switch (type)
 	{
-	case 1:			//If the int type was = 1
+	case 1:			//If the int type was = 1 (gun)
 		fout.open ("../Engine/data/model01.txt");
 		break;
-	case 2:			//If the int type was = 2
+	case 2:			//If the int type was = 2 (cube)
 		fout.open ("../Engine/data/model02.txt");
+		break;
+	case 3:			//If the int type was = 3 (ground plane)
+		fout.open ("../Engine/data/model03.txt");
 		break;
 
 	default:
