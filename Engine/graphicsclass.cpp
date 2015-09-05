@@ -101,10 +101,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	m_Light->SetAmbientColor	 (0.05f, 0.05f, 0.05f, 1.0f);
 	m_Light->SetDiffuseColor	 (1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light->SetLookAt			 (0.0f, -1.5f, 1.0f);
+	m_Light->SetLookAt			 (-2.0f, -1.0f, 0.0f);
 	m_Light->GenerateOrthoMatrix (20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
-	m_Light->SetPosition		 (0.0f, 5.0f, 0.0f);
-	m_Light->SetDirection		 (0.0f, -1.5f, 2.0f);
+	m_Light->SetPosition		 (2.0f, 5.0f, 0.0f);
+	m_Light->SetDirection		 (-2.0f, -1.0f, 0.0f);
 
 	m_RenderTexture	  = new RenderTextureClass;
 	m_DepthShader	  = new DepthShaderClass;

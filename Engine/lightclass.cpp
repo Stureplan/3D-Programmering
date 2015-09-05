@@ -71,7 +71,7 @@ void LightClass::GenerateViewMatrix ()
 	up.x = 0.0f;
 	up.y = 1.0f; 
 	up.z = 0.0f;
-	D3DXMatrixLookAtLH (&m_viewMatrix, &m_position, &m_lookAt, &up);
+	D3DXMatrixLookAtLH (&m_viewMatrix, &m_position, &m_direction, &up);
 	return;
 }
 
