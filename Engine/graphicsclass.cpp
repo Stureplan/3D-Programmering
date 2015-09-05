@@ -276,6 +276,8 @@ bool GraphicsClass::RenderSceneToTexture ()
 	//Render cube shadow
 	xyz = m_Cube->GetPosition ();
 	D3DXMatrixTranslation (&worldMatrix, xyz.x, xyz.y, xyz.z);
+	D3DXMatrixMultiply (&worldMatrix, &rot, &worldMatrix);
+
 	m_Cube		 ->Render (m_D3D->GetDevice ());
 	m_DepthShader->Render (m_D3D->GetDevice (), m_Cube->GetIndexCount (), worldMatrix, lightViewMatrix, lightOrthoMatrix);
 
@@ -294,7 +296,6 @@ bool GraphicsClass::RenderSceneToTexture ()
 	//Render normal cube shadow
 	xyz = m_NormalCube->GetPosition ();
 	D3DXMatrixTranslation (&worldMatrix, xyz.x, xyz.y, xyz.z);
-
 	D3DXMatrixMultiply(&worldMatrix, &rot, &worldMatrix);
 	
 	m_NormalCube ->Render (m_D3D->GetDevice ());
