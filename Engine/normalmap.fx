@@ -53,7 +53,7 @@ PixelInputType NormalMapVertexShader (VertexInputType input)
 	output.tangent = normalize (output.tangent);
 
 	output.binormal = mul (input.binormal, (float3x3)worldMatrix);
-	output.binormal = normalize (output.tangent);
+	output.binormal = normalize (output.binormal);
 
 	return output;
 }
@@ -71,7 +71,7 @@ float4 NormalMapPixelShader (PixelInputType input) : SV_Target
 	textureColor = shaderTexture.Sample (SampleType, input.tex);
 
 	normalMap = shaderNormalTexture.Sample (SampleType, input.tex);
-	normalMap = (normalMap * 10.0f) - 1.0f;
+	normalMap = (normalMap * 15.0f) - 1.0f;
 	bumpNormal = (normalMap.x * input.tangent) + (normalMap.y * input.binormal) + (normalMap.z * input.normal);
 	bumpNormal = normalize (bumpNormal);
 

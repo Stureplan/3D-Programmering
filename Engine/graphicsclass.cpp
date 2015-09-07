@@ -24,10 +24,10 @@ GraphicsClass::GraphicsClass()
 
 	//These are the POSITIONS for each object in the scene
 	gun		= D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
-	cube	= D3DXVECTOR3 (0.0f, 0.5f, 0.0f);
+	cube	= D3DXVECTOR3 (0.0f, 0.3f, 0.0f);
 	def		= D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
 	ground	= D3DXVECTOR3 (0.0f, -1.0f, 0.0f);
-	cube2	= D3DXVECTOR3 (1.5f, -0.3f, 0.0f);
+	cube2	= D3DXVECTOR3 (2.5f, 0.3f, 0.0f);
 
 
 	D3DXMatrixIdentity(&rot);
@@ -90,7 +90,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Cube		 = new ModelClass (cube,   m_D3D->GetDevice (), "../Engine/data/model02.txt", L"../Engine/data/dog.jpg", false);
 	m_GroundCube = new ModelClass (ground, m_D3D->GetDevice (), "../Engine/data/model03.txt", L"../Engine/data/dog.jpg", false);
 	m_NormalCube = new ModelClass (cube2,  m_D3D->GetDevice (), "../Engine/data/model02.txt", L"../Engine/data/dog.jpg", true);
-	m_NormalCube->SetRotation(0.0f, 0.0f, 0.0f);
 
 	//Create the new light object.
 	m_Light = new LightClass;
