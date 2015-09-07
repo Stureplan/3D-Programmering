@@ -107,6 +107,16 @@ D3DXVECTOR3 ModelClass::GetRotation()
 	return m_Object->rotation;
 }
 
+void ModelClass::SetScale(float x, float y, float z)
+{
+	m_Object->scale = D3DXVECTOR3 (x, y, z);
+}
+
+D3DXVECTOR3 ModelClass::GetScale()
+{
+	return m_Object->scale;
+}
+
 
 int ModelClass::GetObjectCount()
 {

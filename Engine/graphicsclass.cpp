@@ -20,13 +20,13 @@ GraphicsClass::GraphicsClass()
 	m_RenderTexture = 0;
 	m_NormalMapShader = 0;
 
-	movespeed = 0.03f;
+	movespeed = 0.09f;
 
 	//These are the POSITIONS for each object in the scene
 	gun		= D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
 	cube	= D3DXVECTOR3 (0.0f, 0.3f, 0.0f);
 	def		= D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
-	ground	= D3DXVECTOR3 (0.0f, -1.0f, 0.0f);
+	ground	= D3DXVECTOR3 (0.0f, -2.0f, 0.0f);
 	cube2	= D3DXVECTOR3 (2.5f, 0.3f, 0.0f);
 
 
@@ -204,8 +204,8 @@ bool GraphicsClass::Frame()
 		rotation -= 360.0f;
 	}
 
-	//D3DXVECTOR3 pos = m_Cube->GetPosition();
-	//m_Cube->SetPosition(pos.x+0.01f, pos.y, pos.z);
+	//D3DXVECTOR3 pos = m_GroundCube->GetPosition();
+	//m_GroundCube->SetPosition(pos.x+0.01f, pos.y, pos.z);
 
 	
 	// Render the graphics scene.
@@ -262,7 +262,7 @@ void GraphicsClass::Launch ()
 bool GraphicsClass::RenderSceneToTexture ()
 {
 	D3DXMATRIX worldMatrix, lightViewMatrix, lightOrthoMatrix, translateMatrix;
-	D3DXVECTOR3 xyz;
+	D3DXVECTOR3 xyz, scale;
 
 	m_RenderTexture->SetRenderTarget   (m_D3D->GetDevice ());
 	m_RenderTexture->ClearRenderTarget (m_D3D->GetDevice (), 0.0f, 0.0f, 0.0f, 1.0f);
@@ -279,13 +279,15 @@ bool GraphicsClass::RenderSceneToTexture ()
 
 	m_Cube		 ->Render (m_D3D->GetDevice ());
 	m_DepthShader->Render (m_D3D->GetDevice (), m_Cube->GetIndexCount (), worldMatrix, lightViewMatrix, lightOrthoMatrix);
-
+	
 	//Reset
 	m_D3D->GetWorldMatrix (worldMatrix);
 
 	//Render ground shadow
 	xyz = m_GroundCube->GetPosition ();
+	//scale = m_GroundCube->GetScale ();
 	D3DXMatrixTranslation (&worldMatrix, xyz.x, xyz.y, xyz.z);
+	//D3DXMatrixScaling (&worldMatrix, scale.x, scale.y, scale.z);
 	m_GroundCube ->Render (m_D3D->GetDevice ());
 	m_DepthShader->Render (m_D3D->GetDevice (), m_GroundCube->GetIndexCount (), worldMatrix, lightViewMatrix, lightOrthoMatrix);
 

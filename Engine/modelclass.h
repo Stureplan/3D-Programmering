@@ -69,6 +69,8 @@ public:
 	D3DXVECTOR3 GetPosition();
 	void SetRotation(float, float, float);
 	D3DXVECTOR3 GetRotation();
+	void SetScale (float, float, float);
+	D3DXVECTOR3 GetScale();
 	int GetObjectCount();
 	void Shutdown();
 	void Render(ID3D10Device*);
