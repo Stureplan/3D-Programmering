@@ -8,10 +8,11 @@ GraphicsClass::GraphicsClass()
 {
 	m_D3D = 0;
 	m_Camera = 0;
+	m_Terrain = 0;
 	m_Models = 0;
 	m_LightShader = 0;
 	m_Light = 0;
-	m_Terrain = 0;
+	
 
 	movespeed = 0.03f;
 }
@@ -131,9 +132,9 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	//Initialize the light object.
-	m_Light->SetAmbientColor(0.3f, 0.3f, 0.3f, 1.0f);
-	m_Light->SetDiffuseColor(1.0f, 0.0f, 0.0f, 1.0f);
-	m_Light->SetDirection(1.0f, 0.0f, 0.0f);
+	m_Light->SetAmbientColor(0.5f, 0.5f, 0.5f, 1.0f);
+	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_Light->SetDirection(0.0f, 0.0f, 0.74f);
 
 	return true;
 }
@@ -264,7 +265,7 @@ void GraphicsClass::Launch ()
 
 bool GraphicsClass::Render(float rotation)
 {
-	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 	D3DXMATRIX scaleMatrix, rotationMatrix;
 	D3DXMATRIX translationMatrix;
 
@@ -283,12 +284,13 @@ bool GraphicsClass::Render(float rotation)
 	m_Camera ->GetViewMatrix(viewMatrix);
 	m_D3D	 ->GetWorldMatrix(worldMatrix);
 	m_D3D	 ->GetProjectionMatrix(projectionMatrix);
+	m_D3D    ->GetOrthoMatrix(orthoMatrix);
 
 	// Render the terrain
 	m_Terrain->Render(m_D3D->GetDevice());
 
 	// Render the model using the light shader
-	m_LightShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	m_LightShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), m_Light->GetDirection());
 	m_D3D->GetWorldMatrix(worldMatrix);
 	
 

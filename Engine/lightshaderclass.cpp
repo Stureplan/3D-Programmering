@@ -72,7 +72,7 @@ void LightShaderClass::Render(ID3D10Device* device, int indexCount, D3DXMATRIX w
 }
 
 void LightShaderClass::Render(ID3D10Device* device, int indexCount, D3DXMATRIX worldMatrix,
-	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix)
+	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor, D3DXVECTOR3 lightDirection)
 {
 	// Set the shader parameters that it will use for rendering.
 	SetShaderParameters(worldMatrix, viewMatrix, projectionMatrix);
