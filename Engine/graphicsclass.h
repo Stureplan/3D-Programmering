@@ -69,9 +69,11 @@ private:
 	RenderTextureClass*	  m_RenderTexture;
 	NormalMapShaderClass* m_NormalMapShader;
 
-	float movespeed;
+	float movespeed, rotatespeed;
 	D3DXVECTOR3 gun, cube, def, ground, cube2;
-	D3DXVECTOR3 pos;
+	D3DXVECTOR3 cam_pos, gun_pos, rotate;
+	D3DXVECTOR3 camera_forward, camera_lookat, camera_up;
+	D3DXVECTOR3 camera_left, camera_right;
 	D3DXMATRIX rot;
 };
 

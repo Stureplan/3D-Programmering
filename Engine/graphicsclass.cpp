@@ -21,6 +21,7 @@ GraphicsClass::GraphicsClass()
 	m_NormalMapShader = 0;
 
 	movespeed = 0.09f;
+	rotatespeed = 1.0f;
 
 	//These are the POSITIONS for each object in the scene
 	gun		= D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
@@ -31,6 +32,7 @@ GraphicsClass::GraphicsClass()
 
 
 	D3DXMatrixIdentity(&rot);
+	camera_up = { 0.0f, 1.0f, 0.0f };
 }
 
 
@@ -203,10 +205,6 @@ bool GraphicsClass::Frame()
 	{
 		rotation -= 360.0f;
 	}
-
-	//D3DXVECTOR3 pos = m_GroundCube->GetPosition();
-	//m_GroundCube->SetPosition(pos.x+0.01f, pos.y, pos.z);
-
 	
 	// Render the graphics scene.
 	Render(rotation);
@@ -216,41 +214,54 @@ bool GraphicsClass::Frame()
 
 void GraphicsClass::Move (int dir)
 {
+	cam_pos		  = m_Camera->GetPosition ();
+	gun_pos		  = m_Gun	->GetPosition ();
+	rotate		  = m_Camera->GetRotation ();
+	camera_lookat = m_Camera->GetLookAt	  ();
+
+	camera_forward = camera_lookat - cam_pos;
+	D3DXVec3Normalize (&camera_forward, &camera_forward);
 
 	if (dir == 1)	//MOVE FWD
 	{
-		pos = m_Camera->GetPosition ();
-		m_Camera->SetPosition (pos.x, pos.y, pos.z + movespeed);
-
-		pos = m_Gun->GetPosition ();
-		m_Gun->SetPosition	  (pos.x, pos.y, pos.z + movespeed);
+		cam_pos		  = cam_pos		  + camera_forward * movespeed;
+		camera_lookat = camera_lookat + camera_forward * movespeed;
+		m_Camera->SetPosition (cam_pos.x, cam_pos.y, cam_pos.z);
 	}
 
 	if (dir == 2)	//MOVE LEFT
 	{
-		pos = m_Camera->GetPosition ();
-		m_Camera->SetPosition (pos.x - movespeed, pos.y, pos.z);
+		D3DXVec3Cross (&camera_left, &camera_forward, &camera_up);
 
-		pos = m_Gun->GetPosition ();
-		m_Gun->SetPosition	  (pos.x - movespeed, pos.y, pos.z);
+		cam_pos		  = cam_pos		  + camera_left * movespeed;
+		camera_lookat = camera_lookat + camera_left * movespeed;
+		m_Camera->SetPosition (cam_pos.x, cam_pos.y, cam_pos.z);
 	}
 
 	if (dir == 3)	//MOVE BACK
 	{
-		pos = m_Camera->GetPosition ();
-		m_Camera->SetPosition (pos.x, pos.y, pos.z - movespeed);
-
-		pos = m_Gun->GetPosition ();
-		m_Gun->SetPosition	  (pos.x, pos.y, pos.z - movespeed);
+		cam_pos		  = cam_pos		  - camera_forward * movespeed;
+		camera_lookat = camera_lookat - camera_forward * movespeed;
+		m_Camera->SetPosition (cam_pos.x, cam_pos.y, cam_pos.z);
 	}
 
 	if (dir == 4)	//MOVE RIGHT
 	{
-		pos = m_Camera->GetPosition ();
-		m_Camera->SetPosition (pos.x + movespeed, pos.y, pos.z);
+		D3DXVec3Cross (&camera_right, &camera_up, &camera_forward);
 
-		pos = m_Gun->GetPosition ();
-		m_Gun->SetPosition	  (pos.x + movespeed, pos.y, pos.z);
+		cam_pos		  = cam_pos		  + camera_right * movespeed;
+		camera_lookat = camera_lookat + camera_right * movespeed;
+		m_Camera->SetPosition (cam_pos.x, cam_pos.y, cam_pos.z);
+	}
+
+	if (dir == 5) //ROTATE LEFT
+	{
+		m_Camera->SetRotation (rotate.x, rotate.y - rotatespeed, rotate.z);
+	}
+
+	if (dir == 6) //ROTATE RIGHT
+	{
+		m_Camera->SetRotation (rotate.x, rotate.y + rotatespeed, rotate.z);
 	}
 }
 
@@ -346,7 +357,8 @@ bool GraphicsClass::Render(float rotation)
 	//1. Gun
 	//-------------------------------------------------------------------------//
 	pos = m_Gun->GetPosition ();
-	D3DXMatrixTranslation (&worldMatrix, pos.x, pos.y, pos.z);
+	D3DXMatrixTranslation (&translationMatrix, pos.x, pos.y, pos.z);
+	D3DXMatrixMultiply (&worldMatrix, &worldMatrix, &translationMatrix);
 
 	m_Gun		  ->Render (m_D3D->GetDevice ());
 	m_ShadowShader->Render (m_D3D->GetDevice(), m_Gun->GetIndexCount (),
