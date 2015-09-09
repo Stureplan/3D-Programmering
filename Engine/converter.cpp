@@ -16,17 +16,12 @@ ConverterClass::~ConverterClass()
 
 }
 
-int ConverterClass::Convert(int type)
+int ConverterClass::Convert(WCHAR* filename, int type)
 {
 	bool result;
-	char filename[27];
 
 	int vertexCount, textureCount, normalCount, faceCount;
 	char garbage;
-
-	//Read the name of the model file
-	GetModelFilename(filename, type);
-
 
 	//Read the number of vvertices, texture coords, normals and faces
 	//so that the data structures can be initialized with the exact sizes needed.
@@ -40,7 +35,7 @@ int ConverterClass::Convert(int type)
 	//Now read the data from the file into the data structures and then
 	//output it in our model format, (x, y, z, U, V, nx, ny, nz)
 	result = LoadDataStructures(filename, type, vertexCount, textureCount,
-											normalCount, faceCount);
+								normalCount, faceCount);
 	if (!result)
 	{
 		return -1;
@@ -49,37 +44,14 @@ int ConverterClass::Convert(int type)
 	return 0;
 }
 
-void ConverterClass::GetModelFilename(char* filename, int type)
-{
-	ifstream fin;
-	char* localFilename;
-
-	switch (type)
-	{
-	case 1:			//If the int type was = 1 (gun)
-		localFilename = "../Engine/data/model01.obj";
-		break;
-	case 2:			//If the int type was = 2 (cube)
-		localFilename = "../Engine/data/model02.obj";
-		break;
-	case 3:			//If the int type was = 3 (ground plane)
-		localFilename = "../Engine/data/model03.obj";
-	default:
-		break;
-	}
-
-	for (int i = 0; i < 27; i++)
-	{
-		filename[i] = localFilename[i];
-	}
-	return;
-}
-
-bool ConverterClass::ReadFileCounts(char* filename, int& vertexCount,
+bool ConverterClass::ReadFileCounts(WCHAR* filename, int& vertexCount,
 	int& textureCount, int& normalCount, int& faceCount)
 {
 	ifstream fin;
 	char input;
+	char mtlfile[30];
+	WCHAR* mtl;
+	int mtlchars = 0;
 
 	//Initialize the counts.
 	vertexCount = 0;
@@ -101,6 +73,40 @@ bool ConverterClass::ReadFileCounts(char* filename, int& vertexCount,
 	fin.get(input);
 	while (!fin.eof())
 	{
+		//Check for mtllib and then write the mtl filename to mtlfile[]
+		//We are assuming the following: 
+		//1. The .OBJ file has an .MTL file associated with it (written in the .OBJ)
+		//2. The .MTL file is not corrupt or missing
+
+		if (input == 'm')
+		{
+			fin.get (input);
+			if (input == 't')
+			{
+				fin.get (input);
+				if (input == 'l')
+				{
+					fin.get (input);
+					if (input == 'l')
+					{
+						fin.get (input); //i
+						fin.get (input); //b
+						fin.get (input); //(whitespace)
+						fin.get (input); //first letter
+						while (input != '\n')
+						{
+							mtlfile[mtlchars] = input;
+							fin.get (input);
+							mtlchars++;
+						}
+						mtlfile[mtlchars] = '\0';
+						ReadMaterialFile (mtlfile);
+					}
+				}
+			}
+		}
+
+
 		//If the line starts with v then count either the vertex,
 		//the texture coordinates or the normal vector.
 		if (input == 'v')
@@ -143,7 +149,7 @@ bool ConverterClass::ReadFileCounts(char* filename, int& vertexCount,
 	return true;
 }
 
-bool ConverterClass::LoadDataStructures(char* filename, int type, int vertexCount,
+bool ConverterClass::LoadDataStructures(WCHAR* filename, int type, int vertexCount,
 										int textureCount, int normalCount, int faceCount)
 {
 	VertexType *vertices, *texcoords, *normals;
@@ -156,28 +162,9 @@ bool ConverterClass::LoadDataStructures(char* filename, int type, int vertexCoun
 
 	//Initialize the four data structures
 	vertices = new VertexType[vertexCount];
-	if (!vertices)
-	{
-		return false;
-	}
-
 	texcoords = new VertexType[textureCount];
-	if (!texcoords)
-	{
-		return false;
-	}
-
 	normals = new VertexType[normalCount];
-	if (!normals)
-	{
-		return false;
-	}
-
 	faces = new FaceType[faceCount];
-	if (!faces)
-	{
-		return false;
-	}
 
 	//Initialize the indexes
 	vertexIndex = 0;
@@ -342,4 +329,16 @@ bool ConverterClass::LoadDataStructures(char* filename, int type, int vertexCoun
 	}
 
 	return true;
+}
+
+void ConverterClass::ReadMaterialFile (char* filename)
+{
+	char input;
+	ifstream fin;
+	char filepath[16] = {'.','.','/','E','n','g','i','n','e','/','d','a','t','a','/','\0'};
+	string totalname = filepath;
+	totalname = totalname + filename;
+
+	fin.open (totalname);
+	fin.get (input);
 }

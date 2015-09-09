@@ -21,7 +21,7 @@ ModelClass::ModelClass(const ModelClass& other)
 {
 }
 
-ModelClass::ModelClass (D3DXVECTOR3 pos, ID3D10Device* device, char* model, WCHAR* texture, bool normalMapped)
+ModelClass::ModelClass (D3DXVECTOR3 pos, ID3D10Device* device, WCHAR* model, WCHAR* texture, bool normalMapped)
 {
 	m_vertexBuffer = 0;
 	m_indexBuffer = 0;
@@ -43,7 +43,7 @@ ModelClass::~ModelClass()
 }
 
 
-bool ModelClass::Initialize(ID3D10Device* device, char* model, WCHAR* texture)
+bool ModelClass::Initialize(ID3D10Device* device, WCHAR* model, WCHAR* texture)
 {
 	bool result;
 
@@ -338,7 +338,7 @@ void ModelClass::ReleaseTexture()
 	return;
 }
 
-bool ModelClass::LoadModel(char* filename)
+bool ModelClass::LoadModel(WCHAR* filename)
 {
 	ifstream fin;
 	char input;

@@ -8,6 +8,8 @@
 //////////////
 // INCLUDES //
 //////////////
+#include <D3D10.h>
+#include <D3DX10.h>
 #include <fstream>
 using namespace std;
 #include "textureclass.h"
@@ -61,10 +63,10 @@ private:
 public:
 	ModelClass();
 	ModelClass(const ModelClass&);
-	ModelClass(D3DXVECTOR3, ID3D10Device*, char*, WCHAR*, bool);
+	ModelClass(D3DXVECTOR3, ID3D10Device*, WCHAR*, WCHAR*, bool);
 	~ModelClass();
 
-	bool Initialize(ID3D10Device*, char*, WCHAR*);
+	bool Initialize(ID3D10Device*, WCHAR*, WCHAR*);
 	void SetPosition (float, float, float);
 	D3DXVECTOR3 GetPosition();
 	void SetRotation(float, float, float);
@@ -85,7 +87,7 @@ private:
 	bool LoadTexture(ID3D10Device*, WCHAR*);
 	void LoadNormalmap (ID3D10Device*, WCHAR*);
 	void ReleaseTexture();
-	bool LoadModel(char*);
+	bool LoadModel(WCHAR*);
 	void ReleaseModel();
 
 	void CalculateModelVectors ();

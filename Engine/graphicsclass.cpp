@@ -32,7 +32,8 @@ GraphicsClass::GraphicsClass()
 
 
 	D3DXMatrixIdentity(&rot);
-	camera_up = { 0.0f, 1.0f, 0.0f };
+	camera_up  = { 0.0f, 1.0f, 0.0f };
+	gun_offset = { 0.5f,-0.5f, 1.5f };
 }
 
 
@@ -83,15 +84,16 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	m_Convert->Convert (1);	//Convert model01 (gun)
-	m_Convert->Convert (2);	//Convert model02 (cube)
-	m_Convert->Convert (3); //Convert model03 (ground plane)
+	//Convert all the models we're using to our format
+	m_Convert->Convert (L"../Engine/data/model01.obj", 1);	//Convert model01 (gun)
+	m_Convert->Convert (L"../Engine/data/model02.obj", 2);	//Convert model02 (cube)
+	m_Convert->Convert (L"../Engine/data/model03.obj", 3); //Convert model03 (ground plane)
 
 	// Create the model objects.
-	m_Gun		 = new ModelClass (gun,    m_D3D->GetDevice (), "../Engine/data/model01.txt", L"../Engine/data/dog.jpg", false);
-	m_Cube		 = new ModelClass (cube,   m_D3D->GetDevice (), "../Engine/data/model02.txt", L"../Engine/data/dog.jpg", false);
-	m_GroundCube = new ModelClass (ground, m_D3D->GetDevice (), "../Engine/data/model03.txt", L"../Engine/data/dog.jpg", false);
-	m_NormalCube = new ModelClass (cube2,  m_D3D->GetDevice (), "../Engine/data/model02.txt", L"../Engine/data/dog.jpg", true);
+	m_Gun		 = new ModelClass (gun,    m_D3D->GetDevice (), L"../Engine/data/model01.txt", L"../Engine/data/dog.jpg", false);
+	m_Cube		 = new ModelClass (cube,   m_D3D->GetDevice (), L"../Engine/data/model02.txt", L"../Engine/data/dog.jpg", false);
+	m_GroundCube = new ModelClass (ground, m_D3D->GetDevice (), L"../Engine/data/model03.txt", L"../Engine/data/dog.jpg", false);
+	m_NormalCube = new ModelClass (cube2,  m_D3D->GetDevice (), L"../Engine/data/model02.txt", L"../Engine/data/dog.jpg", true);
 
 	//Create the new light object.
 	m_Light = new LightClass;
@@ -263,6 +265,10 @@ void GraphicsClass::Move (int dir)
 	{
 		m_Camera->SetRotation (rotate.x, rotate.y + rotatespeed, rotate.z);
 	}
+
+	//gun_pos = camera_lookat;
+	//m_Gun->SetPosition (gun_pos.x, gun_pos.y, gun_pos.z);
+	//m_Gun->SetRotation (rotate.x, rotate.y, rotate.z);
 }
 
 void GraphicsClass::Launch ()
@@ -329,7 +335,7 @@ bool GraphicsClass::Render(float rotation)
 
 	D3DXMATRIX lightViewMatrix, lightOrthoMatrix;
 
-	D3DXVECTOR3 pos;
+	D3DXVECTOR3 pos, rotate;
 
 	int index;
 	float pos_x, pos_y, pos_z;
@@ -366,6 +372,7 @@ bool GraphicsClass::Render(float rotation)
 							lightViewMatrix, lightOrthoMatrix,
 							m_Gun->GetTexture (), m_RenderTexture->GetShaderResourceView (),
 							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Light->GetDiffuseColor ());
+
 	//-------------------------------------------------------------------------//
 
 
@@ -384,9 +391,6 @@ bool GraphicsClass::Render(float rotation)
 
 	D3DXMatrixTranslation(&translationMatrix, pos.x, pos.y, pos.z);
 	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
-
-
-
 
 	m_Cube		  ->Render (m_D3D->GetDevice ());
 	m_ShadowShader->Render (m_D3D->GetDevice (), m_Cube->GetIndexCount (),
