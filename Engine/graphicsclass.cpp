@@ -87,7 +87,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//Convert all the models we're using to our format
 	m_Convert->Convert (L"../Engine/data/model01.obj", 1);	//Convert model01 (gun)
 	m_Convert->Convert (L"../Engine/data/model02.obj", 2);	//Convert model02 (cube)
-	m_Convert->Convert (L"../Engine/data/model03.obj", 3); //Convert model03 (ground plane)
+	m_Convert->Convert (L"../Engine/data/model03.obj", 3);  //Convert model03 (ground plane)
 
 	// Create the model objects.
 	m_Gun		 = new ModelClass (gun,    m_D3D->GetDevice (), L"../Engine/data/model01.txt", L"../Engine/data/dog.jpg", false);

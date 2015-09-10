@@ -97,6 +97,8 @@ private:
 private:
 	ID3D10Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount, m_objectCount;
+	string texturefile;
+	float r, g, b;
 	bool m_normalMapped;
 	TextureClass* m_Texture;
 	TextureClass* m_Normalmap;
