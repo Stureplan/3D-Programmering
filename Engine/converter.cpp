@@ -49,7 +49,7 @@ bool ConverterClass::ReadFileCounts(WCHAR* filename, int& vertexCount,
 {
 	ifstream fin;
 	char input;
-	char mtlfile[30];
+	char mtlfile[50];
 	WCHAR* mtl;
 	int mtlchars = 0;
 
@@ -77,6 +77,7 @@ bool ConverterClass::ReadFileCounts(WCHAR* filename, int& vertexCount,
 		//We are assuming the following: 
 		//1. The .OBJ file has an .MTL file associated with it (written in the .OBJ)
 		//2. The .MTL file is not corrupt or missing
+		//3. In the .MTL we assume that either a texture is specified or a diffuse
 
 		if (input == 'm')
 		{
@@ -300,6 +301,20 @@ bool ConverterClass::LoadDataStructures(WCHAR* filename, int type, int vertexCou
 			<< normals[nIndex].x << ' ' << normals[nIndex].y << ' ' << normals[nIndex].z << endl;
 	}
 
+	fout << "t: ";
+	if (textured)
+	{
+		fout << "y" << endl;
+		fout << "p: " << texturename << endl;
+	}
+	else if (!textured)
+	{
+		fout << "n" << endl;
+		fout << "c: " << r << " " << g << " " << b << endl;
+	}
+
+
+
 	//Close the output file.
 	fout.close();
 
@@ -333,12 +348,66 @@ bool ConverterClass::LoadDataStructures(WCHAR* filename, int type, int vertexCou
 
 void ConverterClass::ReadMaterialFile (char* filename)
 {
+	textured = false;
 	char input;
 	ifstream fin;
+	char texturefile[50];
+	int texchars = 0;
 	char filepath[16] = {'.','.','/','E','n','g','i','n','e','/','d','a','t','a','/','\0'};
 	string totalname = filepath;
+	texturename = filepath;
 	totalname = totalname + filename;
 
 	fin.open (totalname);
 	fin.get (input);
+
+	while (!fin.eof ())
+	{
+		fin.get (input);
+		if (input == '\n')
+		{
+			fin.get (input);
+			if (input == 'K')
+			{
+				fin.get (input);
+				if (input == 'd')
+				{
+					fin.get (input);
+					if (input == ' ')
+					{
+						fin >> r >> g >> b;
+					}
+				}
+			}
+		}
+
+		if (input == 'm')
+		{
+			fin.get (input);
+			if (input == 'a')
+			{
+				fin.get (input);
+				if (input == 'p')
+				{
+					fin.get (input); //underscore
+					fin.get (input); //K
+					fin.get (input); //d
+					fin.get (input); //whitespace
+
+					fin.get (input); //first letter
+					while (input != '\n')
+					{
+						texturefile[texchars] = input;
+						fin.get (input);
+						texchars++;
+					}
+					texturefile[texchars] = '\0';
+					textured = true;
+					texturename = texturename + texturefile;
+				}
+			}
+		}
+	}
+	
+
 }

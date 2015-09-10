@@ -42,6 +42,9 @@ public:
 private:
 	bool ReadFileCounts(WCHAR*, int&, int&, int&, int&);
 	bool LoadDataStructures(WCHAR*, int, int, int, int, int);
+	float r, g, b;
+	bool textured;
+	string texturename;
 };
 
 
