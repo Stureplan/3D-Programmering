@@ -14,7 +14,7 @@ GraphicsClass::GraphicsClass()
 	m_Light = 0;
 	
 
-	movespeed = 0.03f;
+	movespeed = 0.1f;
 }
 
 
@@ -67,7 +67,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the terrain object
-	result = m_Terrain->Initialize(m_D3D->GetDevice(), "../Engine/data/heightmap01.bmp");
+	result = m_Terrain->Initialize(m_D3D->GetDevice(), "../Engine/data/heightmap01.bmp", L"../Engine/data/floor.jpg");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the terrain object.", L"Error", MB_OK);
@@ -286,11 +286,11 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D	 ->GetProjectionMatrix(projectionMatrix);
 	m_D3D    ->GetOrthoMatrix(orthoMatrix);
 
-	// Render the terrain
+	// Render the terrain buffers
 	m_Terrain->Render(m_D3D->GetDevice());
 
 	// Render the model using the light shader
-	m_LightShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), m_Light->GetDirection());
+	m_LightShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Models->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
 	m_D3D->GetWorldMatrix(worldMatrix);
 	
 
