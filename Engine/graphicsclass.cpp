@@ -24,7 +24,7 @@ GraphicsClass::GraphicsClass()
 	rotatespeed = 1.0f;
 
 	//These are the POSITIONS for each object in the scene
-	gun		= D3DXVECTOR3 (0.5f, -0.5f, -3.5f);
+	gun		= D3DXVECTOR3 (0.5f, -0.5f, -2.5f);
 	cube	= D3DXVECTOR3 (0.0f, 0.3f, 0.0f);
 	def		= D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
 	ground	= D3DXVECTOR3 (0.0f, -2.0f, 0.0f);
@@ -376,7 +376,6 @@ bool GraphicsClass::Render(float rotation)
 
 
 
-
 	//2. Cube
 	//-------------------------------------------------------------------------//
 	m_D3D->GetWorldMatrix (worldMatrix);
@@ -399,7 +398,6 @@ bool GraphicsClass::Render(float rotation)
 							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Cube->GetDiffuse());
 	//-------------------------------------------------------------------------//
 
-	D3DXVECTOR4 test = m_Cube->GetDiffuse();
 
 
 	//3. GroundCube
