@@ -162,7 +162,7 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 
 	if (textureColor.x)
 		color = color * textureColor;
-	
+
 	// Combine the light and texture color.
 	//color = color * diffuseColor;
 

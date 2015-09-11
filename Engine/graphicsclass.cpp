@@ -102,7 +102,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	m_Light->SetAmbientColor	 (0.05f, 0.05f, 0.05f, 1.0f);
+	m_Light->SetAmbientColor	 (0.02f, 0.02f, 0.02f, 1.0f);
 	m_Light->SetDiffuseColor	 (1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetLookAt			 (-2.0f, -1.0f, 0.0f);
 	m_Light->GenerateOrthoMatrix (20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
@@ -434,7 +434,7 @@ bool GraphicsClass::Render(float rotation)
 	m_NormalMapShader->Render (m_D3D->GetDevice (), m_NormalCube->GetIndexCount (),
 							   worldMatrix, viewMatrix, projectionMatrix,
 							   m_NormalCube->GetTexture (), m_NormalCube->GetNormalmap (),
-							   m_Light->GetDirection (), m_NormalCube->GetDiffuse());
+							   m_Light->GetDirection (), m_Light->GetAmbientColor (), m_NormalCube->GetDiffuse ());
 	//-------------------------------------------------------------------------//
 
 

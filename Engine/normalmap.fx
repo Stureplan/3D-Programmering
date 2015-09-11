@@ -4,6 +4,7 @@ matrix viewMatrix;
 matrix projectionMatrix;
 Texture2D shaderTexture;
 Texture2D shaderNormalTexture;
+float4 ambientColor;
 float4 diffuseColor;
 float3 lightDirection;
 
@@ -76,8 +77,14 @@ float4 NormalMapPixelShader (PixelInputType input) : SV_Target
 	bumpNormal = normalize (bumpNormal);
 
 	lightDir = -lightDirection;
+	color = ambientColor;
 	lightIntensity = saturate (dot (bumpNormal, lightDir));
-	color = saturate (diffuseColor * lightIntensity);
+	if (lightIntensity > 0.0f)
+	{
+		color += (diffuseColor * lightIntensity);
+		color = saturate (color);
+	}
+
 	color = color * textureColor;
 
 	return color;
