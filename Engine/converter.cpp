@@ -301,7 +301,7 @@ bool ConverterClass::LoadDataStructures(WCHAR* filename, int type, int vertexCou
 			<< normals[nIndex].x << ' ' << normals[nIndex].y << ' ' << normals[nIndex].z << endl;
 	}
 
-	fout << "t: ";
+	fout << "f: ";
 	if (textured)
 	{
 		fout << "y" << endl;

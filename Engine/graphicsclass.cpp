@@ -85,15 +85,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	//Convert all the models we're using to our format
-	m_Convert->Convert (L"../Engine/data/model01.obj", 1);	//Convert model01 (gun)
-	m_Convert->Convert (L"../Engine/data/model02.obj", 2);	//Convert model02 (cube)
-	m_Convert->Convert (L"../Engine/data/model03.obj", 3);  //Convert model03 (ground plane)
+	m_Convert->Convert (L"../Engine/data/sphereRGB.obj"   , 1);	//Convert sphere
+	m_Convert->Convert (L"../Engine/data/cubeTextured.obj", 2);	//Convert cube
 
 	// Create the model objects.
-	m_Gun		 = new ModelClass (gun,    m_D3D->GetDevice (), L"../Engine/data/model01.txt", L"../Engine/data/dog.jpg", false);
-	m_Cube		 = new ModelClass (cube,   m_D3D->GetDevice (), L"../Engine/data/model02.txt", L"../Engine/data/dog.jpg", false);
-	m_GroundCube = new ModelClass (ground, m_D3D->GetDevice (), L"../Engine/data/model03.txt", L"../Engine/data/dog.jpg", false);
-	m_NormalCube = new ModelClass (cube2,  m_D3D->GetDevice (), L"../Engine/data/model02.txt", L"../Engine/data/dog.jpg", true);
+	m_Gun		 = new ModelClass (gun,    m_D3D->GetDevice (), L"../Engine/data/model01.txt", false);
+	m_Cube		 = new ModelClass (cube,   m_D3D->GetDevice (), L"../Engine/data/model02.txt", false);
+	m_GroundCube = new ModelClass (ground, m_D3D->GetDevice (), L"../Engine/data/model01.txt", false);
+	m_NormalCube = new ModelClass (cube2,  m_D3D->GetDevice (), L"../Engine/data/model02.txt", true);
 
 	//Create the new light object.
 	m_Light = new LightClass;
@@ -371,7 +370,7 @@ bool GraphicsClass::Render(float rotation)
 							worldMatrix, viewMatrix, projectionMatrix,
 							lightViewMatrix, lightOrthoMatrix,
 							m_Gun->GetTexture (), m_RenderTexture->GetShaderResourceView (),
-							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Light->GetDiffuseColor ());
+							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Gun->GetDiffuse());
 
 	//-------------------------------------------------------------------------//
 
@@ -397,10 +396,10 @@ bool GraphicsClass::Render(float rotation)
 							worldMatrix, viewMatrix, projectionMatrix,
 							lightViewMatrix, lightOrthoMatrix,
 							m_Cube->GetTexture (), m_RenderTexture->GetShaderResourceView (),
-							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Light->GetDiffuseColor ());
+							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Cube->GetDiffuse());
 	//-------------------------------------------------------------------------//
 
-
+	D3DXVECTOR4 test = m_Cube->GetDiffuse();
 
 
 	//3. GroundCube
@@ -414,7 +413,7 @@ bool GraphicsClass::Render(float rotation)
 							worldMatrix, viewMatrix, projectionMatrix,
 							lightViewMatrix, lightOrthoMatrix,
 							m_Cube->GetTexture (), m_RenderTexture->GetShaderResourceView (),
-							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Light->GetDiffuseColor ());
+							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_GroundCube->GetDiffuse ());
 	//-------------------------------------------------------------------------//
 
 
@@ -437,7 +436,7 @@ bool GraphicsClass::Render(float rotation)
 	m_NormalMapShader->Render (m_D3D->GetDevice (), m_NormalCube->GetIndexCount (),
 							   worldMatrix, viewMatrix, projectionMatrix,
 							   m_NormalCube->GetTexture (), m_NormalCube->GetNormalmap (),
-							   m_Light->GetDirection (), m_Light->GetDiffuseColor ());
+							   m_Light->GetDirection (), m_NormalCube->GetDiffuse());
 	//-------------------------------------------------------------------------//
 
 
