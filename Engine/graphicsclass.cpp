@@ -19,8 +19,10 @@ GraphicsClass::GraphicsClass()
 	m_DepthShader = 0;
 	m_RenderTexture = 0;
 	m_NormalMapShader = 0;
+	m_Terrain = 0;
+	m_Frustum = 0;
 
-	movespeed = 2.0f;
+	movespeed = 1.0f;
 	rotatespeed = 1.0f;
 
 	//These are the POSITIONS for each object in the scene
@@ -78,7 +80,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Terrain = new TerrainClass;
 
 	// Initialize the terrain object
-	result = m_Terrain->Initialize(m_D3D->GetDevice(), "../Engine/data/heightmap01.bmp", L"../Engine/data/floor.jpg");
+	result = m_Terrain->Initialize(m_D3D->GetDevice(), "../Engine/data/heightmap01.bmp", L"../Engine/data/grass.jpg");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the terrain object.", L"Error", MB_OK);
@@ -129,12 +131,26 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_ShadowShader->Initialize(m_D3D->GetDevice(), hwnd);
 	m_NormalMapShader->Initialize(m_D3D->GetDevice(), hwnd);
 
+	// Create new frustum object.
+	m_Frustum = new FrustumClass;
+	if (!m_Frustum)
+	{
+		return false;
+	}
+
 	return true;
 }
 
 
 void GraphicsClass::Shutdown()
 {
+	// Release the frustum object.
+	if (m_Frustum)
+	{
+		delete m_Frustum;
+		m_Frustum = 0;
+	}
+
 	//Release objects
 	if (m_Light)
 	{
@@ -369,6 +385,9 @@ bool GraphicsClass::Render(float rotation)
 
 	m_Light->GetViewMatrix(lightViewMatrix);
 	m_Light->GetOrthoMatrix(lightOrthoMatrix);
+
+	// Construct the frustum.
+	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
 
 	// Render the terrain buffers
 	m_Terrain->Render(m_D3D->GetDevice());

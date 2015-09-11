@@ -18,6 +18,7 @@
 #include "shadowshaderclass.h"
 #include "normalmapshaderclass.h"
 #include "terrainclass.h"
+#include "frustumclass.h"
 
 
 /////////////
@@ -69,6 +70,7 @@ private:
 	RenderTextureClass*	  m_RenderTexture;
 	NormalMapShaderClass* m_NormalMapShader;
 	TerrainClass*		  m_Terrain;
+	FrustumClass*		  m_Frustum;
 
 	float movespeed, rotatespeed;
 	D3DXVECTOR3 gun, cube, def, ground, cube2, terrain;
