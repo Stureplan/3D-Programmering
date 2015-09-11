@@ -15,6 +15,7 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Engine</RootNamespace>
     <TargetPlatformVersion>8.1</TargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -60,6 +61,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3dx10.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -82,7 +85,11 @@
   <ItemGroup>
     <ClCompile Include="cameraclass.cpp" />
     <ClCompile Include="converter.cpp" />
+    <ClCompile Include="depthshaderclass.cpp" />
     <ClCompile Include="lightclass.cpp" />
+    <ClCompile Include="normalmapshaderclass.cpp" />
+    <ClCompile Include="rendertextureclass.cpp" />
+    <ClCompile Include="shadowshaderclass.cpp" />
     <ClCompile Include="terrainclass.cpp" />
     <ClCompile Include="textureclass.cpp" />
     <ClCompile Include="lightshaderclass.cpp" />
@@ -96,8 +103,12 @@
   <ItemGroup>
     <ClInclude Include="cameraclass.h" />
     <ClInclude Include="converter.h" />
+    <ClInclude Include="depthshaderclass.h" />
     <ClInclude Include="lightclass.h" />
     <ClInclude Include="lightshaderclass.h" />
+    <ClInclude Include="normalmapshaderclass.h" />
+    <ClInclude Include="rendertextureclass.h" />
+    <ClInclude Include="shadowshaderclass.h" />
     <ClInclude Include="terrainclass.h" />
     <ClInclude Include="textureclass.h" />
     <ClInclude Include="d3dclass.h" />
@@ -107,11 +118,23 @@
     <ClInclude Include="systemclass.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="depth.fx">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="light.fx">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="normalmap.fx">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="shadow.fx">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
