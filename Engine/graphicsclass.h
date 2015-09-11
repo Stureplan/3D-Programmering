@@ -11,9 +11,12 @@
 #include "d3dclass.h"
 #include "cameraclass.h"
 #include "modelclass.h"
-#include "lightshaderclass.h"
 #include "lightclass.h"
 #include "converter.h"
+#include "rendertextureclass.h"
+#include "depthshaderclass.h"
+#include "shadowshaderclass.h"
+#include "normalmapshaderclass.h"
 #include "terrainclass.h"
 
 
@@ -23,7 +26,11 @@
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
-const float SCREEN_NEAR = 0.1f;
+const float SCREEN_NEAR = 1.0f;
+const int SHADOWMAP_WIDTH = 1024;
+const int SHADOWMAP_HEIGHT = 1024;
+const float SHADOWMAP_DEPTH = 50.0f;
+const float SHADOWMAP_NEAR = 1.0f;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -39,23 +46,36 @@ public:
 	bool Initialize(int, int, HWND);
 	void Shutdown();
 	bool Frame();
-	void Move (int);
-	void Launch ();
+	void Move(int);
+	void Launch();
 
 private:
+	bool RenderSceneToTexture();
 	bool Render(float);
 
-
 private:
-	D3DClass* m_D3D;
+	D3DClass*	 m_D3D;
 	CameraClass* m_Camera;
-	ModelClass* m_Models;
-	LightShaderClass* m_LightShader;
-	LightClass* m_Light;
-	ConverterClass* m_Convert;
-	TerrainClass* m_Terrain;
-	int objCount;
-	float movespeed;
+	LightClass*  m_Light;
+
+	ModelClass* m_Gun;
+	ModelClass* m_Cube;
+	ModelClass* m_GroundCube;
+	ModelClass* m_NormalCube;
+
+	ConverterClass*		  m_Convert;
+	ShadowShaderClass*	  m_ShadowShader;
+	DepthShaderClass*	  m_DepthShader;
+	RenderTextureClass*	  m_RenderTexture;
+	NormalMapShaderClass* m_NormalMapShader;
+	TerrainClass*		  m_Terrain;
+
+	float movespeed, rotatespeed;
+	D3DXVECTOR3 gun, cube, def, ground, cube2, terrain;
+	D3DXVECTOR3 cam_pos, gun_pos, rotate;
+	D3DXVECTOR3 camera_forward, camera_lookat, camera_up;
+	D3DXVECTOR3 camera_left, camera_right;
+	D3DXMATRIX rot;
 };
 
 #endif

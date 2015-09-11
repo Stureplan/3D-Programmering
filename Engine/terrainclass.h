@@ -62,6 +62,9 @@ private:
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D10Device*);
 
+	void SetPosition(float, float, float);
+	D3DXVECTOR3 GetPosition();
+
 public:
 	int m_terrainWidth, m_terrainHeight;
 	int m_vertexCount, m_indexCount;
