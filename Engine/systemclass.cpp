@@ -138,7 +138,7 @@ bool SystemClass::Frame()
 		return false;
 	}
 
-	//---	MOVEMENT	---//
+	//---MOVEMENT---//
 	if (m_Input->IsKeyDown (VK_UP))
 	{
 		m_Graphics->Move (1);
@@ -167,6 +167,19 @@ bool SystemClass::Frame()
 		m_Graphics->Launch ();
 	}
 	//---END OF SHOOTING---//
+
+
+	//---ROTATION---//
+	if (m_Input->IsKeyDown (VK_F1))
+	{
+		m_Graphics->Move (5);
+	}
+
+	if (m_Input->IsKeyDown (VK_F2))
+	{
+		m_Graphics->Move (6);
+	}
+	//---END OF ROTATION---//
 
 
 	// Do the frame processing for the graphics object.
