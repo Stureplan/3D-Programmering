@@ -85,13 +85,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	//Convert all the models we're using to our format
-	m_Convert->Convert (L"../Engine/data/sphereRGB.obj"   , 1);	//Convert sphere
-	m_Convert->Convert (L"../Engine/data/cubeTextured.obj", 2);	//Convert cube
+	m_Convert->Convert (L"../Engine/data/sphereRGB.obj",	 1);	//Convert sphere
+	m_Convert->Convert (L"../Engine/data/cubeTextured.obj",  2);	//Convert cube
+	m_Convert->Convert (L"../Engine/data/planeTextured.obj", 3);	//Convert plane
 
 	// Create the model objects.
 	m_Gun		 = new ModelClass (gun,    m_D3D->GetDevice (), L"../Engine/data/model01.txt", false);
 	m_Cube		 = new ModelClass (cube,   m_D3D->GetDevice (), L"../Engine/data/model02.txt", false);
-	m_GroundCube = new ModelClass (ground, m_D3D->GetDevice (), L"../Engine/data/model01.txt", false);
+	m_GroundCube = new ModelClass (ground, m_D3D->GetDevice (), L"../Engine/data/model03.txt", false);
 	m_NormalCube = new ModelClass (cube2,  m_D3D->GetDevice (), L"../Engine/data/model02.txt", true);
 
 	//Create the new light object.
@@ -371,7 +372,6 @@ bool GraphicsClass::Render(float rotation)
 							lightViewMatrix, lightOrthoMatrix,
 							m_Gun->GetTexture (), m_RenderTexture->GetShaderResourceView (),
 							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Gun->GetDiffuse());
-
 	//-------------------------------------------------------------------------//
 
 
