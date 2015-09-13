@@ -29,9 +29,11 @@ public:
 
 	void GenerateViewMatrix ();
 	void GenerateOrthoMatrix (float, float, float);
+	void GenerateProjMatrix (float, float);
 
 	void GetViewMatrix  (D3DXMATRIX&);
 	void GetOrthoMatrix (D3DXMATRIX&);
+	void GetProjMatrix  (D3DXMATRIX&);
 
 private:
 	D3DXVECTOR4 m_ambientColor;
@@ -41,6 +43,7 @@ private:
 	D3DXVECTOR3 m_direction;
 	D3DXMATRIX  m_viewMatrix;
 	D3DXMATRIX  m_orthoMatrix;
+	D3DXMATRIX  m_projMatrix;
 };
 
 

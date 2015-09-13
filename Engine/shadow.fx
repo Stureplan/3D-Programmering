@@ -13,9 +13,10 @@ matrix lightViewMatrix;
 matrix lightProjectionMatrix;
 Texture2D shaderTexture;
 Texture2D depthMapTexture;
+float3 lightDirection;
 float4 ambientColor;
 float4 diffuseColor;
-float3 lightDirection;
+
 
 
 ///////////////////
