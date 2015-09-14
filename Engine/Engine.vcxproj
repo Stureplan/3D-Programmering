@@ -86,13 +86,13 @@
     <ClCompile Include="cameraclass.cpp" />
     <ClCompile Include="converter.cpp" />
     <ClCompile Include="depthshaderclass.cpp" />
+    <ClCompile Include="frustumclass.cpp" />
     <ClCompile Include="lightclass.cpp" />
     <ClCompile Include="normalmapshaderclass.cpp" />
     <ClCompile Include="rendertextureclass.cpp" />
     <ClCompile Include="shadowshaderclass.cpp" />
     <ClCompile Include="terrainclass.cpp" />
     <ClCompile Include="textureclass.cpp" />
-    <ClCompile Include="lightshaderclass.cpp" />
     <ClCompile Include="d3dclass.cpp" />
     <ClCompile Include="graphicsclass.cpp" />
     <ClCompile Include="inputclass.cpp" />
@@ -104,8 +104,8 @@
     <ClInclude Include="cameraclass.h" />
     <ClInclude Include="converter.h" />
     <ClInclude Include="depthshaderclass.h" />
+    <ClInclude Include="frustumclass.h" />
     <ClInclude Include="lightclass.h" />
-    <ClInclude Include="lightshaderclass.h" />
     <ClInclude Include="normalmapshaderclass.h" />
     <ClInclude Include="rendertextureclass.h" />
     <ClInclude Include="shadowshaderclass.h" />
@@ -121,12 +121,6 @@
     <FxCompile Include="depth.fx">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="light.fx">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="normalmap.fx">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
