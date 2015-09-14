@@ -9,6 +9,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <D3D10.h>
+#include <D3DX10.h>
 using namespace std;
 
 
@@ -34,12 +36,15 @@ public:
 	ConverterClass(const ConverterClass&);
 	~ConverterClass();
 
-	int Convert(int);
+	int Convert(WCHAR*, int);
+	void ReadMaterialFile (char*);
 
 private:
-	void GetModelFilename(char*, int);
-	bool ReadFileCounts(char*, int&, int&, int&, int&);
-	bool LoadDataStructures(char*, int, int, int, int, int);
+	bool ReadFileCounts(WCHAR*, int&, int&, int&, int&);
+	bool LoadDataStructures(WCHAR*, int, int, int, int, int);
+	float r, g, b;
+	bool textured;
+	string texturename;
 };
 
 

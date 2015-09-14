@@ -69,8 +69,9 @@ void LightClass::GenerateViewMatrix ()
 {
 	D3DXVECTOR3 up;
 	up.x = 0.0f;
-	up.y = 1.0f; 
+	up.y = 1.0f;
 	up.z = 0.0f;
+
 	D3DXMatrixLookAtLH (&m_viewMatrix, &m_position, &m_direction, &up);
 	return;
 }
@@ -78,6 +79,17 @@ void LightClass::GenerateViewMatrix ()
 void LightClass::GenerateOrthoMatrix (float width, float depthPlane, float nearPlane)
 {
 	D3DXMatrixOrthoLH (&m_orthoMatrix, width, width, nearPlane, depthPlane);
+	return;
+}
+
+void LightClass::GenerateProjMatrix (float screenDepth, float screenNear)
+{
+	float fieldOfView, screenAspect;
+	fieldOfView = (float) D3DX_PI / 2.0f;
+	screenAspect = 1.0f;
+
+
+	D3DXMatrixPerspectiveFovLH (&m_projMatrix, fieldOfView, screenAspect, screenNear, screenDepth);
 	return;
 }
 
@@ -90,5 +102,11 @@ void LightClass::GetViewMatrix (D3DXMATRIX& viewMatrix)
 void LightClass::GetOrthoMatrix (D3DXMATRIX& orthoMatrix)
 {
 	orthoMatrix = m_orthoMatrix;
+	return;
+}
+
+void LightClass::GetProjMatrix (D3DXMATRIX& projMatrix)
+{
+	projMatrix = m_projMatrix;
 	return;
 }

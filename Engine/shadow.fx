@@ -13,9 +13,10 @@ matrix lightViewMatrix;
 matrix lightProjectionMatrix;
 Texture2D shaderTexture;
 Texture2D depthMapTexture;
+float3 lightDirection;
 float4 ambientColor;
 float4 diffuseColor;
-float3 lightDirection;
+
 
 
 ///////////////////
@@ -160,8 +161,11 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 	// Sample the pixel color from the texture using the sampler at this texture coordinate location.
 	textureColor = shaderTexture.Sample (SampleTypeWrap, input.tex);
 
+	if (textureColor.x)
+		color = color * textureColor;
+
 	// Combine the light and texture color.
-	color = color * textureColor;
+	//color = color * diffuseColor;
 
 	return color;
 }
