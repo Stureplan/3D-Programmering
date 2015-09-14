@@ -416,7 +416,7 @@ bool ModelClass::LoadModel(WCHAR* filename)
 				fin.get(input); // :
 				fin.get(input); // whitespace
 				fin >> texturefile;
-				m_textured == true;
+				m_textured = true;
 				m_diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
 			}
 			else if (input == 'n')
@@ -426,7 +426,7 @@ bool ModelClass::LoadModel(WCHAR* filename)
 				fin.get(input); // :
 				fin.get(input); // whitespace
 				fin >> m_diffuse.x >> m_diffuse.y >> m_diffuse.z;
-				m_textured == false;
+				m_textured = false;
 				m_diffuse = { m_diffuse.x, m_diffuse.y, m_diffuse.z, 1.0f };
 			}
 		}

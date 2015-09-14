@@ -21,7 +21,6 @@ int ConverterClass::Convert(WCHAR* filename, int type)
 	bool result;
 
 	int vertexCount, textureCount, normalCount, faceCount;
-	char garbage;
 
 	//Read the number of vvertices, texture coords, normals and faces
 	//so that the data structures can be initialized with the exact sizes needed.
@@ -50,7 +49,6 @@ bool ConverterClass::ReadFileCounts(WCHAR* filename, int& vertexCount,
 	ifstream fin;
 	char input;
 	char mtlfile[50];
-	WCHAR* mtl;
 	int mtlchars = 0;
 
 	//Initialize the counts.

@@ -30,8 +30,8 @@ GraphicsClass::GraphicsClass()
 	cube	= D3DXVECTOR3 (0.0f, 0.3f, 0.0f);
 	def		= D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
 	ground	= D3DXVECTOR3 (0.0f, -2.0f, 0.0f);
-	cube2 = D3DXVECTOR3(2.5f, 0.3f, 0.0f);
-	terrain = D3DXVECTOR3(100.0f, 100.0f, 100.0f);
+	cube2   = D3DXVECTOR3 (2.5f, 0.3f, 0.0f);
+	terrain = D3DXVECTOR3 (100.0f, 100.0f, 100.0f);
 
 
 	D3DXMatrixIdentity(&rot);
@@ -224,7 +224,6 @@ void GraphicsClass::Shutdown()
 
 bool GraphicsClass::Frame()			
 {
-	bool result;
 	static float rotation = 0.0f;
 	rotation += (float) D3DX_PI * 0.005f;
 	if (rotation > 360.0f)
@@ -308,7 +307,7 @@ bool GraphicsClass::RenderSceneToTexture ()
 	m_RenderTexture->SetRenderTarget   (m_D3D->GetDevice ());
 	m_RenderTexture->ClearRenderTarget (m_D3D->GetDevice (), 0.0f, 0.0f, 0.0f, 1.0f);
 
-	m_Light->GenerateViewMatrix ();
+	//m_Light->GenerateViewMatrix ();
 	m_D3D  ->GetWorldMatrix (worldMatrix);
 	m_Light->GetViewMatrix	(lightViewMatrix);
 	m_Light->GetOrthoMatrix (lightOrthoMatrix);
@@ -361,8 +360,6 @@ bool GraphicsClass::Render(float rotation)
 
 	D3DXVECTOR3 pos, rotate;
 
-	int index;
-	float pos_x, pos_y, pos_z;
 	bool rendermodel = false;
 
 
