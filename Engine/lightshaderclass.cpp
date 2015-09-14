@@ -71,6 +71,18 @@ void LightShaderClass::Render(ID3D10Device* device, int indexCount, D3DXMATRIX w
 	return;
 }
 
+void LightShaderClass::Render(ID3D10Device* device, int indexCount, D3DXMATRIX worldMatrix,
+	D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor, D3DXVECTOR3 lightDirection)
+{
+	// Set the shader parameters that it will use for rendering.
+	SetShaderParameters(worldMatrix, viewMatrix, projectionMatrix);
+
+	// Now render the prepared buffers with the shader.
+	RenderShader(device, indexCount);
+
+	return;
+}
+
 
 bool LightShaderClass::InitializeShader(ID3D10Device* device, HWND hwnd, WCHAR* filename)
 {
@@ -268,6 +280,20 @@ void LightShaderClass::SetShaderParameters(D3DXMATRIX worldMatrix, D3DXMATRIX vi
 	//Sets the diffuse color of the light inside the shader.
 	m_diffuseColorPtr->SetFloatVector((float*)&diffuseColor);
 
+	return;
+}
+
+void LightShaderClass::SetShaderParameters(D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix,
+	D3DXMATRIX projectionMatrix)
+{
+	// Set the world matrix variable inside the shader.
+	m_worldMatrixPtr->SetMatrix((float*)&worldMatrix);
+
+	// Set the view matrix variable inside the shader.
+	m_viewMatrixPtr->SetMatrix((float*)&viewMatrix);
+
+	// Set the projection matrix variable inside the shader.
+	m_projectionMatrixPtr->SetMatrix((float*)&projectionMatrix);
 	return;
 }
 
