@@ -58,7 +58,6 @@ build/
 *_p.c
 *.ilk
 *.meta
-*.obj
 *.pch
 *.pdb
 *.pgc
@@ -230,16 +229,10 @@ Engine/Debug/graphicsclass.obj
 Debug/Engine.ilk
 *.pdb
 *.cso
-*.obj
 *.suo
-*.obj
 *.log
 *.tlog
 *.tlog
 *.tlog
 *.tlog
-*.obj
-*.obj
-*.obj
-*.obj
 *.pdb
