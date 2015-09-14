@@ -17,6 +17,8 @@
 #include "depthshaderclass.h"
 #include "shadowshaderclass.h"
 #include "normalmapshaderclass.h"
+#include "terrainclass.h"
+#include "frustumclass.h"
 
 
 /////////////
@@ -24,7 +26,7 @@
 /////////////
 const bool FULL_SCREEN		= false;
 const bool VSYNC_ENABLED	= true;
-const float SCREEN_DEPTH	= 100.0f;
+const float SCREEN_DEPTH	= 1000.0f;
 const float SCREEN_NEAR		= 1.0f;
 const int SHADOWMAP_WIDTH	= 1024;
 const int SHADOWMAP_HEIGHT	= 1024;
@@ -68,9 +70,11 @@ private:
 	DepthShaderClass*	  m_DepthShader;
 	RenderTextureClass*	  m_RenderTexture;
 	NormalMapShaderClass* m_NormalMapShader;
+	TerrainClass*		  m_Terrain;
+	FrustumClass*		  m_Frustum;
 
 	float movespeed, rotatespeed;
-	D3DXVECTOR3 gun, cube, def, ground, cube2;
+	D3DXVECTOR3 gun, cube, def, ground, cube2, terrain;
 	D3DXVECTOR3 cam_pos, gun_pos, gun_offset, rotate;
 	D3DXVECTOR3 camera_forward, camera_lookat, camera_up;
 	D3DXVECTOR3 camera_left, camera_right;

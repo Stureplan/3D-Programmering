@@ -19,8 +19,10 @@ GraphicsClass::GraphicsClass()
 	m_DepthShader = 0;
 	m_RenderTexture = 0;
 	m_NormalMapShader = 0;
+	m_Terrain = 0;
+	m_Frustum = 0;
 
-	movespeed = 0.09f;
+	movespeed = 1.0f;
 	rotatespeed = 1.0f;
 
 	//These are the POSITIONS for each object in the scene
@@ -28,7 +30,8 @@ GraphicsClass::GraphicsClass()
 	cube	= D3DXVECTOR3 (0.0f, 0.3f, 0.0f);
 	def		= D3DXVECTOR3 (0.0f, 0.0f, 0.0f);
 	ground	= D3DXVECTOR3 (0.0f, -2.0f, 0.0f);
-	cube2	= D3DXVECTOR3 (2.5f, 0.3f, 0.0f);
+	cube2 = D3DXVECTOR3(2.5f, 0.3f, 0.0f);
+	terrain = D3DXVECTOR3(100.0f, 100.0f, 100.0f);
 
 
 	D3DXMatrixIdentity(&rot);
@@ -67,6 +70,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+	// Initialize the terrain object
+	m_Terrain = new TerrainClass;
+	m_Terrain->Initialize(m_D3D->GetDevice(), "../Engine/data/heightmap01.bmp", L"../Engine/data/grass.jpg");
+
+	// Initalize the frustum object
+	m_Frustum = new FrustumClass;
+
 	// Create the camera object.
 	m_Camera = new CameraClass;
 	if(!m_Camera)
@@ -104,7 +114,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	m_Light->SetAmbientColor	 (0.02f, 0.02f, 0.02f, 1.0f);
 	m_Light->SetDiffuseColor	 (1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light->SetLookAt			 (-2.0f, -1.0f, 0.0f);
+	m_Light->SetLookAt			 (-8.0f, -8.0f, 0.0f);
 	m_Light->GenerateOrthoMatrix (20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
 	m_Light->GenerateProjMatrix  (SCREEN_DEPTH, SCREEN_NEAR);
 	m_Light->SetPosition		 (8.0f, 8.0f, 0.0f);
@@ -128,6 +138,18 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 void GraphicsClass::Shutdown()
 {
 	//Release objects
+	if (m_Terrain)
+	{
+		delete m_Terrain;
+		m_Terrain = 0;
+	}
+
+	if (m_Frustum)
+	{
+		delete m_Frustum;
+		m_Frustum = 0;
+	}
+
 	if (m_Light)
 	{
 		delete m_Light;
@@ -341,8 +363,10 @@ bool GraphicsClass::Render(float rotation)
 
 	int index;
 	float pos_x, pos_y, pos_z;
-	
-	RenderSceneToTexture ();
+	bool rendermodel = false;
+
+
+	RenderSceneToTexture();
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
@@ -350,7 +374,7 @@ bool GraphicsClass::Render(float rotation)
 	// Generate the view matrix based on the camera's position.
 	m_Camera->Render();
 
-	//m_Light->GenerateViewMatrix ();
+	//m_Light->GenerateViewMatrix();
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
 	m_Camera ->GetViewMatrix(viewMatrix);
@@ -361,60 +385,91 @@ bool GraphicsClass::Render(float rotation)
 	m_Light->GetOrthoMatrix (lightOrthoMatrix);
 	m_Light->GetProjMatrix  (lightProjMatrix);
 
+	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
+	m_Terrain->Render(m_D3D->GetDevice());
+	
+	D3DXMatrixTranslation(&translationMatrix, 0.0f, -5.0f, 0.0f);
+	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
+
+	m_ShadowShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(), 
+						   worldMatrix, viewMatrix, projectionMatrix, 
+						   lightViewMatrix, lightOrthoMatrix, 
+						   m_Terrain->GetTexture(), m_RenderTexture->GetShaderResourceView(), 
+						   m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
+
+	m_D3D->GetWorldMatrix(worldMatrix);
+
 
 	//					--v-- OBJECT HANDLING --v--
 	//1. Gun
 	//-------------------------------------------------------------------------//
 	pos = m_Gun->GetPosition ();
-	D3DXMatrixTranslation (&translationMatrix, pos.x, pos.y, pos.z);
-	D3DXMatrixMultiply (&worldMatrix, &worldMatrix, &translationMatrix);
+	rendermodel = m_Frustum->CheckSphere(pos.x, pos.y, pos.z, 0.1f);
 
-	m_Gun		  ->Render (m_D3D->GetDevice ());
-	m_ShadowShader->Render (m_D3D->GetDevice(), m_Gun->GetIndexCount (),
-							worldMatrix, viewMatrix, projectionMatrix,
-							lightViewMatrix, lightOrthoMatrix,
-							m_Gun->GetTexture (), m_RenderTexture->GetShaderResourceView (),
-							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Gun->GetDiffuse());
+	if (rendermodel == true)
+	{
+		D3DXMatrixTranslation(&translationMatrix, pos.x, pos.y, pos.z);
+		D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
+
+		m_Gun->Render(m_D3D->GetDevice());
+		m_ShadowShader->Render(m_D3D->GetDevice(), m_Gun->GetIndexCount(),
+			worldMatrix, viewMatrix, projectionMatrix,
+			lightViewMatrix, lightOrthoMatrix,
+			m_Gun->GetTexture(), m_RenderTexture->GetShaderResourceView(),
+			m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Gun->GetDiffuse());
+	}
 	//-------------------------------------------------------------------------//
 
 
 
 	//2. Cube
 	//-------------------------------------------------------------------------//
-	m_D3D->GetWorldMatrix (worldMatrix);
+
 	pos = m_Cube->GetPosition ();
-	D3DXMatrixTranslation (&worldMatrix, pos.x, pos.y, pos.z);
+	rendermodel = m_Frustum->CheckSphere(pos.x, pos.y, pos.z, 0.8f);
+
+	if (rendermodel == true)
+	{
+		m_D3D->GetWorldMatrix(worldMatrix);
+		D3DXMatrixTranslation(&worldMatrix, pos.x, pos.y, pos.z);
 
 
-	//rotation
-	D3DXMatrixRotationY(&worldMatrix, rotation);
-	D3DXMatrixRotationY(&rot, rotation);
+		//rotation
+		D3DXMatrixRotationY(&worldMatrix, rotation);
+		D3DXMatrixRotationY(&rot, rotation);
 
-	D3DXMatrixTranslation(&translationMatrix, pos.x, pos.y, pos.z);
-	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
+		D3DXMatrixTranslation(&translationMatrix, pos.x, pos.y, pos.z);
+		D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
 
-	m_Cube		  ->Render (m_D3D->GetDevice ());
-	m_ShadowShader->Render (m_D3D->GetDevice (), m_Cube->GetIndexCount (),
-							worldMatrix, viewMatrix, projectionMatrix,
-							lightViewMatrix, lightOrthoMatrix,
-							m_Cube->GetTexture (), m_RenderTexture->GetShaderResourceView (),
-							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_Cube->GetDiffuse());
+		m_Cube->Render(m_D3D->GetDevice());
+		m_ShadowShader->Render(m_D3D->GetDevice(), m_Cube->GetIndexCount(),
+			worldMatrix, viewMatrix, projectionMatrix,
+			lightViewMatrix, lightOrthoMatrix,
+			m_Cube->GetTexture(), m_RenderTexture->GetShaderResourceView(),
+			m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Cube->GetDiffuse());
+	}
 	//-------------------------------------------------------------------------//
 
 
 
 	//3. GroundCube
 	//-------------------------------------------------------------------------//
-	m_D3D->GetWorldMatrix (worldMatrix);
 	pos = m_GroundCube->GetPosition ();
-	D3DXMatrixTranslation (&worldMatrix, pos.x, pos.y, pos.z);
+	rendermodel = m_Frustum->CheckSphere(pos.x, pos.y, pos.z, 6.0f);
 
-	m_GroundCube  ->Render (m_D3D->GetDevice ());
-	m_ShadowShader->Render (m_D3D->GetDevice (), m_Cube->GetIndexCount (),
-							worldMatrix, viewMatrix, projectionMatrix,
-							lightViewMatrix, lightOrthoMatrix,
-							m_Cube->GetTexture (), m_RenderTexture->GetShaderResourceView (),
-							m_Light->GetDirection (), m_Light->GetAmbientColor (), m_GroundCube->GetDiffuse ());
+	if (rendermodel == true)
+	{
+		m_D3D->GetWorldMatrix(worldMatrix);
+
+		D3DXMatrixTranslation(&worldMatrix, pos.x, pos.y, pos.z);
+
+		m_GroundCube->Render(m_D3D->GetDevice());
+		m_ShadowShader->Render(m_D3D->GetDevice(), m_Cube->GetIndexCount(),
+			worldMatrix, viewMatrix, projectionMatrix,
+			lightViewMatrix, lightOrthoMatrix,
+			m_Cube->GetTexture(), m_RenderTexture->GetShaderResourceView(),
+			m_Light->GetDirection(), m_Light->GetAmbientColor(), m_GroundCube->GetDiffuse());
+	}
 	//-------------------------------------------------------------------------//
 
 
@@ -422,22 +477,28 @@ bool GraphicsClass::Render(float rotation)
 
 	//3. NormalCube
 	//-------------------------------------------------------------------------//
-	m_D3D->GetWorldMatrix (worldMatrix);
-	pos = m_NormalCube->GetPosition ();
-	D3DXMatrixTranslation (&worldMatrix, pos.x, pos.y, pos.z);
-
-	//rotation
-	D3DXMatrixRotationY (&worldMatrix, rotation);
-	D3DXMatrixRotationY(&rot, rotation);
 	
-	D3DXMatrixTranslation (&translationMatrix, pos.x, pos.y, pos.z);
-	D3DXMatrixMultiply	  (&worldMatrix, &worldMatrix, &translationMatrix);
+	pos = m_NormalCube->GetPosition ();
+	rendermodel = m_Frustum->CheckSphere(pos.x, pos.y, pos.z, 0.8f);
 
-	m_NormalCube	 ->Render (m_D3D->GetDevice ());
-	m_NormalMapShader->Render (m_D3D->GetDevice (), m_NormalCube->GetIndexCount (),
-							   worldMatrix, viewMatrix, projectionMatrix,
-							   m_NormalCube->GetTexture (), m_NormalCube->GetNormalmap (),
-							   m_Light->GetDirection (), m_Light->GetAmbientColor (), m_NormalCube->GetDiffuse ());
+	if (rendermodel == true)
+	{
+		m_D3D->GetWorldMatrix(worldMatrix);
+		D3DXMatrixTranslation(&worldMatrix, pos.x, pos.y, pos.z);
+
+		//rotation
+		D3DXMatrixRotationY(&worldMatrix, rotation);
+		D3DXMatrixRotationY(&rot, rotation);
+
+		D3DXMatrixTranslation(&translationMatrix, pos.x, pos.y, pos.z);
+		D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
+
+		m_NormalCube->Render(m_D3D->GetDevice());
+		m_NormalMapShader->Render(m_D3D->GetDevice(), m_NormalCube->GetIndexCount(),
+			worldMatrix, viewMatrix, projectionMatrix,
+			m_NormalCube->GetTexture(), m_NormalCube->GetNormalmap(),
+			m_Light->GetDirection(), m_Light->GetAmbientColor(), m_NormalCube->GetDiffuse());
+	}
 	//-------------------------------------------------------------------------//
 
 
