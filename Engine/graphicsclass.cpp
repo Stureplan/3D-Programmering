@@ -119,7 +119,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Light->GenerateProjMatrix  (SCREEN_DEPTH, SCREEN_NEAR);
 	m_Light->SetPosition		 (2.0f, 1.0f, 0.0f);
 	m_Light->SetDirection		 (-2.0f, -1.0f, 0.0f);
-	m_Light->GenerateViewMatrix ();
+	m_Light->GenerateViewMatrix  ();
 
 	m_RenderTexture	  = new RenderTextureClass;
 	m_DepthShader	  = new DepthShaderClass;
@@ -382,6 +382,8 @@ bool GraphicsClass::Render(float rotation)
 	m_Light->GetOrthoMatrix (lightOrthoMatrix);
 	m_Light->GetProjMatrix  (lightProjMatrix);
 
+	//					--\/-- TERRAIN HANDLING --\/--
+	//-------------------------------------------------------------------------//
 	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
 	m_Terrain->Render(m_D3D->GetDevice());
 	
@@ -395,6 +397,9 @@ bool GraphicsClass::Render(float rotation)
 						   m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
 
 	m_D3D->GetWorldMatrix(worldMatrix);
+	//-------------------------------------------------------------------------//
+	//					--/\-- TERRAIN HANDLING --/\--
+
 
 
 	//					--v-- OBJECT HANDLING --v--
@@ -461,14 +466,13 @@ bool GraphicsClass::Render(float rotation)
 		D3DXMatrixTranslation(&worldMatrix, pos.x, pos.y, pos.z);
 
 		m_GroundCube->Render(m_D3D->GetDevice());
-		m_ShadowShader->Render(m_D3D->GetDevice(), m_Cube->GetIndexCount(),
+		m_ShadowShader->Render(m_D3D->GetDevice(), m_GroundCube->GetIndexCount(),
 			worldMatrix, viewMatrix, projectionMatrix,
 			lightViewMatrix, lightOrthoMatrix,
-			m_Cube->GetTexture(), m_RenderTexture->GetShaderResourceView(),
+			m_GroundCube->GetTexture(), m_RenderTexture->GetShaderResourceView(),
 			m_Light->GetDirection(), m_Light->GetAmbientColor(), m_GroundCube->GetDiffuse());
 	}
 	//-------------------------------------------------------------------------//
-
 
 
 
