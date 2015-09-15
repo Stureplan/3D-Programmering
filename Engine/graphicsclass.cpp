@@ -114,6 +114,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_EnvironmentLight->SetDirection(-2.0f, -1.0f, 0.0f);
 	m_EnvironmentLight->GenerateViewMatrix();
 
+	m_ObjectLight->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_ObjectLight->SetSpecularPower(32.0f);
 	m_ObjectLight->SetPosition(1.0f, 4.0f, 0.0f);
 	m_ObjectLight->SetDirection(-1.0f, -4.0f, 0.0f);
 	m_ObjectLight->GenerateOrthoMatrix(20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
@@ -412,7 +414,10 @@ bool GraphicsClass::Render(float rotation)
 		m_RenderTexture->GetShaderResourceView(),
 		m_EnvironmentLight->GetDirection(),
 		m_EnvironmentLight->GetAmbientColor(),
-		m_EnvironmentLight->GetDiffuseColor());
+		m_EnvironmentLight->GetDiffuseColor(),
+		m_Camera->GetPosition(), 
+		m_ObjectLight->GetSpecularColor(), 
+		m_ObjectLight->GetSpecularPower());
 
 	//-------------------------------------------------------------------------//
 	//					--/\-- TERRAIN HANDLING --/\--						   //
@@ -437,7 +442,8 @@ bool GraphicsClass::Render(float rotation)
 			worldMatrix, viewMatrix, projectionMatrix,
 			objViewMatrix, objOrthoMatrix,
 			m_Gun->GetTexture(), m_RenderTexture->GetShaderResourceView(),
-			m_ObjectLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_Gun->GetDiffuse());
+			m_ObjectLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_Gun->GetDiffuse(),
+			m_Camera->GetPosition(), m_ObjectLight->GetSpecularColor(), m_ObjectLight->GetSpecularPower());
 	}
 	//-------------------------------------------------------------------------//
 
@@ -467,7 +473,8 @@ bool GraphicsClass::Render(float rotation)
 			worldMatrix, viewMatrix, projectionMatrix,
 			objViewMatrix, objOrthoMatrix,
 			m_Cube->GetTexture(), m_RenderTexture->GetShaderResourceView(),
-			m_ObjectLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_Cube->GetDiffuse());
+			m_ObjectLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_Cube->GetDiffuse(),
+			m_Camera->GetPosition(), m_ObjectLight->GetSpecularColor(), m_ObjectLight->GetSpecularPower());
 	}
 	//-------------------------------------------------------------------------//
 
@@ -489,7 +496,8 @@ bool GraphicsClass::Render(float rotation)
 			worldMatrix, viewMatrix, projectionMatrix,
 			objViewMatrix, objOrthoMatrix,
 			m_GroundCube->GetTexture(), m_RenderTexture->GetShaderResourceView(),
-			m_ObjectLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_GroundCube->GetDiffuse());
+			m_ObjectLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_GroundCube->GetDiffuse(),
+			m_Camera->GetPosition(), m_ObjectLight->GetSpecularColor(), m_ObjectLight->GetSpecularPower());
 	}
 	//-------------------------------------------------------------------------//
 
