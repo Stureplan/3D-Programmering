@@ -22,7 +22,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -89,6 +89,7 @@
     <ClCompile Include="frustumclass.cpp" />
     <ClCompile Include="lightclass.cpp" />
     <ClCompile Include="normalmapshaderclass.cpp" />
+    <ClCompile Include="quadtreeclass.cpp" />
     <ClCompile Include="rendertextureclass.cpp" />
     <ClCompile Include="shadowshaderclass.cpp" />
     <ClCompile Include="terrainclass.cpp" />
@@ -107,6 +108,7 @@
     <ClInclude Include="frustumclass.h" />
     <ClInclude Include="lightclass.h" />
     <ClInclude Include="normalmapshaderclass.h" />
+    <ClInclude Include="quadtreeclass.h" />
     <ClInclude Include="rendertextureclass.h" />
     <ClInclude Include="shadowshaderclass.h" />
     <ClInclude Include="terrainclass.h" />

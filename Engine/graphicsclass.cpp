@@ -21,6 +21,7 @@ GraphicsClass::GraphicsClass()
 	m_NormalMapShader = 0;
 	m_Terrain = 0;
 	m_Frustum = 0;
+	m_QuadTree = 0;
 
 	movespeed = 0.4f;
 	rotatespeed = 1.0f;
@@ -138,12 +139,34 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+	// Create the quad tree object.
+	m_QuadTree = new QuadTreeClass;
+	if (!m_QuadTree)
+	{
+		return false;
+	}
+
+	// Initializde the quad tree object.
+	result = m_QuadTree->Initialize(m_Terrain, m_D3D->GetDevice());
+	if (!result)
+	{
+		return false;
+	}
+
 	return true;
 }
 
 
 void GraphicsClass::Shutdown()
 {
+	// Release the quad tree object.
+	if (m_QuadTree)
+	{
+		m_QuadTree->Shutdown();
+		delete m_QuadTree;
+		m_QuadTree = 0;
+	}
+
 	// Release the frustum object.
 	if (m_Frustum)
 	{
@@ -370,6 +393,7 @@ bool GraphicsClass::Render(float rotation)
 	float pos_x, pos_y, pos_z;
 
 	bool renderModel = false;
+	bool result;
 
 	RenderSceneToTexture();
 
@@ -391,24 +415,36 @@ bool GraphicsClass::Render(float rotation)
 	// Construct the frustum.
 	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
 
-	// Render the terrain buffers
+	// Set the terrain shader parameters that it will use for rendering
+	result = m_ShadowShader->SetShaderParameters(m_D3D->GetDevice(), worldMatrix, viewMatrix, 
+									projectionMatrix, m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
+									m_Light->GetDirection(), m_Terrain->GetTexture());
+	if (!result)
+	{
+		return false;
+	}
+
+	// Render the terrain using the quad tree and terrain shader.
+	m_QuadTree->Render(m_Frustum, m_D3D->GetDevice(), m_ShadowShader);
+
+/*	// Render the terrain buffers
 	m_Terrain->Render(m_D3D->GetDevice());
 
 	// Render the terrain using the light shader
 	//m_LightShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(), worldMatrix, 
 	//viewMatrix, projectionMatrix, m_Terrain->GetTexture(), m_Light->GetDirection(), 
 	//m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
-
+*/
 	D3DXMatrixTranslation(&translationMatrix, 0.0f, -5.0f, 0.0f);
 	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
 
-	//NEW SHADOWSHADER FOR TERRAIN
+/*	//NEW SHADOWSHADER FOR TERRAIN
 	m_ShadowShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(),
 						   worldMatrix, viewMatrix, projectionMatrix,
 						   lightViewMatrix, lightOrthoMatrix,
 						   m_Terrain->GetTexture(), m_RenderTexture->GetShaderResourceView(),
 						   m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
-
+*/
 	m_D3D->GetWorldMatrix(worldMatrix);
 	
 	//					--v-- OBJECT HANDLING --v--

@@ -23,6 +23,9 @@ ShadowShaderClass::ShadowShaderClass ()
 	m_lightDirectionPtr = 0;
 	m_ambientColorPtr = 0;
 	m_diffuseColorPtr = 0;
+
+	m_matrixBuffer = 0;
+	m_lightBuffer = 0;
 }
 
 
@@ -80,6 +83,12 @@ void ShadowShaderClass::Render (ID3D10Device* device, int indexCount,
 	return;
 }
 
+/*bool ShadowShaderClass::SetShaderParameters(ID3D10Device* device, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix,
+	D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor, D3DXVECTOR3 lightDirection, ID3D10ShaderResourceView* texture)
+{
+
+}
+*/
 
 bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR* filename)
 {
@@ -88,6 +97,8 @@ bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR
 	D3D10_INPUT_ELEMENT_DESC polygonLayout[3];
 	unsigned int numElements;
 	D3D10_PASS_DESC passDesc;
+	D3D10_BUFFER_DESC matrixBufferDesc;
+	D3D10_BUFFER_DESC lightBufferDesc;
 
 
 	// Initialize the error message.
@@ -157,6 +168,8 @@ bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR
 	{
 		return false;
 	}
+
+	
 
 	// Get pointers to the three matrices inside the shader so we can update them from this class.
 	m_worldMatrixPtr	  = m_effect->GetVariableByName ("worldMatrix")		->AsMatrix ();
@@ -281,6 +294,78 @@ void ShadowShaderClass::SetShaderParameters(
 	m_diffuseColorPtr			->SetFloatVector ((float*) &diffuseColor);
 
 	return;
+}
+
+bool ShadowShaderClass::SetShaderParameters(ID3D10Device* device, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix,
+	D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor, D3DXVECTOR3 lightDirection,
+	ID3D10ShaderResourceView* texture)
+{
+	/*
+	HRESULT result;
+	//D3D10_MAPPED_TEXTURE2D mappedResource;
+	unsigned int bufferNumber;
+	//MatrixBufferType* dataPtr;
+	//LightBufferType* dataPtr2;
+
+	// Transpose the matricres to prepare them for the shader.
+	D3DXMatrixTranspose(&worldMatrix, &worldMatrix);
+	D3DXMatrixTranspose(&viewMatrix, &viewMatrix);
+	D3DXMatrixTranspose(&projectionMatrix, &projectionMatrix);
+
+	// Lock the constant buffer so it can be written to.
+	result = device->Map(m_matrixBuffer, 0, D3D10_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+	{
+		return false;
+	}
+	
+	// Get a pointer to the data in the constant buffer.
+	//dataPtr = (MatrixBufferType*)mappedResource.pData;
+
+	// Cope the matrices into the constant buffer
+	//dataPtr->world = worldMatrix;
+	//dataPtr->view = viewMatrix;
+	//dataPtr->projection = projectionMatrix;
+
+	// Unlock the constant buffer.
+	//device->Unmap(m_matrixBuffer, 0);
+
+	// Set the position of the constant buffer in the vertex shader.
+	bufferNumber = 0;
+
+	// Now set the constant buffer in the vertex shader with the updated values.
+	device->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+
+	// Lock the light constant buffer so it can be written to.
+	result = device->Map(m_lightBuffer, 0, D3D10_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+	{
+		return false;
+	}
+	
+	// Get a pointer to the data in the constant buffer.
+	//dataPtr2 = (LightBufferType*)mappedResource.pData;
+
+	// Copy the lighting variables into the constant buffer.
+	//dataPtr2->ambientColor = ambientColor;
+	//dataPtr2->diffuseColor = diffuseColor;
+	//dataPtr2->lightDirection = lightDirection;
+	//dataPtr2->padding = 0.0f
+
+	// Unlock the constant buffer.
+	//device->Unmap(m_lightBuffer, 0);
+
+	// Set the position of the light constant buffer in the pixel shader.
+	bufferNumber = 0;
+
+	// Finally set the light constant buffer in the pixel shader with the updated values.
+	device->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
+	
+	// Set shader texture resource in the pixel shader.
+	device->PSSetShaderResources(0, 1, &texture);
+	*/
+	return true;
+	
 }
 
 

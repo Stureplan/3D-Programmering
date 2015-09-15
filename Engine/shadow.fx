@@ -17,6 +17,14 @@ float4 ambientColor;
 float4 diffuseColor;
 float3 lightDirection;
 
+/*
+cbuffer MatrixBuffer
+{
+	matrix worldMatrix;
+	matrix viewMatrix;
+	matrix projectionMatrix;
+};
+*/
 
 ///////////////////
 // SAMPLE STATES //
