@@ -155,9 +155,8 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 				// Saturate the final light color.
 				color = saturate (color);
 
-
-				reflection = normalize(2 * lightIntensity * input.normal - lightDir);
-				specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
+				reflection = normalize (2 * lightIntensity * input.normal - lightDir);
+				specular = pow (saturate (dot (reflection, input.viewDirection)), specularPower);
 			}
 		}
 	}
@@ -171,9 +170,9 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 			color += (diffuseColor * lightIntensity);
 			color = saturate (color);
 
+			reflection = normalize (2 * lightIntensity * input.normal - lightDir);
+			specular = pow (saturate (dot (reflection, input.viewDirection)), specularPower);
 
-			reflection = normalize(2 * lightIntensity * input.normal - lightDir);
-			specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
 		}
 	}
 
@@ -185,7 +184,9 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 	if (textureColor.x)
 		color = color * textureColor;
 
-	color = saturate(color + specular);
+
+	if (specularColor.a != 0.0f)
+		color = saturate(color + specular);
 
 	// Combine the light and texture color.
 	//color = color * diffuseColor;

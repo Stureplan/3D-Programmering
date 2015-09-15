@@ -116,10 +116,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	m_ObjectLight->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_ObjectLight->SetSpecularPower(32.0f);
-	m_ObjectLight->SetPosition(1.0f, 4.0f, 0.0f);
-	m_ObjectLight->SetDirection(-1.0f, -4.0f, 0.0f);
+	m_ObjectLight->SetPosition(4.0f, 4.0f, 0.0f);
+	m_ObjectLight->SetDirection(-4.0f, -4.0f, 0.0f);
 	m_ObjectLight->GenerateOrthoMatrix(20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
 	m_ObjectLight->GenerateViewMatrix();
+	no_specular = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 	m_RenderTexture = new RenderTextureClass;
 	m_DepthShader = new DepthShaderClass;
@@ -416,7 +417,7 @@ bool GraphicsClass::Render(float rotation)
 		m_EnvironmentLight->GetAmbientColor(),
 		m_EnvironmentLight->GetDiffuseColor(),
 		m_Camera->GetPosition(), 
-		m_ObjectLight->GetSpecularColor(), 
+		no_specular, 
 		m_ObjectLight->GetSpecularPower());
 
 	//-------------------------------------------------------------------------//

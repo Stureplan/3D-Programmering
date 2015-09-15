@@ -80,6 +80,8 @@ private:
 	D3DXVECTOR3 camera_forward, camera_lookat, camera_up;
 	D3DXVECTOR3 camera_left, camera_right;
 	D3DXMATRIX rot;
+
+	D3DXVECTOR4 no_specular;
 };
 
 #endif
