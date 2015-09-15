@@ -112,7 +112,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_EnvironmentLight->SetAmbientColor(0.02f, 0.02f, 0.02f, 1.0f);
 	m_EnvironmentLight->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_EnvironmentLight->SetDirection(-2.0f, -1.0f, 0.0f);
-	m_EnvironmentLight->GenerateOrthoMatrix(20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
 	m_EnvironmentLight->GenerateViewMatrix();
 
 	m_ObjectLight->SetPosition(1.0f, 4.0f, 0.0f);
@@ -346,6 +345,15 @@ bool GraphicsClass::RenderSceneToTexture()
 	m_DepthShader->Render(m_D3D->GetDevice(), m_NormalCube->GetIndexCount(), worldMatrix, lightViewMatrix, lightOrthoMatrix);
 
 
+	//Reset
+	m_D3D->GetWorldMatrix(worldMatrix);
+	D3DXMatrixTranslation(&worldMatrix, -100.0f, -5.0f, -100.0f);
+	//D3DXMatrixMultiply(&worldMatrix, &rot, &worldMatrix);
+	
+	m_Terrain->Render(m_D3D->GetDevice());
+	m_DepthShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(), worldMatrix, lightViewMatrix, lightOrthoMatrix);
+
+
 	//Set rendering target to normal
 	m_D3D->SetBackBufferRenderTarget();
 	m_D3D->ResetViewport();
@@ -481,7 +489,7 @@ bool GraphicsClass::Render(float rotation)
 			worldMatrix, viewMatrix, projectionMatrix,
 			objViewMatrix, objOrthoMatrix,
 			m_GroundCube->GetTexture(), m_RenderTexture->GetShaderResourceView(),
-			m_EnvironmentLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_GroundCube->GetDiffuse());
+			m_ObjectLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_GroundCube->GetDiffuse());
 	}
 	//-------------------------------------------------------------------------//
 
