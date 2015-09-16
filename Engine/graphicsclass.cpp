@@ -416,7 +416,7 @@ bool GraphicsClass::Render(float rotation)
 	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
 
 	// Set the terrain shader parameters that it will use for rendering
-	result = m_ShadowShader->SetShaderParameters(m_D3D->GetDevice(), worldMatrix, viewMatrix, 
+	result = m_ShadowShader->SetShaderParametersTerrain(m_D3D->GetDevice(), worldMatrix, viewMatrix, 
 									projectionMatrix, m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 									m_Light->GetDirection(), m_Terrain->GetTexture());
 	if (!result)

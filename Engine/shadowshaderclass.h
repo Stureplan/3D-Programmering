@@ -10,7 +10,7 @@
 //////////////
 #include <d3d10.h>
 #include <d3dx10math.h>
-#include <d3dx10async.h>
+//#include <d3dx10async.h>
 #include <fstream>
 using namespace std;
 
@@ -32,7 +32,9 @@ public:
 				 ID3D10ShaderResourceView*, ID3D10ShaderResourceView*, 
 				 D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4);
 
-	bool SetShaderParameters(ID3D10Device*, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR3, ID3D10ShaderResourceView*);
+	bool SetShaderParametersTerrain(ID3D10Device*, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
+							D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR3, 
+							ID3D10ShaderResourceView*);
 
 	void RenderShader(ID3D10Device*, int);
 
