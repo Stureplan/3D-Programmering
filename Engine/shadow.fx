@@ -17,7 +17,6 @@ float3 lightDirection;
 float4 ambientColor;
 float4 diffuseColor;
 float3 cameraPosition;
-float4 specularColor;
 float specularPower;
 
 
@@ -190,12 +189,8 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 	if (textureColor.x)
 		color = color * textureColor;
 
-
 	if (specularPower != 0.0f)
 		color = saturate(color + specular);
-
-	// Combine the light and texture color.
-	//color = color * diffuseColor;
 
 	return color;
 }

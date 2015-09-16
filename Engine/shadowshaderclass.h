@@ -30,7 +30,7 @@ public:
 			 	 D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
 				 ID3D10ShaderResourceView*, ID3D10ShaderResourceView*, 
 				 D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
-				 D3DXVECTOR3, D3DXVECTOR4, float);
+				 D3DXVECTOR3, float);
 
 private:
 	bool InitializeShader (ID3D10Device*, HWND, WCHAR*);
@@ -40,7 +40,7 @@ private:
 	void SetShaderParameters (D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
 							  ID3D10ShaderResourceView*, ID3D10ShaderResourceView*,
 							  D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
-							  D3DXVECTOR3, D3DXVECTOR4, float);
+							  D3DXVECTOR3, float);
 
 	void RenderShader (ID3D10Device*, int);
 
@@ -70,7 +70,6 @@ private:
 
 	//Specular pointers
 	ID3D10EffectVectorVariable* m_cameraPositionPtr;
-	ID3D10EffectVectorVariable* m_specularColorPtr;
 	ID3D10EffectScalarVariable* m_specularPowerPtr;
 };
 

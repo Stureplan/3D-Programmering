@@ -81,7 +81,7 @@ private:
 	D3DXVECTOR3 camera_left, camera_right;
 	D3DXMATRIX rot;
 
-	D3DXVECTOR4 no_specular;
+	float specular_none, specular_matte, specular_shiny;
 };
 
 #endif

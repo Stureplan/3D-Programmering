@@ -38,6 +38,10 @@ GraphicsClass::GraphicsClass()
 	D3DXMatrixIdentity(&rot);
 	camera_up = { 0.0f, 1.0f, 0.0f };
 	gun_offset = { 0.5f, -0.5f, 1.5f };
+
+	specular_none  = 0.0f;
+	specular_matte = 32.0f;
+	specular_shiny = 8.0f;
 }
 
 
@@ -114,13 +118,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_EnvironmentLight->SetDirection(-2.0f, -1.0f, 0.0f);
 	m_EnvironmentLight->GenerateViewMatrix();
 
-	m_ObjectLight->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_ObjectLight->SetSpecularPower(8.0f);
 	m_ObjectLight->SetPosition(4.0f, 4.0f, 0.0f);
 	m_ObjectLight->SetDirection(-4.0f, -4.0f, 0.0f);
 	m_ObjectLight->GenerateOrthoMatrix(20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
 	m_ObjectLight->GenerateViewMatrix();
-	no_specular = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 	m_RenderTexture = new RenderTextureClass;
 	m_DepthShader = new DepthShaderClass;
@@ -418,8 +419,7 @@ bool GraphicsClass::Render(float rotation)
 	m_EnvironmentLight->GetAmbientColor(),
 	m_EnvironmentLight->GetDiffuseColor(),
 	m_Camera->GetPosition(), 
-	no_specular, 
-	0.0f);
+	specular_none);
 
 	//-------------------------------------------------------------------------//
 	//					--/\-- TERRAIN HANDLING --/\--						   //
@@ -445,7 +445,7 @@ bool GraphicsClass::Render(float rotation)
 			objViewMatrix, objOrthoMatrix,
 			m_Gun->GetTexture(), m_RenderTexture->GetShaderResourceView(),
 			m_ObjectLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_Gun->GetDiffuse(),
-			m_Camera->GetPosition(), m_ObjectLight->GetSpecularColor(), m_ObjectLight->GetSpecularPower());
+			m_Camera->GetPosition(), specular_matte);
 	}
 	//-------------------------------------------------------------------------//
 
@@ -476,7 +476,7 @@ bool GraphicsClass::Render(float rotation)
 			objViewMatrix, objOrthoMatrix,
 			m_Cube->GetTexture(), m_RenderTexture->GetShaderResourceView(),
 			m_ObjectLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_Cube->GetDiffuse(),
-			m_Camera->GetPosition(), m_ObjectLight->GetSpecularColor(), m_ObjectLight->GetSpecularPower());
+			m_Camera->GetPosition(), specular_shiny);
 	}
 	//-------------------------------------------------------------------------//
 
@@ -499,7 +499,7 @@ bool GraphicsClass::Render(float rotation)
 			objViewMatrix, objOrthoMatrix,
 			m_GroundCube->GetTexture(), m_RenderTexture->GetShaderResourceView(),
 			m_ObjectLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_GroundCube->GetDiffuse(),
-			m_Camera->GetPosition(), m_ObjectLight->GetSpecularColor(), m_ObjectLight->GetSpecularPower());
+			m_Camera->GetPosition(), specular_none);
 	}
 	//-------------------------------------------------------------------------//
 
