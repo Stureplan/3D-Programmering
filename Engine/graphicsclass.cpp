@@ -115,7 +115,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_EnvironmentLight->GenerateViewMatrix();
 
 	m_ObjectLight->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_ObjectLight->SetSpecularPower(32.0f);
+	m_ObjectLight->SetSpecularPower(8.0f);
 	m_ObjectLight->SetPosition(4.0f, 4.0f, 0.0f);
 	m_ObjectLight->SetDirection(-4.0f, -4.0f, 0.0f);
 	m_ObjectLight->GenerateOrthoMatrix(20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
@@ -408,17 +408,18 @@ bool GraphicsClass::Render(float rotation)
 	D3DXMatrixTranslation(&translationMatrix, -100.0f, -5.0f, -100.0f);
 	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
 
-	m_ShadowShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(),
-		worldMatrix, viewMatrix, projectionMatrix,
-		objViewMatrix, objOrthoMatrix,
-		m_Terrain->GetTexture(),
-		m_RenderTexture->GetShaderResourceView(),
-		m_EnvironmentLight->GetDirection(),
-		m_EnvironmentLight->GetAmbientColor(),
-		m_EnvironmentLight->GetDiffuseColor(),
-		m_Camera->GetPosition(), 
-		no_specular, 
-		m_ObjectLight->GetSpecularPower());
+	m_ShadowShader->Render(
+	m_D3D->GetDevice(), m_Terrain->GetIndexCount(),
+	worldMatrix, viewMatrix, projectionMatrix,
+	objViewMatrix, objOrthoMatrix,
+	m_Terrain->GetTexture(),
+	m_RenderTexture->GetShaderResourceView(),
+	m_EnvironmentLight->GetDirection(),
+	m_EnvironmentLight->GetAmbientColor(),
+	m_EnvironmentLight->GetDiffuseColor(),
+	m_Camera->GetPosition(), 
+	no_specular, 
+	0.0f);
 
 	//-------------------------------------------------------------------------//
 	//					--/\-- TERRAIN HANDLING --/\--						   //
