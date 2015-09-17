@@ -55,10 +55,12 @@ private:
 	bool RenderSceneToTexture();
 	bool Render(float);
 
+
 private:
 	D3DClass*	 m_D3D;
 	CameraClass* m_Camera;
-	LightClass*  m_Light;
+	LightClass*  m_EnvironmentLight;
+	LightClass*  m_ObjectLight;
 
 	ModelClass* m_Gun;
 	ModelClass* m_Cube;
@@ -76,10 +78,12 @@ private:
 
 	float movespeed, rotatespeed;
 	D3DXVECTOR3 gun, cube, def, ground, cube2, terrain;
-	D3DXVECTOR3 cam_pos, gun_pos, rotate;
+	D3DXVECTOR3 cam_pos, gun_pos, gun_offset, rotate;
 	D3DXVECTOR3 camera_forward, camera_lookat, camera_up;
 	D3DXVECTOR3 camera_left, camera_right;
 	D3DXMATRIX rot;
+
+	float specular_none, specular_matte, specular_shiny;
 };
 
 #endif

@@ -13,9 +13,12 @@ matrix lightViewMatrix;
 matrix lightProjectionMatrix;
 Texture2D shaderTexture;
 Texture2D depthMapTexture;
+float3 lightDirection;
 float4 ambientColor;
 float4 diffuseColor;
-float3 lightDirection;
+float3 cameraPosition;
+float specularPower;
+
 
 /*
 cbuffer MatrixBuffer
@@ -60,6 +63,7 @@ struct PixelInputType
 	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
 	float4 lightViewPosition : TEXCOORD1;
+	float3 viewDirection : TEXCOORD2;
 };
 
 
@@ -94,6 +98,10 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 	// Normalize the normal vector.
 	output.normal = normalize (output.normal);
 
+	worldPosition = mul(input.position, worldMatrix);
+	output.viewDirection = cameraPosition.xyz - worldPosition.xyz;
+	output.viewDirection = normalize(output.viewDirection);
+
 	return output;
 }
 
@@ -111,6 +119,8 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 	float lightIntensity;
 	float4 textureColor;
 	float3 lightDir;
+	float3 reflection;
+	float4 specular;
 
 	lightDir = -lightDirection;
 
@@ -119,6 +129,7 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 
 	// Set the default output color to the ambient light value for all pixels.
 	color = ambientColor;
+	specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Calculate the projected texture coordinates.
 	projectTexCoord.x = input.lightViewPosition.x / input.lightViewPosition.w / 2.0f + 0.5f;
@@ -145,11 +156,15 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 
 			if (lightIntensity > 0.0f)
 			{
-				// Determine the final diffuse color based on the diffuse color and the amount of light intensity.
+				//Calculate diffuse
 				color += (diffuseColor * lightIntensity);
-
-				// Saturate the final light color.
 				color = saturate (color);
+
+				if (specularPower != 0.0f)
+				{
+					reflection = normalize (2 * lightIntensity * input.normal - input.viewDirection);
+					specular = pow (saturate (dot (reflection, input.viewDirection)), specularPower);
+				}
 			}
 		}
 	}
@@ -160,16 +175,30 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 		lightIntensity = saturate (dot (input.normal, lightDir));
 		if (lightIntensity > 0.0f)
 		{
+			//Calculate diffuse
 			color += (diffuseColor * lightIntensity);
 			color = saturate (color);
+
+
+			//If we sent a 0 value as a parameter to the shader, DON'T calculate specular
+			if (specularPower != 0.0f)
+			{
+				reflection = normalize (2 * lightIntensity * input.normal - lightDir);
+				specular = pow (saturate (dot (reflection, input.viewDirection)), specularPower);
+			}
 		}
 	}
+
+
 
 	// Sample the pixel color from the texture using the sampler at this texture coordinate location.
 	textureColor = shaderTexture.Sample (SampleTypeWrap, input.tex);
 
-	// Combine the light and texture color.
-	color = color * textureColor;
+	if (textureColor.x)
+		color = color * textureColor;
+
+	if (specularPower != 0.0f)
+		color = saturate(color + specular);
 
 	return color;
 }

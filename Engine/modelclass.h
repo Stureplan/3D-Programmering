@@ -8,6 +8,8 @@
 //////////////
 // INCLUDES //
 //////////////
+#include <D3D10.h>
+#include <D3DX10.h>
 #include <fstream>
 using namespace std;
 #include "textureclass.h"
@@ -61,16 +63,17 @@ private:
 public:
 	ModelClass();
 	ModelClass(const ModelClass&);
-	ModelClass(D3DXVECTOR3, ID3D10Device*, char*, WCHAR*, bool);
+	ModelClass(D3DXVECTOR3, ID3D10Device*, WCHAR*, bool);
 	~ModelClass();
 
-	bool Initialize(ID3D10Device*, char*, WCHAR*);
+	bool Initialize(ID3D10Device*, WCHAR*);
 	void SetPosition (float, float, float);
 	D3DXVECTOR3 GetPosition();
 	void SetRotation(float, float, float);
 	D3DXVECTOR3 GetRotation();
 	void SetScale (float, float, float);
 	D3DXVECTOR3 GetScale();
+	D3DXVECTOR4 GetDiffuse();
 	int GetObjectCount();
 	void Shutdown();
 	void Render(ID3D10Device*);
@@ -82,10 +85,10 @@ private:
 	bool InitializeBuffers(ID3D10Device*);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D10Device*);
-	bool LoadTexture(ID3D10Device*, WCHAR*);
+	bool LoadTexture(ID3D10Device*, string);
 	void LoadNormalmap (ID3D10Device*, WCHAR*);
 	void ReleaseTexture();
-	bool LoadModel(char*);
+	bool LoadModel(WCHAR*);
 	void ReleaseModel();
 
 	void CalculateModelVectors ();
@@ -95,13 +98,16 @@ private:
 private:
 	ID3D10Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount, m_objectCount;
-	bool m_normalMapped;
+	string texturefile;
+	float r, g, b;
+	bool m_textured, m_normalMapped;
 	TextureClass* m_Texture;
 	TextureClass* m_Normalmap;
 	ModelType* m_model;
 	Object* m_Object;
 
 	D3DXVECTOR3 defaultpos;
+	D3DXVECTOR4 m_diffuse;
 };
 
 #endif

@@ -30,7 +30,8 @@ public:
 	void Render (ID3D10Device*, int, 
 			 	 D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
 				 ID3D10ShaderResourceView*, ID3D10ShaderResourceView*, 
-				 D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4);
+				 D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
+				 D3DXVECTOR3, float);
 
 	bool SetShaderParametersTerrain(ID3D10Device*, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
 							D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR3, 
@@ -45,23 +46,12 @@ private:
 
 	void SetShaderParameters (D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
 							  ID3D10ShaderResourceView*, ID3D10ShaderResourceView*,
-							  D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4);
+							  D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
+							  D3DXVECTOR3, float);
+
+	void RenderShader (ID3D10Device*, int);
 
 private:
-	struct MatrixBufferType
-	{
-		D3DXMATRIX world;
-		D3DXMATRIX view;
-		D3DXMATRIX projection;
-	};
-
-	struct LightBufferType
-	{
-		D3DXVECTOR4 ambientColor;
-		D3DXVECTOR4 diffuseColor;
-		D3DXVECTOR3 lightDirection;
-	};
-
 	//Shader pointers
 	ID3D10Effect* m_effect;
 	ID3D10EffectTechnique* m_technique;
@@ -85,9 +75,9 @@ private:
 	ID3D10EffectVectorVariable* m_ambientColorPtr;
 	ID3D10EffectVectorVariable* m_diffuseColorPtr;
 
-	// Matrix and light buffers
-	ID3D10Buffer* m_matrixBuffer;
-	ID3D10Buffer* m_lightBuffer;
+	//Specular pointers
+	ID3D10EffectVectorVariable* m_cameraPositionPtr;
+	ID3D10EffectScalarVariable* m_specularPowerPtr;
 };
 
 #endif

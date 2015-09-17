@@ -18,6 +18,7 @@ NormalMapShaderClass::NormalMapShaderClass ()
 	m_normalTexturePtr = 0;
 
 	m_lightDirectionPtr = 0;
+	m_ambientColorPtr = 0;
 	m_diffuseColorPtr = 0;
 }
 
@@ -62,12 +63,12 @@ void NormalMapShaderClass::Render
 	(ID3D10Device* device, int indexCount, 
 	 D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 
 	 ID3D10ShaderResourceView* texture, ID3D10ShaderResourceView* normalTexture,
-	 D3DXVECTOR3 lightDirection, D3DXVECTOR4 diffuseColor)
+	 D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor)
 {
 	// Set the shader parameters that it will use for rendering.
 	SetShaderParameters (worldMatrix, viewMatrix, projectionMatrix, 
 						 texture, normalTexture,
-						 lightDirection, diffuseColor);
+						 lightDirection, ambientColor, diffuseColor);
 
 	// Now render the prepared buffers with the shader.
 	RenderShader (device, indexCount);
@@ -178,6 +179,7 @@ bool NormalMapShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WC
 
 	//Light pointers
 	m_lightDirectionPtr = m_effect->GetVariableByName ("lightDirection")->AsVector ();
+	m_ambientColorPtr	= m_effect->GetVariableByName ("ambientColor")->AsVector ();
 	m_diffuseColorPtr	= m_effect->GetVariableByName ("diffuseColor")	->AsVector ();
 
 	return true;
@@ -188,6 +190,7 @@ void NormalMapShaderClass::ShutdownShader ()
 {
 	//Release the light pointers
 	m_lightDirectionPtr = 0;
+	m_ambientColorPtr = 0;
 	m_diffuseColorPtr = 0;
 
 	//Release the pointer to the textures in the shader file.
@@ -259,7 +262,7 @@ void NormalMapShaderClass::OutputShaderErrorMessage (ID3D10Blob* errorMessage, H
 void NormalMapShaderClass::SetShaderParameters 
 	(D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 
 	 ID3D10ShaderResourceView* texture, ID3D10ShaderResourceView* normalTexture,
-	 D3DXVECTOR3 lightDirection, D3DXVECTOR4 diffuseColor)
+	 D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor)
 {
 	// Set the world matrix variable inside the shader.
 	m_worldMatrixPtr	 ->SetMatrix ((float*) &worldMatrix);
@@ -272,6 +275,7 @@ void NormalMapShaderClass::SetShaderParameters
 
 	//Sets the direction of the light inside the shader.
 	m_lightDirectionPtr	->SetFloatVector ((float*) &lightDirection);
+	m_ambientColorPtr	->SetFloatVector ((float*) &ambientColor);
 	m_diffuseColorPtr	->SetFloatVector ((float*) &diffuseColor);
 
 	return;

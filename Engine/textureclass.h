@@ -10,6 +10,8 @@
 //////////////
 #include <d3d10.h>
 #include <d3dx10.h>
+#include <string>
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -23,6 +25,7 @@ public:
 	~TextureClass();
 
 	bool Initialize(ID3D10Device*, WCHAR*);
+	bool Initialize(ID3D10Device*, string);
 	void Shutdown();
 	ID3D10ShaderResourceView* GetTexture();
 

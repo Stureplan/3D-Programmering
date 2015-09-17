@@ -21,7 +21,7 @@ ModelClass::ModelClass(const ModelClass& other)
 {
 }
 
-ModelClass::ModelClass (D3DXVECTOR3 pos, ID3D10Device* device, char* model, WCHAR* texture, bool normalMapped)
+ModelClass::ModelClass (D3DXVECTOR3 pos, ID3D10Device* device, WCHAR* model, bool normalMapped)
 {
 	m_vertexBuffer = 0;
 	m_indexBuffer = 0;
@@ -34,7 +34,7 @@ ModelClass::ModelClass (D3DXVECTOR3 pos, ID3D10Device* device, char* model, WCHA
 	m_Object->position = defaultpos;
 
 	m_normalMapped = normalMapped;
-	Initialize (device, model, texture);
+	Initialize (device, model);
 }
 
 
@@ -43,7 +43,7 @@ ModelClass::~ModelClass()
 }
 
 
-bool ModelClass::Initialize(ID3D10Device* device, char* model, WCHAR* texture)
+bool ModelClass::Initialize(ID3D10Device* device, WCHAR* model)
 {
 	bool result;
 
@@ -67,7 +67,7 @@ bool ModelClass::Initialize(ID3D10Device* device, char* model, WCHAR* texture)
 	}
 
 	// Load the texture for this model.
-	result = LoadTexture (device, texture);
+	result = LoadTexture (device, texturefile);
 	if (!result)
 	{
 		return false;
@@ -76,7 +76,8 @@ bool ModelClass::Initialize(ID3D10Device* device, char* model, WCHAR* texture)
 	if (m_normalMapped == true)
 	{
 		WCHAR* normalMap = L"../Engine/data/floor.jpg";
-		//expand with an if/else if, if we want to use more normalmaps...
+		//Currently only supports ONE normalmap,
+		//expand with if/else, if we want to use more normalmaps...
 
 		LoadNormalmap (device, normalMap);
 	}
@@ -115,6 +116,11 @@ void ModelClass::SetScale(float x, float y, float z)
 D3DXVECTOR3 ModelClass::GetScale()
 {
 	return m_Object->scale;
+}
+
+D3DXVECTOR4 ModelClass::GetDiffuse()
+{
+	return m_diffuse;
 }
 
 
@@ -298,7 +304,7 @@ void ModelClass::RenderBuffers(ID3D10Device* device)
 	return;
 }
 
-bool ModelClass::LoadTexture(ID3D10Device* device, WCHAR* filename)
+bool ModelClass::LoadTexture(ID3D10Device* device, string filename)
 {
 	bool result;
 
@@ -338,7 +344,7 @@ void ModelClass::ReleaseTexture()
 	return;
 }
 
-bool ModelClass::LoadModel(char* filename)
+bool ModelClass::LoadModel(WCHAR* filename)
 {
 	ifstream fin;
 	char input;
@@ -388,6 +394,42 @@ bool ModelClass::LoadModel(char* filename)
 		fin >> m_model[i].x >> m_model[i].y >> m_model[i].z;
 		fin >> m_model[i].tu >> m_model[i].tv;
 		fin >> m_model[i].nx >> m_model[i].ny >> m_model[i].nz;
+	}
+
+	fin.get(input);
+	while (input != 'f')
+	{
+		fin.get(input);
+	}
+
+	if (input == 'f')
+	{
+		fin.get(input);
+		if (input == ':')
+		{
+			fin.get(input); // whitespace
+			fin.get(input);
+			if (input == 'y')
+			{
+				fin.get(input); // \n
+				fin.get(input); // p
+				fin.get(input); // :
+				fin.get(input); // whitespace
+				fin >> texturefile;
+				m_textured = true;
+				m_diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
+			}
+			else if (input == 'n')
+			{
+				fin.get(input); // \n
+				fin.get(input); // c
+				fin.get(input); // :
+				fin.get(input); // whitespace
+				fin >> m_diffuse.x >> m_diffuse.y >> m_diffuse.z;
+				m_textured = false;
+				m_diffuse = { m_diffuse.x, m_diffuse.y, m_diffuse.z, 1.0f };
+			}
+		}
 	}
 
 	//Close the model file
