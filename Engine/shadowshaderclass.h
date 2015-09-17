@@ -33,9 +33,11 @@ public:
 				 D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
 				 D3DXVECTOR3, float);
 
-	bool SetShaderParametersTerrain(ID3D10Device*, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
-							D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR3, 
-							ID3D10ShaderResourceView*);
+	void SetShaderParametersTerrain(
+		D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX,
+		ID3D10ShaderResourceView*, ID3D10ShaderResourceView*,
+		D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
+		D3DXVECTOR3, float);
 
 	void RenderShader(ID3D10Device*, int);
 
@@ -48,8 +50,6 @@ private:
 							  ID3D10ShaderResourceView*, ID3D10ShaderResourceView*,
 							  D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
 							  D3DXVECTOR3, float);
-
-	void RenderShader (ID3D10Device*, int);
 
 private:
 	//Shader pointers

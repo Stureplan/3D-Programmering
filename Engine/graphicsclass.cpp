@@ -117,6 +117,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_EnvironmentLight->SetAmbientColor(0.02f, 0.02f, 0.02f, 1.0f);
 	m_EnvironmentLight->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_EnvironmentLight->SetDirection(-2.0f, -1.0f, 0.0f);
+	m_EnvironmentLight->GenerateOrthoMatrix(20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
 	m_EnvironmentLight->GenerateViewMatrix();
 
 	m_ObjectLight->SetPosition(4.0f, 4.0f, 0.0f);
@@ -368,16 +369,6 @@ bool GraphicsClass::RenderSceneToTexture()
 	m_NormalCube->Render(m_D3D->GetDevice());
 	m_DepthShader->Render(m_D3D->GetDevice(), m_NormalCube->GetIndexCount(), worldMatrix, lightViewMatrix, lightOrthoMatrix);
 
-
-	//Reset
-	m_D3D->GetWorldMatrix(worldMatrix);
-	D3DXMatrixTranslation(&worldMatrix, -100.0f, -5.0f, -100.0f);
-	//D3DXMatrixMultiply(&worldMatrix, &rot, &worldMatrix);
-	
-	m_Terrain->Render(m_D3D->GetDevice());
-	m_DepthShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(), worldMatrix, lightViewMatrix, lightOrthoMatrix);
-
-
 	//Set rendering target to normal
 	m_D3D->SetBackBufferRenderTarget();
 	m_D3D->ResetViewport();
@@ -409,8 +400,10 @@ bool GraphicsClass::Render(float rotation)
 	m_Camera->Render();
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
-	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
+
+	m_Camera->GetViewMatrix(viewMatrix);
+
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
 	m_EnvironmentLight->GetViewMatrix(lightViewMatrix);
@@ -424,18 +417,24 @@ bool GraphicsClass::Render(float rotation)
 	//-------------------------------------------------------------------------//
 	//					--\/-- TERRAIN HANDLING --\/--						   //
 	//-------------------------------------------------------------------------//
+	
+	D3DXMatrixTranslation(&translationMatrix, 20.0f, 0, 0);
+	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
 
-	m_ShadowShader->SetShaderParametersTerrain(m_D3D->GetDevice(), worldMatrix, viewMatrix,
-		projectionMatrix, m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
-		m_Light->GetDirection(), m_Terrain->GetTexture());
+
+	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
+	D3DXVECTOR3 test = { viewMatrix._41, viewMatrix._42, viewMatrix._43 };
+
+	m_ShadowShader->SetShaderParametersTerrain(worldMatrix, viewMatrix, projectionMatrix, 
+	objViewMatrix, objOrthoMatrix, m_Terrain->GetTexture(), m_RenderTexture->GetShaderResourceView(),
+	m_EnvironmentLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_EnvironmentLight->GetDiffuseColor(),
+	m_Camera->GetPosition(), specular_none);
 
 	m_QuadTree->Render(m_Frustum, m_D3D->GetDevice(), m_ShadowShader);
-
 
 	//-------------------------------------------------------------------------//
 	//					--/\-- TERRAIN HANDLING --/\--						   //
 	//-------------------------------------------------------------------------//
-
 
 
 	//					--v-- OBJECT HANDLING --v--
