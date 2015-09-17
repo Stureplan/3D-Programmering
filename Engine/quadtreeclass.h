@@ -45,7 +45,7 @@ public:
 	QuadTreeClass(const QuadTreeClass&);
 	~QuadTreeClass();
 
-	bool Initialize(TerrainClass*, ID3D10Device*);
+	bool Initialize(TerrainClass*, ID3D10Device*, D3DXVECTOR3);
 	void Shutdown();
 	void Render(FrustumClass*, ID3D10Device*, ShadowShaderClass*);
 
@@ -63,6 +63,7 @@ private:
 	int m_triangleCount, m_drawCount;
 	VertexType* m_vertexList;
 	NodeType* m_parentNode;
+	D3DXVECTOR3 terrain_offset;
 };
 
 #endif

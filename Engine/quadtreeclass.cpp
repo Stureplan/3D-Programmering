@@ -21,11 +21,11 @@ QuadTreeClass::~QuadTreeClass()
 }
 
 
-bool QuadTreeClass::Initialize(TerrainClass* terrain, ID3D10Device* device)
+bool QuadTreeClass::Initialize(TerrainClass* terrain, ID3D10Device* device, D3DXVECTOR3 offset)
 {
 	int vertexCount;
 	float centerX, centerZ, width;
-
+	terrain_offset = offset;
 
 	// Get the number of vertices in the terrain vertex array.
 	vertexCount = terrain->GetVertexCount();
@@ -435,7 +435,7 @@ void QuadTreeClass::RenderNode(NodeType* node, FrustumClass* frustum,
 
 
 	// Check to see if the node can be viewed, height doesn't matter in a quad tree.
-	result = frustum->CheckCube(node->positionX, 0.0f, node->positionZ, (node->width / 2.0f));
+	result = frustum->CheckCube(node->positionX + terrain_offset.x, 0.0f, node->positionZ + terrain_offset.z, (node->width / 2.0f));
 
 	// If it can't be seen then none of its children can either so don't continue down the tree, this is where the speed is gained.
 	if (!result)

@@ -33,8 +33,8 @@ GraphicsClass::GraphicsClass()
 	def = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	ground = D3DXVECTOR3(0.0f, -2.0f, 0.0f);
 	cube2 = D3DXVECTOR3(2.5f, 0.3f, 0.0f);
-	terrain = D3DXVECTOR3(-100.0f, -5.0f, -100.0f);
-
+	terrain = D3DXVECTOR3(20.0f, -5.0f, 0.0f);
+	
 
 	D3DXMatrixIdentity(&rot);
 	camera_up = { 0.0f, 1.0f, 0.0f };
@@ -143,7 +143,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 
 	// Initializde the quad tree object.
-	m_QuadTree->Initialize(m_Terrain, m_D3D->GetDevice());
+	m_QuadTree->Initialize(m_Terrain, m_D3D->GetDevice(), terrain);
 
 	return true;
 }
@@ -418,12 +418,10 @@ bool GraphicsClass::Render(float rotation)
 	//					--\/-- TERRAIN HANDLING --\/--						   //
 	//-------------------------------------------------------------------------//
 	
-	D3DXMatrixTranslation(&translationMatrix, 20.0f, 0, 0);
+	D3DXMatrixTranslation(&translationMatrix, terrain.x, terrain.y, terrain.z);
 	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
 
-
 	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
-	D3DXVECTOR3 test = { viewMatrix._41, viewMatrix._42, viewMatrix._43 };
 
 	m_ShadowShader->SetShaderParametersTerrain(worldMatrix, viewMatrix, projectionMatrix, 
 	objViewMatrix, objOrthoMatrix, m_Terrain->GetTexture(), m_RenderTexture->GetShaderResourceView(),
