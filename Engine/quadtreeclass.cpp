@@ -426,7 +426,8 @@ void QuadTreeClass::ReleaseNode(NodeType* node)
 }
 
 
-void QuadTreeClass::RenderNode(NodeType* node, FrustumClass* frustum, ID3D10Device* deviceContext, ShadowShaderClass* shader)
+void QuadTreeClass::RenderNode(NodeType* node, FrustumClass* frustum, 
+							   ID3D10Device* deviceContext, ShadowShaderClass* shader)
 {
 	bool result;
 	int count, i, indexCount;
@@ -472,8 +473,8 @@ void QuadTreeClass::RenderNode(NodeType* node, FrustumClass* frustum, ID3D10Devi
 	deviceContext->IASetIndexBuffer(node->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	deviceContext->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	
 	// Determine the number of indices in this node.
 	indexCount = node->triangleCount * 3;
 

@@ -32,7 +32,7 @@ GraphicsClass::GraphicsClass()
 	def = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	ground = D3DXVECTOR3(0.0f, -2.0f, 0.0f);
 	cube2 = D3DXVECTOR3(2.5f, 0.3f, 0.0f);
-	terrain = D3DXVECTOR3(100.0f, 100.0f, 100.0f);
+	terrain = D3DXVECTOR3(-100.0f, -5.0f, -100.0f);
 
 
 	D3DXMatrixIdentity(&rot);
@@ -89,7 +89,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
+	m_Camera->SetPosition(0.0f, 3.0f, 0.0f);
 
 
 	m_Convert = new ConverterClass;
@@ -415,46 +415,24 @@ bool GraphicsClass::Render(float rotation)
 	// Construct the frustum.
 	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
 
-	// Set the terrain shader parameters that it will use for rendering
-	result = m_ShadowShader->SetShaderParametersTerrain(m_D3D->GetDevice(), worldMatrix, viewMatrix, 
-									projectionMatrix, m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
-									m_Light->GetDirection(), m_Terrain->GetTexture());
-	if (!result)
-	{
-		return false;
-	}
+	m_ShadowShader->SetShaderParametersTerrain(m_D3D->GetDevice(), worldMatrix, viewMatrix,
+		projectionMatrix, m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Light->GetDirection(), m_Terrain->GetTexture());
 
-	// Render the terrain using the quad tree and terrain shader.
 	m_QuadTree->Render(m_Frustum, m_D3D->GetDevice(), m_ShadowShader);
 
-/*	// Render the terrain buffers
-	m_Terrain->Render(m_D3D->GetDevice());
-
-	// Render the terrain using the light shader
-	//m_LightShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(), worldMatrix, 
-	//viewMatrix, projectionMatrix, m_Terrain->GetTexture(), m_Light->GetDirection(), 
-	//m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
-*/
-	D3DXMatrixTranslation(&translationMatrix, 0.0f, -5.0f, 0.0f);
-	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
-
-/*	//NEW SHADOWSHADER FOR TERRAIN
-	m_ShadowShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(),
-						   worldMatrix, viewMatrix, projectionMatrix,
-						   lightViewMatrix, lightOrthoMatrix,
-						   m_Terrain->GetTexture(), m_RenderTexture->GetShaderResourceView(),
-						   m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
-*/
-	m_D3D->GetWorldMatrix(worldMatrix);
 	
 	//					--v-- OBJECT HANDLING --v--
 	//1. Gun
 	//-------------------------------------------------------------------------//
+	
 	pos = m_Gun->GetPosition();
 	renderModel = m_Frustum->CheckSphere(pos.x, pos.y, pos.z, 0.1f);
 
-	if (renderModel == true)
+	if (renderModel == false)
 	{
+		m_D3D->GetWorldMatrix(worldMatrix);
+
 		D3DXMatrixTranslation(&translationMatrix, pos.x, pos.y, pos.z);
 		D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
 
@@ -549,7 +527,7 @@ bool GraphicsClass::Render(float rotation)
 			m_Light->GetDirection(), m_Light->GetDiffuseColor());
 	}
 	//-------------------------------------------------------------------------//
-
+	
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 

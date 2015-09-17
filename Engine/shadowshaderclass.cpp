@@ -83,12 +83,6 @@ void ShadowShaderClass::Render (ID3D10Device* device, int indexCount,
 	return;
 }
 
-//bool ShadowShaderClass::SetShaderParametersTerrain(ID3D10Device* device, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix,
-//	D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor, D3DXVECTOR3 lightDirection, ID3D10ShaderResourceView* texture)
-//{
-//
-//}
-
 
 bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR* filename)
 {
@@ -275,6 +269,7 @@ bool ShadowShaderClass::SetShaderParametersTerrain(ID3D10Device* device,
 	D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor, D3DXVECTOR3 lightDirection,
 	ID3D10ShaderResourceView* texture)
 {
+	
 	//Set pointers inside the shader
 	m_worldMatrixPtr->SetMatrix((float*)&worldMatrix);
 	m_viewMatrixPtr->SetMatrix((float*)&viewMatrix);
@@ -285,7 +280,7 @@ bool ShadowShaderClass::SetShaderParametersTerrain(ID3D10Device* device,
 	m_lightDirectionPtr->SetFloatVector((float*)&lightDirection);
 	m_ambientColorPtr->SetFloatVector((float*)&ambientColor);
 	m_diffuseColorPtr->SetFloatVector((float*)&diffuseColor);
-
+	
 	return true;
 }
 
