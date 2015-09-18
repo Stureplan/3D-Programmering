@@ -20,6 +20,14 @@ float3 cameraPosition;
 float specularPower;
 
 
+/*
+cbuffer MatrixBuffer
+{
+	matrix worldMatrix;
+	matrix viewMatrix;
+	matrix projectionMatrix;
+};
+*/
 
 ///////////////////
 // SAMPLE STATES //

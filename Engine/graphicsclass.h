@@ -19,6 +19,7 @@
 #include "normalmapshaderclass.h"
 #include "terrainclass.h"
 #include "frustumclass.h"
+#include "quadtreeclass.h"
 
 
 /////////////
@@ -73,6 +74,7 @@ private:
 	NormalMapShaderClass* m_NormalMapShader;
 	TerrainClass*		  m_Terrain;
 	FrustumClass*		  m_Frustum;
+	QuadTreeClass*		  m_QuadTree;
 
 	float movespeed, rotatespeed;
 	D3DXVECTOR3 gun, cube, def, ground, cube2, terrain;

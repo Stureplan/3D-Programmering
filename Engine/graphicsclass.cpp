@@ -22,6 +22,7 @@ GraphicsClass::GraphicsClass()
 	m_NormalMapShader = 0;
 	m_Terrain = 0;
 	m_Frustum = 0;
+	m_QuadTree = 0;
 
 	movespeed = 0.6f;
 	rotatespeed = 1.0f;
@@ -32,8 +33,8 @@ GraphicsClass::GraphicsClass()
 	def = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	ground = D3DXVECTOR3(0.0f, -2.0f, 0.0f);
 	cube2 = D3DXVECTOR3(2.5f, 0.3f, 0.0f);
-	terrain = D3DXVECTOR3(100.0f, 100.0f, 100.0f);
-
+	terrain = D3DXVECTOR3(20.0f, -5.0f, 0.0f);
+	
 
 	D3DXMatrixIdentity(&rot);
 	camera_up = { 0.0f, 1.0f, 0.0f };
@@ -90,7 +91,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
+	m_Camera->SetPosition(0.0f, 3.0f, 0.0f);
 
 
 	m_Convert = new ConverterClass;
@@ -116,6 +117,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_EnvironmentLight->SetAmbientColor(0.02f, 0.02f, 0.02f, 1.0f);
 	m_EnvironmentLight->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_EnvironmentLight->SetDirection(-2.0f, -1.0f, 0.0f);
+	m_EnvironmentLight->GenerateOrthoMatrix(20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
 	m_EnvironmentLight->GenerateViewMatrix();
 
 	m_ObjectLight->SetPosition(4.0f, 4.0f, 0.0f);
@@ -133,12 +135,30 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_ShadowShader->Initialize(m_D3D->GetDevice(), hwnd);
 	m_NormalMapShader->Initialize(m_D3D->GetDevice(), hwnd);
 
+	// Create new frustum object.
+	m_Frustum = new FrustumClass;
+
+	// Create the quad tree object.
+	m_QuadTree = new QuadTreeClass;
+
+
+	// Initializde the quad tree object.
+	m_QuadTree->Initialize(m_Terrain, m_D3D->GetDevice(), terrain);
+
 	return true;
 }
 
 
 void GraphicsClass::Shutdown()
 {
+	// Release the quad tree object.
+	if (m_QuadTree)
+	{
+		m_QuadTree->Shutdown();
+		delete m_QuadTree;
+		m_QuadTree = 0;
+	}
+
 	//Release objects
 	if (m_Terrain)
 	{
@@ -146,6 +166,7 @@ void GraphicsClass::Shutdown()
 		m_Terrain = 0;
 	}
 
+	// Release the frustum object.
 	if (m_Frustum)
 	{
 		delete m_Frustum;
@@ -348,16 +369,6 @@ bool GraphicsClass::RenderSceneToTexture()
 	m_NormalCube->Render(m_D3D->GetDevice());
 	m_DepthShader->Render(m_D3D->GetDevice(), m_NormalCube->GetIndexCount(), worldMatrix, lightViewMatrix, lightOrthoMatrix);
 
-
-	//Reset
-	m_D3D->GetWorldMatrix(worldMatrix);
-	D3DXMatrixTranslation(&worldMatrix, -100.0f, -5.0f, -100.0f);
-	//D3DXMatrixMultiply(&worldMatrix, &rot, &worldMatrix);
-	
-	m_Terrain->Render(m_D3D->GetDevice());
-	m_DepthShader->Render(m_D3D->GetDevice(), m_Terrain->GetIndexCount(), worldMatrix, lightViewMatrix, lightOrthoMatrix);
-
-
 	//Set rendering target to normal
 	m_D3D->SetBackBufferRenderTarget();
 	m_D3D->ResetViewport();
@@ -389,8 +400,10 @@ bool GraphicsClass::Render(float rotation)
 	m_Camera->Render();
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
-	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
+
+	m_Camera->GetViewMatrix(viewMatrix);
+
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
 	m_EnvironmentLight->GetViewMatrix(lightViewMatrix);
@@ -399,27 +412,23 @@ bool GraphicsClass::Render(float rotation)
 	m_ObjectLight->GetViewMatrix(objViewMatrix);
 	m_ObjectLight->GetOrthoMatrix(objOrthoMatrix);
 
+
+	
 	//-------------------------------------------------------------------------//
 	//					--\/-- TERRAIN HANDLING --\/--						   //
 	//-------------------------------------------------------------------------//
-
-	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
-	m_Terrain->Render(m_D3D->GetDevice());
-
-	D3DXMatrixTranslation(&translationMatrix, -100.0f, -5.0f, -100.0f);
+	
+	D3DXMatrixTranslation(&translationMatrix, terrain.x, terrain.y, terrain.z);
 	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
 
-	m_ShadowShader->Render(
-	m_D3D->GetDevice(), m_Terrain->GetIndexCount(),
-	worldMatrix, viewMatrix, projectionMatrix,
-	objViewMatrix, objOrthoMatrix,
-	m_Terrain->GetTexture(),
-	m_RenderTexture->GetShaderResourceView(),
-	m_EnvironmentLight->GetDirection(),
-	m_EnvironmentLight->GetAmbientColor(),
-	m_EnvironmentLight->GetDiffuseColor(),
-	m_Camera->GetPosition(), 
-	specular_none);
+	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
+
+	m_ShadowShader->SetShaderParametersTerrain(worldMatrix, viewMatrix, projectionMatrix, 
+	objViewMatrix, objOrthoMatrix, m_Terrain->GetTexture(), m_RenderTexture->GetShaderResourceView(),
+	m_EnvironmentLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_EnvironmentLight->GetDiffuseColor(),
+	m_Camera->GetPosition(), specular_none);
+
+	m_QuadTree->Render(m_Frustum, m_D3D->GetDevice(), m_ShadowShader);
 
 	//-------------------------------------------------------------------------//
 	//					--/\-- TERRAIN HANDLING --/\--						   //
@@ -429,6 +438,7 @@ bool GraphicsClass::Render(float rotation)
 	//					--v-- OBJECT HANDLING --v--
 	//1. Gun
 	//-------------------------------------------------------------------------//
+	
 	pos = m_Gun->GetPosition();
 	rendermodel = m_Frustum->CheckSphere(pos.x, pos.y, pos.z, 0.1f);
 
@@ -448,8 +458,6 @@ bool GraphicsClass::Render(float rotation)
 			m_Camera->GetPosition(), specular_matte);
 	}
 	//-------------------------------------------------------------------------//
-
-
 
 	//2. Cube
 	//-------------------------------------------------------------------------//
@@ -480,8 +488,6 @@ bool GraphicsClass::Render(float rotation)
 	}
 	//-------------------------------------------------------------------------//
 
-
-
 	//3. GroundCube
 	//-------------------------------------------------------------------------//
 	pos = m_GroundCube->GetPosition();
@@ -502,8 +508,6 @@ bool GraphicsClass::Render(float rotation)
 			m_Camera->GetPosition(), specular_none);
 	}
 	//-------------------------------------------------------------------------//
-
-
 
 	//3. NormalCube
 	//-------------------------------------------------------------------------//
@@ -531,7 +535,7 @@ bool GraphicsClass::Render(float rotation)
 	}
 	//-------------------------------------------------------------------------//
 
-
+	
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 

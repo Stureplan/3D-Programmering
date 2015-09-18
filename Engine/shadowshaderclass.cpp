@@ -94,6 +94,8 @@ bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR
 	D3D10_INPUT_ELEMENT_DESC polygonLayout[3];
 	unsigned int numElements;
 	D3D10_PASS_DESC passDesc;
+	D3D10_BUFFER_DESC matrixBufferDesc;
+	D3D10_BUFFER_DESC lightBufferDesc;
 
 
 	// Initialize the error message.
@@ -163,6 +165,8 @@ bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR
 	{
 		return false;
 	}
+
+	
 
 	// Get pointers to the three matrices inside the shader so we can update them from this class.
 	m_worldMatrixPtr	  = m_effect->GetVariableByName ("worldMatrix")		->AsMatrix ();
@@ -270,6 +274,32 @@ void ShadowShaderClass::OutputShaderErrorMessage (ID3D10Blob* errorMessage, HWND
 	return;
 }
 
+void ShadowShaderClass::SetShaderParametersTerrain(D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix,
+	D3DXMATRIX lightViewMatrix, D3DXMATRIX lightProjectionMatrix,
+	ID3D10ShaderResourceView* texture, ID3D10ShaderResourceView* depthMapTexture,
+	D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor,
+	D3DXVECTOR3 cameraPosition, float specularPower)
+{
+	//Set pointers inside the shader
+	m_worldMatrixPtr->SetMatrix((float*)&worldMatrix);
+	m_viewMatrixPtr->SetMatrix((float*)&viewMatrix);
+	m_projectionMatrixPtr->SetMatrix((float*)&projectionMatrix);
+
+	m_lightViewMatrixPtr->SetMatrix((float*)&lightViewMatrix);
+	m_lightProjectionMatrixPtr->SetMatrix((float*)&lightProjectionMatrix);
+
+	m_texturePtr->SetResource(texture);
+	m_depthMapTexturePtr->SetResource(depthMapTexture);
+
+	m_lightDirectionPtr->SetFloatVector((float*)&lightDirection);
+	m_ambientColorPtr->SetFloatVector((float*)&ambientColor);
+	m_diffuseColorPtr->SetFloatVector((float*)&diffuseColor);
+
+	m_cameraPositionPtr->SetFloatVector((float*)&cameraPosition);
+	m_specularPowerPtr->SetFloat(specularPower);
+
+	return;
+}
 
 void ShadowShaderClass::SetShaderParameters(
 	D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 

@@ -1,19 +1,33 @@
-/////////////////////////////////
-// Fliename : terrainclass.h
-/////////////////////////////////
-
+////////////////////////////////////////////////////////////////////////////////
+// Filename: terrainclass.h
+////////////////////////////////////////////////////////////////////////////////
 #ifndef _TERRAINCLASS_H_
 #define _TERRAINCLASS_H_
 
-#include <D3D10.h>
-#include <D3DX10math.h>
-#include <stdio.h>
-#include "textureclass.h"
 
-//////////////////
+/////////////
 // GLOBALS //
+/////////////
 const int TEXTURE_REPEAT = 8;
 
+
+//////////////
+// INCLUDES //
+//////////////
+#include <d3d10.h>
+#include <d3dx10math.h>
+#include <stdio.h>
+
+
+///////////////////////
+// MY CLASS INCLUDES //
+///////////////////////
+#include "textureclass.h"
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Class name: TerrainClass
+////////////////////////////////////////////////////////////////////////////////
 class TerrainClass
 {
 private:
@@ -43,10 +57,11 @@ public:
 
 	bool Initialize(ID3D10Device*, char*, WCHAR*);
 	void Shutdown();
-	void Render(ID3D10Device*);
 
-	int GetIndexCount();
 	ID3D10ShaderResourceView* GetTexture();
+
+	int GetVertexCount();
+	void CopyVertexArray(void*);
 
 private:
 	bool LoadHeightMap(char*);
@@ -60,18 +75,13 @@ private:
 
 	bool InitializeBuffers(ID3D10Device*);
 	void ShutdownBuffers();
-	void RenderBuffers(ID3D10Device*);
 
-	void SetPosition(float, float, float);
-	D3DXVECTOR3 GetPosition();
-
-public:
+private:
 	int m_terrainWidth, m_terrainHeight;
-	int m_vertexCount, m_indexCount;
-	ID3D10Buffer *m_vertexBuffer, *m_indexBuffer;
 	HeightMapType* m_heightMap;
 	TextureClass* m_Texture;
-
+	int m_vertexCount;
+	VertexType* m_vertices;
 };
 
 #endif

@@ -45,22 +45,25 @@
     <ClCompile Include="converter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shadowshaderclass.cpp">
+    <ClCompile Include="terrainclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="depthshaderclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="normalmapshaderclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="rendertextureclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="normalmapshaderclass.cpp">
+    <ClCompile Include="shadowshaderclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="frustumclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="terrainclass.cpp">
+    <ClCompile Include="quadtreeclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,22 +95,25 @@
     <ClInclude Include="converter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shadowshaderclass.h">
+    <ClInclude Include="terrainclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="depthshaderclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="normalmapshaderclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="rendertextureclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="normalmapshaderclass.h">
+    <ClInclude Include="shadowshaderclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="frustumclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="terrainclass.h">
+    <ClInclude Include="quadtreeclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -115,10 +121,10 @@
     <FxCompile Include="shadow.fx">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="depth.fx">
+    <FxCompile Include="normalmap.fx">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="normalmap.fx">
+    <FxCompile Include="depth.fx">
       <Filter>Shader Files</Filter>
     </FxCompile>
   </ItemGroup>
