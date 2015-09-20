@@ -131,7 +131,6 @@ bool SystemClass::Frame()
 {
 	bool result;
 
-
 	//Escape quits the program
 	if(m_Input->IsKeyDown(VK_ESCAPE))
 	{

@@ -14,6 +14,9 @@ D3DClass::D3DClass()
 	m_depthStencilView = 0;
 	m_rasterState = 0;
 	m_depthDisabledStencilState = 0;
+
+	m_alphaEnableBlendingState = 0;
+	m_alphaDisableBlendingState = 0;
 }
 
 
@@ -45,6 +48,9 @@ bool D3DClass::Initialize (int screenWidth, int screenHeight, bool vsync, HWND h
 	float fieldOfView, screenAspect;
 	D3D10_RASTERIZER_DESC rasterDesc;
 	D3D10_DEPTH_STENCIL_DESC depthDisabledStencilDesc;
+
+	D3D_FEATURE_LEVEL featureLevel;
+	D3D10_VIEWPORT viewport;
 
 
 	// Store the vsync setting.
@@ -193,6 +199,9 @@ bool D3DClass::Initialize (int screenWidth, int screenHeight, bool vsync, HWND h
 
 	// Don't set the advanced flags.
 	swapChainDesc.Flags = 0;
+
+	// Set the fature level to DirectX 10.
+	featureLevel = D3D_FEATURE_LEVEL_10_0;
 
 	// Create the swap chain and the Direct3D device.
 	result = D3D10CreateDeviceAndSwapChain (NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, 0, D3D10_SDK_VERSION,
@@ -515,6 +524,41 @@ void D3DClass::TurnZBufferOn ()
 void D3DClass::TurnZBufferOff ()
 {
 	m_device->OMSetDepthStencilState (m_depthDisabledStencilState, 1);
+	return;
+}
+
+void D3DClass::TurnOnAlphaBlending()
+{
+	float blendFactor[4];
+
+
+	// Setup the blend factor.
+	blendFactor[0] = 0.0f;
+	blendFactor[1] = 0.0f;
+	blendFactor[2] = 0.0f;
+	blendFactor[3] = 0.0f;
+
+	// Turn on the alpha blending.
+	m_device->OMSetBlendState(m_alphaEnableBlendingState, blendFactor, 0xffffffff);
+
+	return;
+}
+
+
+void D3DClass::TurnOffAlphaBlending()
+{
+	float blendFactor[4];
+
+
+	// Setup the blend factor.
+	blendFactor[0] = 0.0f;
+	blendFactor[1] = 0.0f;
+	blendFactor[2] = 0.0f;
+	blendFactor[3] = 0.0f;
+
+	// Turn off the alpha blending.
+	m_device->OMSetBlendState(m_alphaDisableBlendingState, blendFactor, 0xffffffff);
+
 	return;
 }
 

@@ -18,6 +18,8 @@
 //////////////
 #include <d3d10.h>
 #include <d3dx10.h>
+#include <dxgi.h>
+#include <d3dcommon.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +49,9 @@ public:
 	void TurnZBufferOn ();
 	void TurnZBufferOff ();
 
+	void TurnOnAlphaBlending();
+	void TurnOffAlphaBlending();
+
 	void SetBackBufferRenderTarget ();
 	void ResetViewport ();
 
@@ -66,6 +71,9 @@ private:
 	D3DXMATRIX m_orthoMatrix;
 	ID3D10DepthStencilState* m_depthDisabledStencilState;
 	D3D10_VIEWPORT m_viewport;
+	
+	ID3D10BlendState* m_alphaEnableBlendingState;
+	ID3D10BlendState* m_alphaDisableBlendingState;
 };
 
 #endif

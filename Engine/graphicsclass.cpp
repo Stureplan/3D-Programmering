@@ -20,9 +20,17 @@ GraphicsClass::GraphicsClass()
 	m_DepthShader = 0;
 	m_RenderTexture = 0;
 	m_NormalMapShader = 0;
+	
 	m_Terrain = 0;
 	m_Frustum = 0;
 	m_QuadTree = 0;
+	
+	m_Text = 0;
+	m_FontShader = 0;
+	m_Font = 0;
+	m_Fps = 0;
+	m_Cpu = 0;
+	m_Timer = 0;
 
 	movespeed = 0.6f;
 	rotatespeed = 1.0f;
@@ -59,6 +67,9 @@ GraphicsClass::~GraphicsClass()
 bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result;
+	D3DXMATRIX baseViewMatrix;
+	char videoCard[128];
+	int videoMemory;
 
 
 	// Create the Direct3D object.
@@ -90,13 +101,92 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+	// Initialize a base view matrix with the camera for 2D user interface rendering.
+
 	// Set the initial position of the camera.
 	m_Camera->SetPosition(0.0f, 3.0f, 0.0f);
+	m_Camera->Render();
+	m_Camera->GetViewMatrix(baseViewMatrix);
 
+	// Create the text object.
+	m_Text = new TextClass;
+	if (!m_Text)
+	{
+		return false;
+	}
+
+	// Create the timer object.
+	m_Timer = new TimerClass;
+	if (!m_Timer)
+	{
+		return false;
+	}
+
+	// Initialize the timer object.
+	result = m_Timer->Initialize();
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the timer object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Create the fps object.
+	m_Fps = new FpsClass;
+	if (!m_Fps)
+	{
+		return false;
+	}
+
+	// Initialize the fps object.
+	m_Fps->Initialize();
+
+	// Create the cpu object.
+	m_Cpu = new CpuClass;
+	if (!m_Cpu)
+	{
+		return false;
+	}
+
+	// Initialize the cpu object.
+	m_Cpu->Initialize();
+
+	// Create the font shader object.
+	m_FontShader = new FontShaderClass;
+	if (!m_FontShader)
+	{
+		return false;
+	}
+
+	// Initialize the font shader object.
+	result = m_FontShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the font shader object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Initialize the text object.
+	result = m_Text->Initialize(m_D3D->GetDevice(), hwnd, screenWidth, screenHeight, baseViewMatrix);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
+		return false;
+	}
 
 	m_Convert = new ConverterClass;
 	if (!m_Convert)
 	{
+		return false;
+	}
+
+	// Retrieve the video card information.
+	m_D3D->GetVideoCardInfo(videoCard, videoMemory);
+
+	// Set the video card information in the text object.
+	result = m_Text->SetVideoCardInfo(videoCard, videoMemory, m_D3D->GetDevice());
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not set video card info in the text object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -140,10 +230,18 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	// Create the quad tree object.
 	m_QuadTree = new QuadTreeClass;
+	if (!m_QuadTree)
+	{
+		return false;
+	}
 
-
-	// Initializde the quad tree object.
-	m_QuadTree->Initialize(m_Terrain, m_D3D->GetDevice(), terrain);
+	// Initialize the quad tree object.
+	result = m_QuadTree->Initialize(m_Terrain, m_D3D->GetDevice(), terrain);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the quad tree object.", L"Error", MB_OK);
+		return false;
+	}
 
 	return true;
 }
@@ -151,6 +249,44 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
+	// Release the font shader object.
+	if (m_FontShader)
+	{
+		m_FontShader->Shutdown();
+		delete m_FontShader;
+		m_FontShader = 0;
+	}
+
+	// Release the cpu object.
+	if (m_Cpu)
+	{
+		m_Cpu->Shutdown();
+		delete m_Cpu;
+		m_Cpu = 0;
+	}
+	
+	// Release the fps object.
+	if (m_Fps)
+	{
+		delete m_Fps;
+		m_Fps = 0;
+	}
+
+	// Release the timer object.
+	if (m_Timer)
+	{
+		delete m_Timer;
+		m_Timer = 0;
+	}
+
+	// Release the text object.
+	if (m_Text)
+	{
+		m_Text->Shutdown();
+		delete m_Text;
+		m_Text = 0;
+	}
+
 	// Release the quad tree object.
 	if (m_QuadTree)
 	{
@@ -159,7 +295,7 @@ void GraphicsClass::Shutdown()
 		m_QuadTree = 0;
 	}
 
-	//Release objects
+	//Release terrain objects
 	if (m_Terrain)
 	{
 		delete m_Terrain;
@@ -253,11 +389,35 @@ void GraphicsClass::Shutdown()
 
 bool GraphicsClass::Frame()
 {
+	bool result;
+
+	// Update the system stats
+	
+	
 	static float rotation = 0.0f;
 	rotation += (float)D3DX_PI * 0.005f;
 	if (rotation > 360.0f)
 	{
 		rotation -= 360.0f;
+	}
+
+	// Update the system stats.
+	m_Timer->Frame();
+	m_Fps->Frame();
+	m_Cpu->Frame();
+
+	// Update the FPS value in the text object.
+	result = m_Text->SetFps(m_Fps->GetFps(), m_D3D->GetDevice());
+	if (!result)
+	{
+		return false;
+	}
+
+	// Update the CPU usage value in the text object.
+	result = m_Text->SetCpu(m_Cpu->GetCpuPercentage(), m_D3D->GetDevice());
+	if (!result)
+	{
+		return false;
 	}
 
 	// Render the graphics scene.
@@ -433,6 +593,34 @@ bool GraphicsClass::Render(float rotation)
 	//-------------------------------------------------------------------------//
 	//					--/\-- TERRAIN HANDLING --/\--						   //
 	//-------------------------------------------------------------------------//
+
+
+	//-------------------------------------------------------------------------//
+	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
+	//-------------------------------------------------------------------------//
+
+	// Set the number of rendered terrain triangles since some were culled.
+	m_Text->SetRenderCount(m_QuadTree->GetDrawCount(), m_D3D->GetDevice());
+
+	// Turn off the Z buffer to begin all 2D rendering.
+	m_D3D->TurnZBufferOff();
+
+	// Turn on the alpha blending before rendering the text.
+	m_D3D->TurnOnAlphaBlending();
+
+	// Render the text user interface elements.
+	m_Text->Render(m_D3D->GetDevice(), m_FontShader, worldMatrix, objOrthoMatrix);
+
+	// Turn off alpha blending after rendering the text.
+	m_D3D->TurnOffAlphaBlending();
+
+	// Turn the Z buffer back on now that all 2D rendering has completed.
+	m_D3D->TurnZBufferOn();
+
+	//-------------------------------------------------------------------------//
+	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
+	//-------------------------------------------------------------------------//
+
 
 
 	//					--v-- OBJECT HANDLING --v--

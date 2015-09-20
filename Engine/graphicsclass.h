@@ -21,6 +21,14 @@
 #include "frustumclass.h"
 #include "quadtreeclass.h"
 
+#include "textclass.h"
+#include "fontshaderclass.h"
+#include "fontclass.h"
+#include "timerclass.h"
+#include "fpsclass.h"
+#include "cpuclass.h"
+
+
 
 /////////////
 // GLOBALS //
@@ -72,9 +80,18 @@ private:
 	DepthShaderClass*	  m_DepthShader;
 	RenderTextureClass*	  m_RenderTexture;
 	NormalMapShaderClass* m_NormalMapShader;
+	
 	TerrainClass*		  m_Terrain;
 	FrustumClass*		  m_Frustum;
 	QuadTreeClass*		  m_QuadTree;
+	
+	TextClass*			  m_Text;
+	FontShaderClass*	  m_FontShader;
+	FontClass*			  m_Font;
+
+	FpsClass*			  m_Fps;
+	CpuClass*			  m_Cpu;
+	TimerClass*			  m_Timer;
 
 	float movespeed, rotatespeed;
 	D3DXVECTOR3 gun, cube, def, ground, cube2, terrain;
