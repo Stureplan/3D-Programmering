@@ -18,8 +18,6 @@
 //////////////
 #include <d3d10.h>
 #include <d3dx10.h>
-#include <dxgi.h>
-#include <d3dcommon.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +32,7 @@ public:
 
 	bool Initialize(int, int, bool, HWND, bool, float, float);
 	void Shutdown();
-	
+
 	void BeginScene(float, float, float, float);
 	void EndScene();
 
@@ -46,14 +44,11 @@ public:
 
 	void GetVideoCardInfo(char*, int&);
 
-	void TurnZBufferOn ();
-	void TurnZBufferOff ();
+	void TurnZBufferOn();
+	void TurnZBufferOff();
 
-	void TurnOnAlphaBlending();
-	void TurnOffAlphaBlending();
-
-	void SetBackBufferRenderTarget ();
-	void ResetViewport ();
+	void SetBackBufferRenderTarget();
+	void ResetViewport();
 
 private:
 	bool m_vsync_enabled;
@@ -71,9 +66,6 @@ private:
 	D3DXMATRIX m_orthoMatrix;
 	ID3D10DepthStencilState* m_depthDisabledStencilState;
 	D3D10_VIEWPORT m_viewport;
-	
-	ID3D10BlendState* m_alphaEnableBlendingState;
-	ID3D10BlendState* m_alphaDisableBlendingState;
 };
 
 #endif
