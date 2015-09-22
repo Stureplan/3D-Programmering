@@ -1,7 +1,8 @@
-///////////////
-// Filename : fontshaderclass.cpp
-///////////////
+////////////////////////////////////////////////////////////////////////////////
+// Filename: fontshaderclass.cpp
+////////////////////////////////////////////////////////////////////////////////
 #include "fontshaderclass.h"
+
 
 FontShaderClass::FontShaderClass()
 {
@@ -12,23 +13,25 @@ FontShaderClass::FontShaderClass()
 	m_worldMatrixPtr = 0;
 	m_viewMatrixPtr = 0;
 	m_projectionMatrixPtr = 0;
-
+	m_texturePtr = 0;
 	m_pixelColorPtr = 0;
 }
 
+
 FontShaderClass::FontShaderClass(const FontShaderClass& other)
 {
-
 }
+
 
 FontShaderClass::~FontShaderClass()
 {
-
 }
+
 
 bool FontShaderClass::Initialize(ID3D10Device* device, HWND hwnd)
 {
 	bool result;
+
 
 	// Initialize the shader that will be used to draw the triangle.
 	result = InitializeShader(device, hwnd, L"../Engine/font.fx");
@@ -37,7 +40,9 @@ bool FontShaderClass::Initialize(ID3D10Device* device, HWND hwnd)
 		return false;
 	}
 
+	return true;
 }
+
 
 void FontShaderClass::Shutdown()
 {
@@ -47,18 +52,19 @@ void FontShaderClass::Shutdown()
 	return;
 }
 
-void FontShaderClass::Render(ID3D10Device* device, int indexCount, 
-	D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 
-	ID3D10ShaderResourceView* texture, D3DXVECTOR4 pixelColor)
+
+void FontShaderClass::Render(ID3D10Device* device, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix,
+	D3DXMATRIX projectionMatrix, ID3D10ShaderResourceView* texture, D3DXVECTOR4 pixelColor)
 {
 	// Set the shader parameters that it will use for rendering.
 	SetShaderParameters(worldMatrix, viewMatrix, projectionMatrix, texture, pixelColor);
 
-	// Now render the prpared buffers with the shader.
+	// Now render the prepared buffers with the shader.
 	RenderShader(device, indexCount);
 
 	return;
 }
+
 
 bool FontShaderClass::InitializeShader(ID3D10Device* device, HWND hwnd, WCHAR* filename)
 {
@@ -68,14 +74,13 @@ bool FontShaderClass::InitializeShader(ID3D10Device* device, HWND hwnd, WCHAR* f
 	unsigned int numElements;
 	D3D10_PASS_DESC passDesc;
 
+
 	// Initialize the error message.
 	errorMessage = 0;
 
 	// Load the shader in from the file.
-	result = D3DX10CreateEffectFromFile(filename, NULL, NULL, "fx_4_0", 
-		D3D10_SHADER_ENABLE_STRICTNESS, 0, device, NULL, NULL, 
-		&m_effect, &errorMessage, NULL);
-
+	result = D3DX10CreateEffectFromFile(filename, NULL, NULL, "fx_4_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
+		device, NULL, NULL, &m_effect, &errorMessage, NULL);
 	if (FAILED(result))
 	{
 		// If the shader failed to compile it should have writen something to the error message.
@@ -83,7 +88,7 @@ bool FontShaderClass::InitializeShader(ID3D10Device* device, HWND hwnd, WCHAR* f
 		{
 			OutputShaderErrorMessage(errorMessage, hwnd, filename);
 		}
-		// If there was nothing in the error message then it simply oculd not find the shader file itself.
+		// If there was  nothing in the error message then it simply could not find the shader file itself.
 		else
 		{
 			MessageBox(hwnd, filename, L"Missing Shader File", MB_OK);
@@ -92,15 +97,15 @@ bool FontShaderClass::InitializeShader(ID3D10Device* device, HWND hwnd, WCHAR* f
 		return false;
 	}
 
-	// Get a pointer to the twchnique inside the shader.
+	// Get a pointer to the technique inside the shader.
 	m_technique = m_effect->GetTechniqueByName("FontTechnique");
 	if (!m_technique)
 	{
 		return false;
 	}
 
-	// Now setip the layout of the data that goes into the shader.
-	// This setup needs to match the VertexType structure in the ModelClass and in the shader.
+	// Now setup the layout of the data that goes into the shader.
+	// This setup needs to match the VertexType stucture in the ModelClass and in the shader.
 	polygonLayout[0].SemanticName = "POSITION";
 	polygonLayout[0].SemanticIndex = 0;
 	polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -117,15 +122,15 @@ bool FontShaderClass::InitializeShader(ID3D10Device* device, HWND hwnd, WCHAR* f
 	polygonLayout[1].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
 	polygonLayout[1].InstanceDataStepRate = 0;
 
-	// Get a cpimt pf the eöe,emts om the layout.
+	// Get a count of the elements in the layout.
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
 
 	// Get the description of the first pass described in the shader technique.
 	m_technique->GetPassByIndex(0)->GetDesc(&passDesc);
-	
+
 	// Create the input layout.
-	result = device->CreateInputLayout(polygonLayout, numElements, 
-		passDesc.pIAInputSignature, passDesc.IAInputSignatureSize, &m_layout);
+	result = device->CreateInputLayout(polygonLayout, numElements, passDesc.pIAInputSignature, passDesc.IAInputSignatureSize,
+		&m_layout);
 	if (FAILED(result))
 	{
 		return false;
@@ -136,7 +141,7 @@ bool FontShaderClass::InitializeShader(ID3D10Device* device, HWND hwnd, WCHAR* f
 	m_viewMatrixPtr = m_effect->GetVariableByName("viewMatrix")->AsMatrix();
 	m_projectionMatrixPtr = m_effect->GetVariableByName("projectionMatrix")->AsMatrix();
 
-	// Get pointer to hte texture resource inside the shader.
+	// Get pointer to the texture resource inside the shader.
 	m_texturePtr = m_effect->GetVariableByName("shaderTexture")->AsShaderResource();
 
 	// Get pointer to the pixel color variable inside the shader.
@@ -144,6 +149,7 @@ bool FontShaderClass::InitializeShader(ID3D10Device* device, HWND hwnd, WCHAR* f
 
 	return true;
 }
+
 
 void FontShaderClass::ShutdownShader()
 {
@@ -165,7 +171,7 @@ void FontShaderClass::ShutdownShader()
 		m_layout = 0;
 	}
 
-	// Release the pointer the shader technique.
+	// Release the pointer to the shader technique.
 	m_technique = 0;
 
 	// Release the pointer to the shader.
@@ -178,11 +184,13 @@ void FontShaderClass::ShutdownShader()
 	return;
 }
 
+
 void FontShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
 {
 	char* compileErrors;
 	unsigned long bufferSize, i;
-	ofstream foul;
+	ofstream fout;
+
 
 	// Get a pointer to the error message text buffer.
 	compileErrors = (char*)(errorMessage->GetBufferPointer());
@@ -190,62 +198,65 @@ void FontShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hw
 	// Get the length of the message.
 	bufferSize = errorMessage->GetBufferSize();
 
-	// Open a file to wtite the error message to
-	foul.open("shader-error.txt");
+	// Open a file to write the error message to.
+	fout.open("shader-error.txt");
 
 	// Write out the error message.
-	for (i = 0; i < bufferSize; i++)
+	for (i = 0; i<bufferSize; i++)
 	{
-		foul << compileErrors[i];
+		fout << compileErrors[i];
 	}
 
 	// Close the file.
-	foul.close();
+	fout.close();
 
 	// Release the error message.
 	errorMessage->Release();
 	errorMessage = 0;
 
 	// Pop a message up on the screen to notify the user to check the text file for compile errors.
-	MessageBox(hwnd, L"Error compiling shader. Check shader-error.txt for message.", shaderFilename, MB_OK);
+	MessageBox(hwnd, L"Error compiling shader.  Check shader-error.txt for message.", shaderFilename, MB_OK);
 
 	return;
 }
 
-void FontShaderClass::SetShaderParameters(D3DXMATRIX worldmatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 
+
+void FontShaderClass::SetShaderParameters(D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix,
 	ID3D10ShaderResourceView* texture, D3DXVECTOR4 pixelColor)
 {
 	// Set the world matrix variable inside the shader.
-	m_worldMatrixPtr->SetMatrix((float*)&worldmatrix);
+	m_worldMatrixPtr->SetMatrix((float*)&worldMatrix);
 
 	// Set the view matrix variable inside the shader.
 	m_viewMatrixPtr->SetMatrix((float*)&viewMatrix);
 
-	// Set the proejction matrix variable inside hte shader.
+	// Set the projection matrix variable inside the shader.
 	m_projectionMatrixPtr->SetMatrix((float*)&projectionMatrix);
 
 	// Bind the texture.
 	m_texturePtr->SetResource(texture);
 
-	// Set the pixel color variable iside the shader with the pixelColor vector.
+	// Set the pixel color variable inside the shader with the pixelColor vector.
 	m_pixelColorPtr->SetFloatVector((float*)&pixelColor);
 
 	return;
 }
+
 
 void FontShaderClass::RenderShader(ID3D10Device* device, int indexCount)
 {
 	D3D10_TECHNIQUE_DESC techniqueDesc;
 	unsigned int i;
 
+
 	// Set the input layout.
 	device->IASetInputLayout(m_layout);
 
-	// Get the description scructure of the technique from inside the shader so it can be used for rendering.
+	// Get the description structure of the technique from inside the shader so it can be used for rendering.
 	m_technique->GetDesc(&techniqueDesc);
 
-	// Go through each pass in the technique and render the triangles.
-	for (i = 0; i < techniqueDesc.Passes; ++i)
+	// Go through each pass in the technique (should be just one currently) and renders the triangles.
+	for (i = 0; i<techniqueDesc.Passes; ++i)
 	{
 		m_technique->GetPassByIndex(i)->Apply(0);
 		device->DrawIndexed(indexCount, 0, 0);
@@ -253,4 +264,3 @@ void FontShaderClass::RenderShader(ID3D10Device* device, int indexCount)
 
 	return;
 }
-

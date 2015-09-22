@@ -1,26 +1,28 @@
-//////////////
-// Filename : cpuclass.cpp
-//////////////
+///////////////////////////////////////////////////////////////////////////////
+// Filename: cpuclass.cpp
+///////////////////////////////////////////////////////////////////////////////
 #include "cpuclass.h"
+
 
 CpuClass::CpuClass()
 {
-
 }
+
 
 CpuClass::CpuClass(const CpuClass& other)
 {
-
 }
+
 
 CpuClass::~CpuClass()
 {
-
 }
+
 
 void CpuClass::Initialize()
 {
 	PDH_STATUS status;
+
 
 	// Initialize the flag indicating whether this object can read the system cpu usage or not.
 	m_canReadCpu = true;
@@ -46,6 +48,7 @@ void CpuClass::Initialize()
 	return;
 }
 
+
 void CpuClass::Shutdown()
 {
 	if (m_canReadCpu)
@@ -56,6 +59,7 @@ void CpuClass::Shutdown()
 	return;
 }
 
+
 void CpuClass::Frame()
 {
 	PDH_FMT_COUNTERVALUE value;
@@ -65,9 +69,9 @@ void CpuClass::Frame()
 		if ((m_lastSampleTime + 1000) < GetTickCount())
 		{
 			m_lastSampleTime = GetTickCount();
-			
+
 			PdhCollectQueryData(m_queryHandle);
-			
+
 			PdhGetFormattedCounterValue(m_counterHandle, PDH_FMT_LONG, NULL, &value);
 
 			m_cpuUsage = value.longValue;
@@ -77,11 +81,11 @@ void CpuClass::Frame()
 	return;
 }
 
+
 int CpuClass::GetCpuPercentage()
 {
 	int usage;
 
-	// If the class can read the cpu from the operating system then return the current usage.  If not then return zero.
 	if (m_canReadCpu)
 	{
 		usage = (int)m_cpuUsage;
@@ -93,4 +97,3 @@ int CpuClass::GetCpuPercentage()
 
 	return usage;
 }
-

@@ -26,11 +26,6 @@ GraphicsClass::GraphicsClass()
 	m_QuadTree = 0;
 	
 	m_Text = 0;
-	m_FontShader = 0;
-	m_Font = 0;
-	m_Fps = 0;
-	m_Cpu = 0;
-	m_Timer = 0;
 
 	movespeed = 0.6f;
 	rotatespeed = 1.0f;
@@ -115,56 +110,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	// Create the timer object.
-	m_Timer = new TimerClass;
-	if (!m_Timer)
-	{
-		return false;
-	}
-
-	// Initialize the timer object.
-	result = m_Timer->Initialize();
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the timer object.", L"Error", MB_OK);
-		return false;
-	}
-
-	// Create the fps object.
-	m_Fps = new FpsClass;
-	if (!m_Fps)
-	{
-		return false;
-	}
-
-	// Initialize the fps object.
-	m_Fps->Initialize();
-
-	// Create the cpu object.
-	m_Cpu = new CpuClass;
-	if (!m_Cpu)
-	{
-		return false;
-	}
-
-	// Initialize the cpu object.
-	m_Cpu->Initialize();
-
-	// Create the font shader object.
-	m_FontShader = new FontShaderClass;
-	if (!m_FontShader)
-	{
-		return false;
-	}
-
-	// Initialize the font shader object.
-	result = m_FontShader->Initialize(m_D3D->GetDevice(), hwnd);
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the font shader object.", L"Error", MB_OK);
-		return false;
-	}
-
 	// Initialize the text object.
 	result = m_Text->Initialize(m_D3D->GetDevice(), hwnd, screenWidth, screenHeight, baseViewMatrix);
 	if (!result)
@@ -183,12 +128,12 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_D3D->GetVideoCardInfo(videoCard, videoMemory);
 
 	// Set the video card information in the text object.
-	result = m_Text->SetVideoCardInfo(videoCard, videoMemory, m_D3D->GetDevice());
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not set video card info in the text object.", L"Error", MB_OK);
-		return false;
-	}
+	//result = m_Text->SetVideoCardInfo(videoCard, videoMemory, m_D3D->GetDevice());
+	//if (!result)
+	//{
+	//	MessageBox(hwnd, L"Could not set video card info in the text object.", L"Error", MB_OK);
+	//	return false;
+	//}
 
 	//Convert all the models we're using to our format
 	m_Convert->Convert(L"../Engine/data/sphereRGB.obj", 1);	//Convert sphere
@@ -249,36 +194,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
-	// Release the font shader object.
-	if (m_FontShader)
-	{
-		m_FontShader->Shutdown();
-		delete m_FontShader;
-		m_FontShader = 0;
-	}
-
-	// Release the cpu object.
-	if (m_Cpu)
-	{
-		m_Cpu->Shutdown();
-		delete m_Cpu;
-		m_Cpu = 0;
-	}
-	
-	// Release the fps object.
-	if (m_Fps)
-	{
-		delete m_Fps;
-		m_Fps = 0;
-	}
-
-	// Release the timer object.
-	if (m_Timer)
-	{
-		delete m_Timer;
-		m_Timer = 0;
-	}
-
 	// Release the text object.
 	if (m_Text)
 	{
@@ -387,9 +302,23 @@ void GraphicsClass::Shutdown()
 }
 
 
-bool GraphicsClass::Frame()
+bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 {
 	bool result;
+
+	// Set the frames per second.
+	result = m_Text->SetFps(fps);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Set the cpu usage.
+	result = m_Text->SetCpu(cpu);
+	if (!result)
+	{
+		return false;
+	}
 
 	// Update the system stats
 	
@@ -401,21 +330,16 @@ bool GraphicsClass::Frame()
 		rotation -= 360.0f;
 	}
 
-	// Update the system stats.
-	m_Timer->Frame();
-	m_Fps->Frame();
-	m_Cpu->Frame();
-
-	// Update the FPS value in the text object.
-	result = m_Text->SetFps(m_Fps->GetFps(), m_D3D->GetDevice());
+	// Set the cpu usage.
+	result = m_Text->SetCpu(cpu);
 	if (!result)
 	{
 		return false;
 	}
 
-	// Update the CPU usage value in the text object.
-	result = m_Text->SetCpu(m_Cpu->GetCpuPercentage(), m_D3D->GetDevice());
-	if (!result)
+	// Set the frames per second.
+	result = m_Text->SetFps(fps);
+	if (!result);
 	{
 		return false;
 	}
@@ -573,6 +497,23 @@ bool GraphicsClass::Render(float rotation)
 	m_ObjectLight->GetOrthoMatrix(objOrthoMatrix);
 
 
+	//-------------------------------------------------------------------------//
+	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
+	//-------------------------------------------------------------------------//
+
+	// Turn off the Z buffer to begin all 2D rendering.
+	m_D3D->TurnZBufferOff();
+
+	// Render the text strings.
+	m_Text->Render(m_D3D->GetDevice(), worldMatrix, objOrthoMatrix);
+
+	// Turn the Z buffer back on now that all 2D rendering has completed.
+	m_D3D->TurnZBufferOn();
+
+	//-------------------------------------------------------------------------//
+	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
+	//-------------------------------------------------------------------------//
+
 	
 	//-------------------------------------------------------------------------//
 	//					--\/-- TERRAIN HANDLING --\/--						   //
@@ -592,33 +533,6 @@ bool GraphicsClass::Render(float rotation)
 
 	//-------------------------------------------------------------------------//
 	//					--/\-- TERRAIN HANDLING --/\--						   //
-	//-------------------------------------------------------------------------//
-
-
-	//-------------------------------------------------------------------------//
-	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
-	//-------------------------------------------------------------------------//
-
-	// Set the number of rendered terrain triangles since some were culled.
-	m_Text->SetRenderCount(m_QuadTree->GetDrawCount(), m_D3D->GetDevice());
-
-	// Turn off the Z buffer to begin all 2D rendering.
-	m_D3D->TurnZBufferOff();
-
-	// Turn on the alpha blending before rendering the text.
-	m_D3D->TurnOnAlphaBlending();
-
-	// Render the text user interface elements.
-	m_Text->Render(m_D3D->GetDevice(), m_FontShader, worldMatrix, objOrthoMatrix);
-
-	// Turn off alpha blending after rendering the text.
-	m_D3D->TurnOffAlphaBlending();
-
-	// Turn the Z buffer back on now that all 2D rendering has completed.
-	m_D3D->TurnZBufferOn();
-
-	//-------------------------------------------------------------------------//
-	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
 	//-------------------------------------------------------------------------//
 
 

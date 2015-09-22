@@ -22,13 +22,6 @@
 #include "quadtreeclass.h"
 
 #include "textclass.h"
-#include "fontshaderclass.h"
-#include "fontclass.h"
-#include "timerclass.h"
-#include "fpsclass.h"
-#include "cpuclass.h"
-
-
 
 /////////////
 // GLOBALS //
@@ -55,7 +48,7 @@ public:
 
 	bool Initialize(int, int, HWND);
 	void Shutdown();
-	bool Frame();
+	bool Frame(int, int, float);
 	void Move(int);
 	void Launch();
 
@@ -86,12 +79,7 @@ private:
 	QuadTreeClass*		  m_QuadTree;
 	
 	TextClass*			  m_Text;
-	FontShaderClass*	  m_FontShader;
-	FontClass*			  m_Font;
 
-	FpsClass*			  m_Fps;
-	CpuClass*			  m_Cpu;
-	TimerClass*			  m_Timer;
 
 	float movespeed, rotatespeed;
 	D3DXVECTOR3 gun, cube, def, ground, cube2, terrain;

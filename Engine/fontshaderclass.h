@@ -45,7 +45,6 @@ private:
 	ID3D10EffectMatrixVariable* m_viewMatrixPtr;
 	ID3D10EffectMatrixVariable* m_projectionMatrixPtr;
 	ID3D10EffectShaderResourceVariable* m_texturePtr;
-
 	ID3D10EffectVectorVariable* m_pixelColorPtr;
 };
 

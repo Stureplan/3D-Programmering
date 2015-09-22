@@ -24,7 +24,6 @@ using namespace std;
 class FontClass
 {
 private:
-
 	struct FontType
 	{
 		float left, right;
