@@ -99,7 +99,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	// Initialize a base view matrix with the camera for 2D user interface rendering.
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 3.0f, 0.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
 	m_Camera->Render();
 	m_Camera->GetViewMatrix(baseViewMatrix);
 
@@ -320,28 +320,13 @@ bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 		return false;
 	}
 
-	// Update the system stats
-	
-	
+
+
 	static float rotation = 0.0f;
 	rotation += (float)D3DX_PI * 0.005f;
 	if (rotation > 360.0f)
 	{
 		rotation -= 360.0f;
-	}
-
-	// Set the cpu usage.
-	result = m_Text->SetCpu(cpu);
-	if (!result)
-	{
-		return false;
-	}
-
-	// Set the frames per second.
-	result = m_Text->SetFps(fps);
-	if (!result);
-	{
-		return false;
 	}
 
 	// Render the graphics scene.
@@ -460,10 +445,34 @@ bool GraphicsClass::RenderSceneToTexture()
 	return true;
 }
 
+bool GraphicsClass::RenderText()
+{
+	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
+
+
+	// Clear the buffers to begin the scene.
+	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+
+	// Generate the view matrix based on the camera's position.
+	m_Camera->Render();
+
+	// Get the world, view, projection, and ortho matrices from the camera and d3d objects.
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
+	m_D3D->GetOrthoMatrix(orthoMatrix);
+
+
+	// Present the rendered scene to the screen.
+	m_D3D->EndScene();
+
+	return true;
+}
+
 
 bool GraphicsClass::Render(float rotation)
 {
-	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 	D3DXMATRIX scaleMatrix, rotationMatrix;
 	D3DXMATRIX translationMatrix;
 
@@ -474,6 +483,7 @@ bool GraphicsClass::Render(float rotation)
 	D3DXVECTOR3 pos, rotate;
 
 	bool rendermodel = false;
+
 
 	RenderSceneToTexture();
 
@@ -501,14 +511,6 @@ bool GraphicsClass::Render(float rotation)
 	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
 	//-------------------------------------------------------------------------//
 
-	// Turn off the Z buffer to begin all 2D rendering.
-	m_D3D->TurnZBufferOff();
-
-	// Render the text strings.
-	m_Text->Render(m_D3D->GetDevice(), worldMatrix, objOrthoMatrix);
-
-	// Turn the Z buffer back on now that all 2D rendering has completed.
-	m_D3D->TurnZBufferOn();
 
 	//-------------------------------------------------------------------------//
 	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
@@ -638,6 +640,20 @@ bool GraphicsClass::Render(float rotation)
 	//-------------------------------------------------------------------------//
 
 	
+
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_D3D->GetOrthoMatrix(orthoMatrix);
+
+	// Turn off the Z buffer to begin all 2D rendering.
+	m_D3D->TurnZBufferOff();
+
+	// Render the text strings.
+	m_Text->Render(m_D3D->GetDevice(), worldMatrix, orthoMatrix);
+
+	// Turn the Z buffer back on now that all 2D rendering has completed.
+	m_D3D->TurnZBufferOn();
+
+
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 

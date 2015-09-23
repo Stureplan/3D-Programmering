@@ -25,7 +25,7 @@ private:
 		float red, green, blue;
 	};
 
-	struct VertexType
+	struct TextType
 	{
 		D3DXVECTOR3 position;
 		D3DXVECTOR2 texture;

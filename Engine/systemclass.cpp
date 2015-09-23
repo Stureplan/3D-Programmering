@@ -12,6 +12,7 @@ SystemClass::SystemClass()
 	m_Timer = 0;
 	m_Cpu = 0;
 	m_Fps = 0;
+	m_hinstance = 0;
 }
 
 
@@ -29,6 +30,7 @@ bool SystemClass::Initialize()
 {
 	int screenWidth, screenHeight;
 	bool result;
+	//HINSTANCE m_hinstance;
 
 
 	// Initialize the width and height of the screen to zero before sending the variables into the function.
@@ -252,6 +254,13 @@ bool SystemClass::Frame()
 	{
 		return false;
 	}
+
+	//// Finally render the graphics to the screen.
+	//result = m_Graphics->RenderText();
+	//if (!result)
+	//{
+	//	return false;
+	//}
 
 	return true;
 }

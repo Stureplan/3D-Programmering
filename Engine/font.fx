@@ -97,6 +97,12 @@ float4 FontPixelShader(PixelInputType input) : SV_Target
 		color.a = 1.0f;
 	}
 
+
+	color.r = 1.0f;
+	color.g = 1.0f;
+	color.b = 1.0f;
+	color.a = 1.0f;
+
 	return color;
 }
 

@@ -23,6 +23,7 @@
 
 #include "textclass.h"
 
+
 /////////////
 // GLOBALS //
 /////////////
@@ -51,6 +52,7 @@ public:
 	bool Frame(int, int, float);
 	void Move(int);
 	void Launch();
+	bool RenderText();
 
 private:
 	bool RenderSceneToTexture();
@@ -79,7 +81,7 @@ private:
 	QuadTreeClass*		  m_QuadTree;
 	
 	TextClass*			  m_Text;
-
+	
 
 	float movespeed, rotatespeed;
 	D3DXVECTOR3 gun, cube, def, ground, cube2, terrain;

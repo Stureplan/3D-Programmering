@@ -44,7 +44,7 @@ bool TextClass::Initialize(ID3D10Device* device, HWND hwnd, int screenWidth, int
 	}
 
 	// Initialize the font object.
-	result = m_Font->Initialize(device, "../Engine/data/fontdata.txt", L"../Engine/data/font.jpg");
+	result = m_Font->Initialize(device, "../Engine/data/fontdata.txt", L"../Engine/data/font.dds");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the font object.", L"Error", MB_OK);
@@ -74,7 +74,7 @@ bool TextClass::Initialize(ID3D10Device* device, HWND hwnd, int screenWidth, int
 	}
 
 	// Now update the sentence vertex buffer with the new string information.
-	result = UpdateSentence(m_sentence1, "Fps: ", 20, 20, 0.0f, 1.0f, 0.0f);
+	result = UpdateSentence(m_sentence1, "Fps: ", 20, 20, 1.0f, 1.0f, 1.0f);
 	if (!result)
 	{
 		return false;
@@ -88,7 +88,7 @@ bool TextClass::Initialize(ID3D10Device* device, HWND hwnd, int screenWidth, int
 	}
 
 	// Now update the sentence vertex buffer with the new string information.
-	result = UpdateSentence(m_sentence2, "Cpu: ", 20, 40, 0.0f, 1.0f, 0.0f);
+	result = UpdateSentence(m_sentence2, "Cpu: ", 20, 40, 1.0f, 1.0f, 1.0f);
 	if (!result)
 	{
 		return false;
@@ -140,7 +140,7 @@ void TextClass::Render(ID3D10Device* device, D3DXMATRIX worldMatrix, D3DXMATRIX 
 
 bool TextClass::InitializeSentence(SentenceType** sentence, int maxLength, ID3D10Device* device)
 {
-	VertexType* vertices;
+	TextType* vertices;
 	unsigned long* indices;
 	D3D10_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
 	D3D10_SUBRESOURCE_DATA vertexData, indexData;
@@ -169,7 +169,7 @@ bool TextClass::InitializeSentence(SentenceType** sentence, int maxLength, ID3D1
 	(*sentence)->indexCount = (*sentence)->vertexCount;
 
 	// Create the vertex array.
-	vertices = new VertexType[(*sentence)->vertexCount];
+	vertices = new TextType[(*sentence)->vertexCount];
 	if (!vertices)
 	{
 		return false;
@@ -183,7 +183,7 @@ bool TextClass::InitializeSentence(SentenceType** sentence, int maxLength, ID3D1
 	}
 
 	// Initialize vertex array to zeros at first.
-	memset(vertices, 0, (sizeof(VertexType)* (*sentence)->vertexCount));
+	memset(vertices, 0, (sizeof(TextType)* (*sentence)->vertexCount));
 
 	// Initialize the index array.
 	for (i = 0; i<(*sentence)->indexCount; i++)
@@ -193,7 +193,7 @@ bool TextClass::InitializeSentence(SentenceType** sentence, int maxLength, ID3D1
 
 	// Set up the description of the dynamic vertex buffer.
 	vertexBufferDesc.Usage = D3D10_USAGE_DYNAMIC;
-	vertexBufferDesc.ByteWidth = sizeof(VertexType)* (*sentence)->vertexCount;
+	vertexBufferDesc.ByteWidth = sizeof(TextType)* (*sentence)->vertexCount;
 	vertexBufferDesc.BindFlags = D3D10_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
 	vertexBufferDesc.MiscFlags = 0;
@@ -240,7 +240,7 @@ bool TextClass::InitializeSentence(SentenceType** sentence, int maxLength, ID3D1
 bool TextClass::UpdateSentence(SentenceType* sentence, char* text, int positionX, int positionY, float red, float green, float blue)
 {
 	int numLetters;
-	VertexType* vertices;
+	TextType* vertices;
 	float drawX, drawY;
 	void* verticesPtr;
 	HRESULT result;
@@ -261,14 +261,14 @@ bool TextClass::UpdateSentence(SentenceType* sentence, char* text, int positionX
 	}
 
 	// Create the vertex array.
-	vertices = new VertexType[sentence->vertexCount];
+	vertices = new TextType[sentence->vertexCount];
 	if (!vertices)
 	{
 		return false;
 	}
 
 	// Initialize vertex array to zeros at first.
-	memset(vertices, 0, (sizeof(VertexType)* sentence->vertexCount));
+	memset(vertices, 0, (sizeof(TextType)* sentence->vertexCount));
 
 	// Calculate the X and Y pixel position on the screen to start drawing to.
 	drawX = (float)(((m_screenWidth / 2) * -1) + positionX);
@@ -288,7 +288,7 @@ bool TextClass::UpdateSentence(SentenceType* sentence, char* text, int positionX
 	}
 
 	// Copy the vertex array into the vertex buffer.
-	memcpy(verticesPtr, (void*)vertices, (sizeof(VertexType)* sentence->vertexCount));
+	memcpy(verticesPtr, (void*)vertices, (sizeof(TextType)* sentence->vertexCount));
 
 	// Unlock the vertex buffer.
 	sentence->vertexBuffer->Unmap();
@@ -335,7 +335,7 @@ void TextClass::RenderSentence(ID3D10Device* device, SentenceType* sentence, D3D
 
 
 	// Set vertex buffer stride and offset.
-	stride = sizeof(VertexType);
+	stride = sizeof(TextType);
 	offset = 0;
 
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
