@@ -125,7 +125,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Retrieve the video card information.
-	m_D3D->GetVideoCardInfo(videoCard, videoMemory);
+	//m_D3D->GetVideoCardInfo(videoCard, videoMemory);
 
 	// Set the video card information in the text object.
 	//result = m_Text->SetVideoCardInfo(videoCard, videoMemory, m_D3D->GetDevice());
