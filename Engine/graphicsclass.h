@@ -81,7 +81,7 @@ private:
 	QuadTreeClass*		  m_QuadTree;
 	
 	TextClass*			  m_Text;
-	
+	ID3DX10Font* font;
 
 	float movespeed, rotatespeed;
 	D3DXVECTOR3 gun, cube, def, ground, cube2, terrain;

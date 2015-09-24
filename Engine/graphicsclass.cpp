@@ -4,6 +4,7 @@
 #include "graphicsclass.h"
 #define WM_MOUSEMOVE
 
+#pragma comment(lib, "d3dx10d.lib")
 
 GraphicsClass::GraphicsClass()
 {
@@ -27,6 +28,7 @@ GraphicsClass::GraphicsClass()
 	
 	m_Text = 0;
 
+	
 	movespeed = 0.6f;
 	rotatespeed = 1.0f;
 
@@ -320,8 +322,6 @@ bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 		return false;
 	}
 
-
-
 	static float rotation = 0.0f;
 	rotation += (float)D3DX_PI * 0.005f;
 	if (rotation > 360.0f)
@@ -447,24 +447,50 @@ bool GraphicsClass::RenderSceneToTexture()
 
 bool GraphicsClass::RenderText()
 {
-	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
+	D3DX10_FONT_DESC fd;
+	fd.Height = 175;
+	fd.Width = 0;
+	fd.Weight = 0;
+	fd.MipLevels = 1;
+	fd.Italic = false;
+	fd.CharSet = OUT_DEFAULT_PRECIS;
+	fd.Quality = DEFAULT_QUALITY;
+	fd.PitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+	wcscpy(fd.FaceName, L"Impact");
+
+	D3DX10CreateFontIndirect(m_D3D->GetDevice(), &fd, &font);
+
+	D3DXCOLOR fontColor(1.0f, 1.0f, 1.0f, 1.0f);
+	RECT rectangle = { 35, 50, 0, 0 };
+	font->DrawTextA(0, "Hellow World", -1, &rectangle, DT_NOCLIP, fontColor);
+	
+
+	//D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 
 
-	// Clear the buffers to begin the scene.
-	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+	//// Clear the buffers to begin the scene.
+	////m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-	// Generate the view matrix based on the camera's position.
-	m_Camera->Render();
+	//// Generate the view matrix based on the camera's position.
+	////m_Camera->Render();
 
-	// Get the world, view, projection, and ortho matrices from the camera and d3d objects.
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_Camera->GetViewMatrix(viewMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
-	m_D3D->GetOrthoMatrix(orthoMatrix);
+	//// Get the world, view, projection, and ortho matrices from the camera and d3d objects.
+	//m_D3D->GetWorldMatrix(worldMatrix);
+	//m_Camera->GetViewMatrix(viewMatrix);
+	//m_D3D->GetProjectionMatrix(projectionMatrix);
+	//m_D3D->GetOrthoMatrix(orthoMatrix);
 
+	//// Turn off the Z buffer to begin all 2D rendering.
+	//m_D3D->TurnZBufferOff();
 
-	// Present the rendered scene to the screen.
-	m_D3D->EndScene();
+	//// Render the text strings.
+	//m_Text->Render(m_D3D->GetDevice(), worldMatrix, orthoMatrix);
+
+	//// Turn the Z buffer back on now that all 2D rendering has completed.
+	//m_D3D->TurnZBufferOn();
+
+	//// Present the rendered scene to the screen.
+	////m_D3D->EndScene();
 
 	return true;
 }
@@ -483,8 +509,7 @@ bool GraphicsClass::Render(float rotation)
 	D3DXVECTOR3 pos, rotate;
 
 	bool rendermodel = false;
-
-
+	
 	RenderSceneToTexture();
 
 	// Clear the buffers to begin the scene.
@@ -500,6 +525,8 @@ bool GraphicsClass::Render(float rotation)
 
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
+	m_D3D->GetOrthoMatrix(orthoMatrix);
+
 	m_EnvironmentLight->GetViewMatrix(lightViewMatrix);
 	m_EnvironmentLight->GetOrthoMatrix(lightOrthoMatrix);
 
@@ -510,8 +537,9 @@ bool GraphicsClass::Render(float rotation)
 	//-------------------------------------------------------------------------//
 	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
 	//-------------------------------------------------------------------------//
-
-
+	m_D3D->TurnZBufferOff();
+	RenderText();
+	m_D3D->TurnZBufferOn();
 	//-------------------------------------------------------------------------//
 	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
 	//-------------------------------------------------------------------------//
@@ -520,11 +548,12 @@ bool GraphicsClass::Render(float rotation)
 	//-------------------------------------------------------------------------//
 	//					--\/-- TERRAIN HANDLING --\/--						   //
 	//-------------------------------------------------------------------------//
-	
+	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
+
 	D3DXMatrixTranslation(&translationMatrix, terrain.x, terrain.y, terrain.z);
 	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
 
-	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
+
 
 	m_ShadowShader->SetShaderParametersTerrain(worldMatrix, viewMatrix, projectionMatrix, 
 	objViewMatrix, objOrthoMatrix, m_Terrain->GetTexture(), m_RenderTexture->GetShaderResourceView(),
@@ -641,17 +670,7 @@ bool GraphicsClass::Render(float rotation)
 
 	
 
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetOrthoMatrix(orthoMatrix);
 
-	// Turn off the Z buffer to begin all 2D rendering.
-	m_D3D->TurnZBufferOff();
-
-	// Render the text strings.
-	m_Text->Render(m_D3D->GetDevice(), worldMatrix, orthoMatrix);
-
-	// Turn the Z buffer back on now that all 2D rendering has completed.
-	m_D3D->TurnZBufferOn();
 
 
 	// Present the rendered scene to the screen.

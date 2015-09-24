@@ -8,6 +8,8 @@
 //////////////
 // INCLUDES //
 //////////////
+#include <d3d10.h>
+#include <D3DX10math.h>
 #include <fstream>
 using namespace std;
 
