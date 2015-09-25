@@ -91,6 +91,11 @@ private:
 	D3DXMATRIX rot;
 
 	float specular_none, specular_matte, specular_shiny;
+
+	D3DX10_FONT_DESC fd;
+	D3DXCOLOR fontColor;
+	RECT rectangle;
+
 };
 
 #endif

@@ -48,6 +48,20 @@ GraphicsClass::GraphicsClass()
 	specular_none  = 0.0f;
 	specular_matte = 32.0f;
 	specular_shiny = 8.0f;
+
+	fd.Height = 175;
+	fd.Width = 0;
+	fd.Weight = 0;
+	fd.MipLevels = 1;
+	fd.Italic = false;
+	fd.CharSet = OUT_DEFAULT_PRECIS;
+	fd.Quality = DEFAULT_QUALITY;
+	fd.PitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+	wcscpy(fd.FaceName, L"Impact");
+
+	fontColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	rectangle = { 35, 50, 0, 0 };
+
 }
 
 
@@ -190,6 +204,9 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+	D3DX10CreateFontIndirect(m_D3D->GetDevice(), &fd, &font);
+
+
 	return true;
 }
 
@@ -309,18 +326,18 @@ bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 	bool result;
 
 	// Set the frames per second.
-	result = m_Text->SetFps(fps);
-	if (!result)
-	{
-		return false;
-	}
+//	result = m_Text->SetFps(fps);
+//	if (!result)
+//	{
+//		return false;
+//	}
 
 	// Set the cpu usage.
-	result = m_Text->SetCpu(cpu);
-	if (!result)
-	{
-		return false;
-	}
+//	result = m_Text->SetCpu(cpu);
+//	if (!result)
+//	{
+//		return false;
+//	}
 
 	static float rotation = 0.0f;
 	rotation += (float)D3DX_PI * 0.005f;
@@ -447,23 +464,7 @@ bool GraphicsClass::RenderSceneToTexture()
 
 bool GraphicsClass::RenderText()
 {
-	D3DX10_FONT_DESC fd;
-	fd.Height = 175;
-	fd.Width = 0;
-	fd.Weight = 0;
-	fd.MipLevels = 1;
-	fd.Italic = false;
-	fd.CharSet = OUT_DEFAULT_PRECIS;
-	fd.Quality = DEFAULT_QUALITY;
-	fd.PitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-	wcscpy(fd.FaceName, L"Impact");
-
-	D3DX10CreateFontIndirect(m_D3D->GetDevice(), &fd, &font);
-
-	D3DXCOLOR fontColor(1.0f, 1.0f, 1.0f, 1.0f);
-	RECT rectangle = { 35, 50, 0, 0 };
 	font->DrawTextA(0, "Hellow World", -1, &rectangle, DT_NOCLIP, fontColor);
-	
 
 	//D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 
@@ -537,9 +538,7 @@ bool GraphicsClass::Render(float rotation)
 	//-------------------------------------------------------------------------//
 	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
 	//-------------------------------------------------------------------------//
-	m_D3D->TurnZBufferOff();
-	RenderText();
-	m_D3D->TurnZBufferOn();
+
 	//-------------------------------------------------------------------------//
 	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
 	//-------------------------------------------------------------------------//
@@ -669,7 +668,9 @@ bool GraphicsClass::Render(float rotation)
 	//-------------------------------------------------------------------------//
 
 	
-
+	m_D3D->TurnZBufferOff();
+	RenderText();
+	m_D3D->TurnZBufferOn();
 
 
 
