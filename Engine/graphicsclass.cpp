@@ -345,6 +345,10 @@ bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 	{
 		rotation -= 360.0f;
 	}
+	
+	t_cpu = cpu;
+	t_fps = fps;
+	frametime = frameTime;
 
 	// Render the graphics scene.
 	Render(rotation);
@@ -464,7 +468,13 @@ bool GraphicsClass::RenderSceneToTexture()
 
 bool GraphicsClass::RenderText()
 {
-	font->DrawTextA(0, "Hellow World", -1, &rectangle, DT_NOCLIP, fontColor);
+	LPCSTR fpsText;
+	string convertedText;
+	
+	convertedText = to_string(t_fps);
+	fpsText = convertedText.c_str();
+	
+	font->DrawTextA(0, fpsText, -1, &rectangle, DT_NOCLIP, fontColor);
 
 	//D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 
