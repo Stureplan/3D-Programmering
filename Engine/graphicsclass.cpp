@@ -49,7 +49,7 @@ GraphicsClass::GraphicsClass()
 	specular_matte = 32.0f;
 	specular_shiny = 8.0f;
 
-	fd.Height = 175;
+	fd.Height = 75;
 	fd.Width = 0;
 	fd.Weight = 0;
 	fd.MipLevels = 1;
@@ -60,7 +60,9 @@ GraphicsClass::GraphicsClass()
 	wcscpy(fd.FaceName, L"Impact");
 
 	fontColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-	rectangle = { 35, 50, 0, 0 };
+	rectangleFps = { 25, 25, 0, 0 };
+	rectangleCpu = { 25, 100, 0, 0 };
+	rectangleRenderCount = { 25, 200, 0, 0 };
 
 }
 
@@ -127,7 +129,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the text object.
-	result = m_Text->Initialize(m_D3D->GetDevice(), hwnd, screenWidth, screenHeight, baseViewMatrix);
+	result = m_Text->Initialize();
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
@@ -339,6 +341,7 @@ bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 //		return false;
 //	}
 
+	
 	static float rotation = 0.0f;
 	rotation += (float)D3DX_PI * 0.005f;
 	if (rotation > 360.0f)
@@ -348,6 +351,7 @@ bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 	
 	t_cpu = cpu;
 	t_fps = fps;
+	t_renderCount = m_QuadTree->GetDrawCount();
 	frametime = frameTime;
 
 	// Render the graphics scene.
@@ -469,12 +473,33 @@ bool GraphicsClass::RenderSceneToTexture()
 bool GraphicsClass::RenderText()
 {
 	LPCSTR fpsText;
-	string convertedText;
+	LPCSTR cpuText;
+	LPCSTR renderCountText;
 	
-	convertedText = to_string(t_fps);
-	fpsText = convertedText.c_str();
+	string convertedFpsText;
+	string convertedCpuText;
+	string convertedRenderCountText;
 	
-	font->DrawTextA(0, fpsText, -1, &rectangle, DT_NOCLIP, fontColor);
+	
+	convertedFpsText = to_string(t_fps);
+	fpsText = convertedFpsText.c_str();
+	
+	font->DrawTextA(0, fpsText, -1, &rectangleFps, DT_NOCLIP, fontColor);
+
+	convertedCpuText = to_string(t_cpu);
+	cpuText = convertedCpuText.c_str();
+
+	font->DrawTextA(0, cpuText, -1, &rectangleCpu, DT_NOCLIP, fontColor);
+
+
+	convertedRenderCountText = to_string(t_renderCount);
+	renderCountText = convertedRenderCountText.c_str();
+
+	font->DrawTextA(0, renderCountText, -1, &rectangleRenderCount, DT_NOCLIP, fontColor);
+
+
+
+
 
 	//D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 

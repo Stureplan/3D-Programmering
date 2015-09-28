@@ -66,22 +66,7 @@
     <ClCompile Include="quadtreeclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fontclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="fontshaderclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="textclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="fpsclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cpuclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="timerclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -134,22 +119,7 @@
     <ClInclude Include="quadtreeclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fontshaderclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fontclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="textclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fpsclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cpuclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="timerclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -161,9 +131,6 @@
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="depth.fx">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
-    <FxCompile Include="font.fx">
       <Filter>Shader Files</Filter>
     </FxCompile>
   </ItemGroup>

@@ -9,10 +9,9 @@ SystemClass::SystemClass()
 	m_Input = 0;
 	m_Graphics = 0;
 
-	m_Timer = 0;
-	m_Cpu = 0;
-	m_Fps = 0;
 	m_hinstance = 0;
+	m_Text = 0;
+
 }
 
 
@@ -64,69 +63,12 @@ bool SystemClass::Initialize()
 		return false;
 	}
 
-	// Create the fps object
-	m_Fps = new FpsClass;
-	if (!m_Fps)
-	{
-		return false;
-	}
-
-	// Initialize the fps object.
-	m_Fps->Initialize();
-
-	// Create the cpu object
-	m_Cpu = new CpuClass;
-	if (!m_Cpu)
-	{
-		return false;
-	}
-
-	// Initialize the cpu object.
-	m_Cpu->Initialize();
-
-	// Create the timer object
-	m_Timer = new TimerClass;
-	if (!m_Timer)
-	{
-		return false;
-	}
-
-	// Initialize the timer object.
-	result = m_Timer->Initialize();
-	if (!result)
-	{
-		MessageBox(m_hwnd, L"Could not initialize the Timer object.", L"Error", MB_OK);
-		return false;
-	}
-
 	return true;
 }
 
 
 void SystemClass::Shutdown()
 {
-	// Release the timer object.
-	if (m_Timer)
-	{
-		delete m_Timer;
-		m_Timer = 0;
-	}
-
-	// Release the cpu object.
-	if (m_Cpu)
-	{
-		m_Cpu->Shutdown();
-		delete m_Cpu;
-		m_Cpu = 0;
-	}
-
-	// Release the fps object.
-	if (m_Fps)
-	{
-		delete m_Fps;
-		m_Fps = 0;
-	}
-
 	// Release the graphics object.
 	if (m_Graphics)
 	{
@@ -193,8 +135,7 @@ void SystemClass::Run()
 bool SystemClass::Frame()
 {
 	bool result;
-
-
+	
 	//Escape quits the program
 	if (m_Input->IsKeyDown(VK_ESCAPE))
 	{
@@ -244,16 +185,16 @@ bool SystemClass::Frame()
 	}
 	//---END OF ROTATION---//
 
-	m_Timer->Frame();
-	m_Cpu->Frame();
-	m_Fps->Frame();
+
 
 	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame(m_Fps->GetFps(), m_Cpu->GetCpuPercentage(), m_Timer->GetTime());
+	result = m_Graphics->Frame(m_Text->GetFps(), m_Text->GetCpuPercentage(), m_Text->GetTime());
 	if (!result)
 	{
 		return false;
 	}
+	m_Text->Render();
+
 
 	//// Finally render the graphics to the screen.
 	//result = m_Graphics->RenderText();

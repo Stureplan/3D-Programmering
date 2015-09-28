@@ -94,8 +94,10 @@ private:
 
 	D3DX10_FONT_DESC fd;
 	D3DXCOLOR fontColor;
-	RECT rectangle;
-	int t_fps, t_cpu;
+	RECT rectangleFps;
+	RECT rectangleCpu;
+	RECT rectangleRenderCount;
+	int t_fps, t_cpu, t_renderCount;
 	float frametime;
 };
 

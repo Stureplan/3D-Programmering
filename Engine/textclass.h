@@ -4,12 +4,18 @@
 #ifndef _TEXTCLASS_H_
 #define _TEXTCLASS_H_
 
+/////////////
+// LINKING //
+/////////////
+#pragma comment(lib, "winmm.lib")
+#pragma comment(lib, "pdh.lib")
 
-///////////////////////
-// MY CLASS INCLUDES //
-///////////////////////
-#include "fontclass.h"
-#include "fontshaderclass.h"
+//////////////
+// INCLUDES //
+//////////////
+#include <windows.h>
+#include <mmsystem.h>
+#include <pdh.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -17,45 +23,42 @@
 ////////////////////////////////////////////////////////////////////////////////
 class TextClass
 {
-private:
-	struct SentenceType
-	{
-		ID3D10Buffer *vertexBuffer, *indexBuffer;
-		int vertexCount, indexCount, maxLength;
-		float red, green, blue;
-	};
-
-	struct TextType
-	{
-		D3DXVECTOR3 position;
-		D3DXVECTOR2 texture;
-	};
-
 public:
 	TextClass();
 	TextClass(const TextClass&);
 	~TextClass();
 
-	bool Initialize(ID3D10Device*, HWND, int, int, D3DXMATRIX);
+	bool Initialize();
 	void Shutdown();
-	void Render(ID3D10Device*, D3DXMATRIX, D3DXMATRIX);
+	void Render();
+
+	float GetTime();
+	int GetFps();
+	int GetCpuPercentage();
 
 	bool SetFps(int);
 	bool SetCpu(int);
+	bool SetRenderCount(int);
 
 private:
-	bool InitializeSentence(SentenceType**, int, ID3D10Device*);
-	bool UpdateSentence(SentenceType*, char*, int, int, float, float, float);
-	void ReleaseSentence(SentenceType**);
-	void RenderSentence(ID3D10Device*, SentenceType*, D3DXMATRIX, D3DXMATRIX);
+	// Timer
+	INT64 m_frequency;
+	float m_ticksPerMs;
+	INT64 m_startTime;
+	float m_frameTime;
 
 private:
-	FontClass* m_Font;
-	FontShaderClass* m_FontShader;
-	int m_screenWidth, m_screenHeight;
-	D3DXMATRIX m_baseViewMatrix;
-	SentenceType* m_sentence1;
-	SentenceType* m_sentence2;
+	// Fps
+	int m_fps, m_count;
+	unsigned long m_startTimeFps;
+
+private:
+	// Cpu
+	bool m_canReadCpu;
+	HQUERY m_queryHandle;
+	HCOUNTER m_counterHandle;
+	unsigned long m_lastSampleTime;
+	long m_cpuUsage;
 };
 
 #endif
