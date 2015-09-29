@@ -106,12 +106,12 @@ void TextClass::Render()
 	m_count++;
 
 	// If one second has passed then update the frame per second speed.
-	if (timeGetTime() >= (m_startTime + 1000))
+	if (timeGetTime() >= (m_startTimeFps + 1000))
 	{
 		m_fps = m_count;
 		m_count = 0;
 
-		m_startTime = timeGetTime();
+		m_startTimeFps = timeGetTime();
 	}
 
 	// Set cpu

@@ -11,7 +11,6 @@ SystemClass::SystemClass()
 
 	m_hinstance = 0;
 	m_Text = 0;
-
 }
 
 
@@ -58,6 +57,16 @@ bool SystemClass::Initialize()
 
 	// Initialize the graphics object.
 	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Create the text object.
+	m_Text = new TextClass();
+
+	// Initialize the text object.
+	result = m_Text->Initialize();
 	if (!result)
 	{
 		return false;

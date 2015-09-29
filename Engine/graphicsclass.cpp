@@ -62,7 +62,7 @@ GraphicsClass::GraphicsClass()
 	fontColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	rectangleFps = { 25, 25, 0, 0 };
 	rectangleCpu = { 25, 100, 0, 0 };
-	rectangleRenderCount = { 25, 200, 0, 0 };
+	rectangleRenderCount = { 25, 175, 0, 0 };
 
 }
 
