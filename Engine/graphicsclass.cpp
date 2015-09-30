@@ -38,7 +38,7 @@ GraphicsClass::GraphicsClass()
 	def = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	ground = D3DXVECTOR3(0.0f, -2.0f, 0.0f);
 	cube2 = D3DXVECTOR3(2.5f, 0.3f, 0.0f);
-	terrain = D3DXVECTOR3(20.0f, -5.0f, 0.0f);
+	terrain = D3DXVECTOR3(20.0f, 0.0f, 50.0f);
 	
 
 	D3DXMatrixIdentity(&rot);
@@ -117,7 +117,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	// Initialize a base view matrix with the camera for 2D user interface rendering.
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
+	m_Camera->SetPosition(52.0f, 2.0f, -1.0f);
 	m_Camera->Render();
 	m_Camera->GetViewMatrix(baseViewMatrix);
 
@@ -326,7 +326,7 @@ void GraphicsClass::Shutdown()
 
 bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 {
-	bool result;
+	//bool result;
 
 	// Set the frames per second.
 //	result = m_Text->SetFps(fps);
@@ -343,19 +343,8 @@ bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 //	}
 
 	bool result, foundHeight;
-	D3DXVECTOR3 position;
-	float height;
-	// Get the current position of the camera.
-	position = m_Camera->GetPosition();
 
-	// Get the height of the triangle that is directly underneath the given camera position.
-	foundHeight = m_QuadTree->GetHeightAtPosition(position.x, position.z, height);
-	if (foundHeight)
-	{
-		// If there was a triangle under the camera then position the camera just above it by two units.
-		m_Camera->SetPosition(position.x, height + 2.0f, position.z);
-	}
-
+	
 
 	static float rotation = 0.0f;
 	rotation += (float)D3DX_PI * 0.005f;
@@ -377,10 +366,16 @@ bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 
 void GraphicsClass::Move(int dir)
 {
+	bool foundHeight;
+	D3DXVECTOR3 position;
+	float height;
+
+
 	cam_pos = m_Camera->GetPosition();
 	gun_pos = m_Gun->GetPosition();
 	rotate = m_Camera->GetRotation();
-	camera_lookat = m_Camera->GetLookAt();	
+	camera_lookat = m_Camera->GetLookAt();
+
 
 	camera_forward = camera_lookat - cam_pos;
 	D3DXVec3Normalize(&camera_forward, &camera_forward);
@@ -427,9 +422,17 @@ void GraphicsClass::Move(int dir)
 		m_Camera->SetRotation(rotate.x, rotate.y + rotatespeed, rotate.z);
 	}
 
-	//gun_pos = camera_lookat;
-	//m_Gun->SetPosition (gun_pos.x, gun_pos.y, gun_pos.z);
-	//m_Gun->SetRotation (rotate.x, rotate.y, rotate.z);
+	// Get the current position of the camera.
+	position = m_Camera->GetPosition();
+
+	// Get the height of the triangle that is directly underneath the given camera position.
+	foundHeight = m_QuadTree->GetHeightAtPosition(position.x - terrain.x, position.z - terrain.z, height);
+	if (foundHeight)
+	{
+		// If there was a triangle under the camera then position the camera just above it by two units.
+		m_Camera->SetPosition(position.x, height + 5.0f, position.z);
+	}
+
 }
 
 void GraphicsClass::Launch()

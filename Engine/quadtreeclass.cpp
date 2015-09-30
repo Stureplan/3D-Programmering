@@ -522,7 +522,6 @@ bool QuadTreeClass::GetHeightAtPosition(float positionX, float positionZ, float&
 {
 	float meshMinX, meshMaxX, meshMinZ, meshMaxZ;
 
-
 	meshMinX = m_parentNode->positionX - (m_parentNode->width / 2.0f);
 	meshMaxX = m_parentNode->positionX + (m_parentNode->width / 2.0f);
 
