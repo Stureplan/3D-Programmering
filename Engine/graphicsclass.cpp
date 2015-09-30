@@ -4,6 +4,7 @@
 #include "graphicsclass.h"
 #define WM_MOUSEMOVE
 
+#pragma comment(lib, "d3dx10d.lib")
 
 GraphicsClass::GraphicsClass()
 {
@@ -20,10 +21,14 @@ GraphicsClass::GraphicsClass()
 	m_DepthShader = 0;
 	m_RenderTexture = 0;
 	m_NormalMapShader = 0;
+	
 	m_Terrain = 0;
 	m_Frustum = 0;
 	m_QuadTree = 0;
+	
+	m_Text = 0;
 
+	
 	movespeed = 0.6f;
 	rotatespeed = 1.0f;
 
@@ -33,7 +38,7 @@ GraphicsClass::GraphicsClass()
 	def = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	ground = D3DXVECTOR3(0.0f, -2.0f, 0.0f);
 	cube2 = D3DXVECTOR3(2.5f, 0.3f, 0.0f);
-	terrain = D3DXVECTOR3(20.0f, -5.0f, 0.0f);
+	terrain = D3DXVECTOR3(20.0f, 0.0f, 50.0f);
 	
 
 	D3DXMatrixIdentity(&rot);
@@ -43,6 +48,22 @@ GraphicsClass::GraphicsClass()
 	specular_none  = 0.0f;
 	specular_matte = 32.0f;
 	specular_shiny = 8.0f;
+
+	fd.Height = 75;
+	fd.Width = 0;
+	fd.Weight = 0;
+	fd.MipLevels = 1;
+	fd.Italic = false;
+	fd.CharSet = OUT_DEFAULT_PRECIS;
+	fd.Quality = DEFAULT_QUALITY;
+	fd.PitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+	wcscpy(fd.FaceName, L"Impact");
+
+	fontColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	rectangleFps = { 25, 25, 0, 0 };
+	rectangleCpu = { 25, 100, 0, 0 };
+	rectangleRenderCount = { 25, 175, 0, 0 };
+
 }
 
 
@@ -59,6 +80,9 @@ GraphicsClass::~GraphicsClass()
 bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result;
+	D3DXMATRIX baseViewMatrix;
+	char videoCard[128];
+	int videoMemory;
 
 
 	// Create the Direct3D object.
@@ -90,15 +114,44 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 3.0f, 0.0f);
+	// Initialize a base view matrix with the camera for 2D user interface rendering.
 
+	// Set the initial position of the camera.
+	m_Camera->SetPosition(52.0f, 2.0f, -1.0f);
+	m_Camera->Render();
+	m_Camera->GetViewMatrix(baseViewMatrix);
+
+	// Create the text object.
+	m_Text = new TextClass;
+	if (!m_Text)
+	{
+		return false;
+	}
+
+	// Initialize the text object.
+	result = m_Text->Initialize();
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
+		return false;
+	}
 
 	m_Convert = new ConverterClass;
 	if (!m_Convert)
 	{
 		return false;
 	}
+
+	// Retrieve the video card information.
+	//m_D3D->GetVideoCardInfo(videoCard, videoMemory);
+
+	// Set the video card information in the text object.
+	//result = m_Text->SetVideoCardInfo(videoCard, videoMemory, m_D3D->GetDevice());
+	//if (!result)
+	//{
+	//	MessageBox(hwnd, L"Could not set video card info in the text object.", L"Error", MB_OK);
+	//	return false;
+	//}
 
 	//Convert all the models we're using to our format
 	m_Convert->Convert(L"../Engine/data/sphereRGB.obj", 1);	//Convert sphere
@@ -140,10 +193,21 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	// Create the quad tree object.
 	m_QuadTree = new QuadTreeClass;
+	if (!m_QuadTree)
+	{
+		return false;
+	}
 
+	// Initialize the quad tree object.
+	result = m_QuadTree->Initialize(m_Terrain, m_D3D->GetDevice(), terrain);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the quad tree object.", L"Error", MB_OK);
+		return false;
+	}
 
-	// Initializde the quad tree object.
-	m_QuadTree->Initialize(m_Terrain, m_D3D->GetDevice(), terrain);
+	D3DX10CreateFontIndirect(m_D3D->GetDevice(), &fd, &font);
+
 
 	return true;
 }
@@ -151,6 +215,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
+	// Release the text object.
+	if (m_Text)
+	{
+		m_Text->Shutdown();
+		delete m_Text;
+		m_Text = 0;
+	}
+
 	// Release the quad tree object.
 	if (m_QuadTree)
 	{
@@ -159,7 +231,7 @@ void GraphicsClass::Shutdown()
 		m_QuadTree = 0;
 	}
 
-	//Release objects
+	//Release terrain objects
 	if (m_Terrain)
 	{
 		delete m_Terrain;
@@ -251,14 +323,40 @@ void GraphicsClass::Shutdown()
 }
 
 
-bool GraphicsClass::Frame()
+
+bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 {
+	//bool result;
+
+	// Set the frames per second.
+//	result = m_Text->SetFps(fps);
+//	if (!result)
+//	{
+//		return false;
+//	}
+
+	// Set the cpu usage.
+//	result = m_Text->SetCpu(cpu);
+//	if (!result)
+//	{
+//		return false;
+//	}
+
+	bool result, foundHeight;
+
+	
+
 	static float rotation = 0.0f;
 	rotation += (float)D3DX_PI * 0.005f;
 	if (rotation > 360.0f)
 	{
 		rotation -= 360.0f;
 	}
+	
+	t_cpu = cpu;
+	t_fps = fps;
+	t_renderCount = m_QuadTree->GetDrawCount();
+	frametime = frameTime;
 
 	// Render the graphics scene.
 	Render(rotation);
@@ -268,10 +366,16 @@ bool GraphicsClass::Frame()
 
 void GraphicsClass::Move(int dir)
 {
+	bool foundHeight;
+	D3DXVECTOR3 position;
+	float height;
+
+
 	cam_pos = m_Camera->GetPosition();
 	gun_pos = m_Gun->GetPosition();
 	rotate = m_Camera->GetRotation();
 	camera_lookat = m_Camera->GetLookAt();
+
 
 	camera_forward = camera_lookat - cam_pos;
 	D3DXVec3Normalize(&camera_forward, &camera_forward);
@@ -318,9 +422,17 @@ void GraphicsClass::Move(int dir)
 		m_Camera->SetRotation(rotate.x, rotate.y + rotatespeed, rotate.z);
 	}
 
-	//gun_pos = camera_lookat;
-	//m_Gun->SetPosition (gun_pos.x, gun_pos.y, gun_pos.z);
-	//m_Gun->SetRotation (rotate.x, rotate.y, rotate.z);
+	// Get the current position of the camera.
+	position = m_Camera->GetPosition();
+
+	// Get the height of the triangle that is directly underneath the given camera position.
+	foundHeight = m_QuadTree->GetHeightAtPosition(position.x - terrain.x, position.z - terrain.z, height);
+	if (foundHeight)
+	{
+		// If there was a triangle under the camera then position the camera just above it by two units.
+		m_Camera->SetPosition(position.x, height + 5.0f, position.z);
+	}
+
 }
 
 void GraphicsClass::Launch()
@@ -376,10 +488,71 @@ bool GraphicsClass::RenderSceneToTexture()
 	return true;
 }
 
+bool GraphicsClass::RenderText()
+{
+	LPCSTR fpsText;
+	LPCSTR cpuText;
+	LPCSTR renderCountText;
+	
+	string convertedFpsText;
+	string convertedCpuText;
+	string convertedRenderCountText;
+	
+	
+	convertedFpsText = to_string(t_fps);
+	fpsText = convertedFpsText.c_str();
+	
+	font->DrawTextA(0, fpsText, -1, &rectangleFps, DT_NOCLIP, fontColor);
+
+	convertedCpuText = to_string(t_cpu);
+	cpuText = convertedCpuText.c_str();
+
+	font->DrawTextA(0, cpuText, -1, &rectangleCpu, DT_NOCLIP, fontColor);
+
+
+	convertedRenderCountText = to_string(t_renderCount);
+	renderCountText = convertedRenderCountText.c_str();
+
+	font->DrawTextA(0, renderCountText, -1, &rectangleRenderCount, DT_NOCLIP, fontColor);
+
+
+
+
+
+	//D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
+
+
+	//// Clear the buffers to begin the scene.
+	////m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+
+	//// Generate the view matrix based on the camera's position.
+	////m_Camera->Render();
+
+	//// Get the world, view, projection, and ortho matrices from the camera and d3d objects.
+	//m_D3D->GetWorldMatrix(worldMatrix);
+	//m_Camera->GetViewMatrix(viewMatrix);
+	//m_D3D->GetProjectionMatrix(projectionMatrix);
+	//m_D3D->GetOrthoMatrix(orthoMatrix);
+
+	//// Turn off the Z buffer to begin all 2D rendering.
+	//m_D3D->TurnZBufferOff();
+
+	//// Render the text strings.
+	//m_Text->Render(m_D3D->GetDevice(), worldMatrix, orthoMatrix);
+
+	//// Turn the Z buffer back on now that all 2D rendering has completed.
+	//m_D3D->TurnZBufferOn();
+
+	//// Present the rendered scene to the screen.
+	////m_D3D->EndScene();
+
+	return true;
+}
+
 
 bool GraphicsClass::Render(float rotation)
 {
-	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 	D3DXMATRIX scaleMatrix, rotationMatrix;
 	D3DXMATRIX translationMatrix;
 
@@ -390,7 +563,7 @@ bool GraphicsClass::Render(float rotation)
 	D3DXVECTOR3 pos, rotate;
 
 	bool rendermodel = false;
-
+	
 	RenderSceneToTexture();
 
 	// Clear the buffers to begin the scene.
@@ -406,6 +579,8 @@ bool GraphicsClass::Render(float rotation)
 
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
+	m_D3D->GetOrthoMatrix(orthoMatrix);
+
 	m_EnvironmentLight->GetViewMatrix(lightViewMatrix);
 	m_EnvironmentLight->GetOrthoMatrix(lightOrthoMatrix);
 
@@ -413,15 +588,24 @@ bool GraphicsClass::Render(float rotation)
 	m_ObjectLight->GetOrthoMatrix(objOrthoMatrix);
 
 
+	//-------------------------------------------------------------------------//
+	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
+	//-------------------------------------------------------------------------//
+
+	//-------------------------------------------------------------------------//
+	//					--/\-- TEXT TO SCREEN HANDLING --/\--				   //
+	//-------------------------------------------------------------------------//
+
 	
 	//-------------------------------------------------------------------------//
 	//					--\/-- TERRAIN HANDLING --\/--						   //
 	//-------------------------------------------------------------------------//
-	
+	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
+
 	D3DXMatrixTranslation(&translationMatrix, terrain.x, terrain.y, terrain.z);
 	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
 
-	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
+
 
 	m_ShadowShader->SetShaderParametersTerrain(worldMatrix, viewMatrix, projectionMatrix, 
 	objViewMatrix, objOrthoMatrix, m_Terrain->GetTexture(), m_RenderTexture->GetShaderResourceView(),
@@ -430,9 +614,11 @@ bool GraphicsClass::Render(float rotation)
 
 	m_QuadTree->Render(m_Frustum, m_D3D->GetDevice(), m_ShadowShader);
 
+
 	//-------------------------------------------------------------------------//
 	//					--/\-- TERRAIN HANDLING --/\--						   //
 	//-------------------------------------------------------------------------//
+
 
 
 	//					--v-- OBJECT HANDLING --v--
@@ -536,6 +722,12 @@ bool GraphicsClass::Render(float rotation)
 	//-------------------------------------------------------------------------//
 
 	
+	m_D3D->TurnZBufferOff();
+	RenderText();
+	m_D3D->TurnZBufferOn();
+
+
+
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 

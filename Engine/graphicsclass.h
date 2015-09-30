@@ -21,6 +21,8 @@
 #include "frustumclass.h"
 #include "quadtreeclass.h"
 
+#include "textclass.h"
+
 
 /////////////
 // GLOBALS //
@@ -47,9 +49,10 @@ public:
 
 	bool Initialize(int, int, HWND);
 	void Shutdown();
-	bool Frame();
+	bool Frame(int, int, float);
 	void Move(int);
 	void Launch();
+	bool RenderText();
 
 private:
 	bool RenderSceneToTexture();
@@ -72,9 +75,13 @@ private:
 	DepthShaderClass*	  m_DepthShader;
 	RenderTextureClass*	  m_RenderTexture;
 	NormalMapShaderClass* m_NormalMapShader;
+	
 	TerrainClass*		  m_Terrain;
 	FrustumClass*		  m_Frustum;
 	QuadTreeClass*		  m_QuadTree;
+	
+	TextClass*			  m_Text;
+	ID3DX10Font* font;
 
 	float movespeed, rotatespeed;
 	D3DXVECTOR3 gun, cube, def, ground, cube2, terrain;
@@ -84,6 +91,14 @@ private:
 	D3DXMATRIX rot;
 
 	float specular_none, specular_matte, specular_shiny;
+
+	D3DX10_FONT_DESC fd;
+	D3DXCOLOR fontColor;
+	RECT rectangleFps;
+	RECT rectangleCpu;
+	RECT rectangleRenderCount;
+	int t_fps, t_cpu, t_renderCount;
+	float frametime;
 };
 
 #endif
