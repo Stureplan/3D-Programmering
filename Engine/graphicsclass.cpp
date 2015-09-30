@@ -117,7 +117,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	// Initialize a base view matrix with the camera for 2D user interface rendering.
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(52.0f, 2.0f, -1.0f);
+	m_Camera->SetPosition(52.0f, 0.0f, -1.0f);
 	m_Camera->Render();
 	m_Camera->GetViewMatrix(baseViewMatrix);
 
@@ -430,7 +430,7 @@ void GraphicsClass::Move(int dir)
 	if (foundHeight)
 	{
 		// If there was a triangle under the camera then position the camera just above it by two units.
-		m_Camera->SetPosition(position.x, height + 5.0f, position.z);
+		m_Camera->SetPosition(position.x, height + 1.0f, position.z);
 	}
 
 }

@@ -19,16 +19,6 @@ float4 diffuseColor;
 float3 cameraPosition;
 float specularPower;
 
-
-/*
-cbuffer MatrixBuffer
-{
-	matrix worldMatrix;
-	matrix viewMatrix;
-	matrix projectionMatrix;
-};
-*/
-
 ///////////////////
 // SAMPLE STATES //
 ///////////////////
@@ -55,6 +45,15 @@ struct VertexInputType
 	float4 position : POSITION;
 	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
+};
+
+struct GeometryInputType
+{
+	float4 position : SV_POSITION;
+	float2 tex : TEXCOORD0;
+	float3 normal : NORMAL;
+	float4 lightViewPosition : TEXCOORD1;
+	float3 viewDirection : TEXCOORD2;
 };
 
 struct PixelInputType
@@ -103,6 +102,20 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 	output.viewDirection = normalize(output.viewDirection);
 
 	return output;
+}
+
+
+// Geometry Shader
+[maxvertexcount(4)]
+void ShadowGeometryShader(triangle PixelInputType input[3], inout TriangleStream<PixelInputType> triStream)
+{	
+	input[0].viewDirection = (1.0f, 0.0f, 0.0f, 1.0f);
+	input[1].viewDirection = (1.0f, 0.0f, 0.0f, 1.0f);
+	input[2].viewDirection = (1.0f, 0.0f, 0.0f, 1.0f);
+
+	triStream.Append(input[0]);
+	triStream.Append(input[1]);
+	triStream.Append(input[2]);
 }
 
 
@@ -212,7 +225,7 @@ technique10 ShadowTechnique
 	pass pass0
 	{
 		SetVertexShader (CompileShader(vs_4_0, ShadowVertexShader ()));
+		SetGeometryShader (CompileShader(gs_4_0, ShadowGeometryShader()));
 		SetPixelShader (CompileShader(ps_4_0, ShadowPixelShader ()));
-		SetGeometryShader (NULL);
 	}
 }
