@@ -109,13 +109,22 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 [maxvertexcount(4)]
 void ShadowGeometryShader(triangle PixelInputType input[3], inout TriangleStream<PixelInputType> triStream)
 {	
-	input[0].viewDirection = (1.0f, 0.0f, 0.0f, 1.0f);
-	input[1].viewDirection = (1.0f, 0.0f, 0.0f, 1.0f);
-	input[2].viewDirection = (1.0f, 0.0f, 0.0f, 1.0f);
+	//input[0].viewDirection = (1.0f, 0.0f, 0.0f, 1.0f);
+	//input[1].viewDirection = (1.0f, 0.0f, 0.0f, 1.0f);
+	//input[2].viewDirection = (1.0f, 0.0f, 0.0f, 1.0f);
 
-	triStream.Append(input[0]);
-	triStream.Append(input[1]);
-	triStream.Append(input[2]);
+	
+	if (input[0].normal.x > 0.0f && input[1].normal.x > 0.0f && input[2].normal.x > 0.0f &&
+		input[0].normal.y > 0.0f && input[1].normal.y > 0.0f && input[2].normal.y > 0.0f &&
+		input[0].normal.z > 0.0f && input[1].normal.z > 0.0f && input[2].normal.z > 0.0f)
+	{
+		triStream.Append(input[0]);
+		triStream.Append(input[1]);
+		triStream.Append(input[2]);
+	}
+
+
+
 }
 
 

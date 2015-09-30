@@ -727,7 +727,7 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D->TurnZBufferOn();
 
 
-
+	
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 
