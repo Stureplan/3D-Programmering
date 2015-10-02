@@ -76,9 +76,7 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 	PixelInputType output;
 	float4 worldPosition;
 	
-
 	
-
 	// Change the position vector to be 4 units for proper matrix calculations.
 	input.position.w = 1.0f;
 
@@ -86,7 +84,8 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul (input.position, worldMatrix);
 
-	output.geopos = output.position;
+	output.geopos = input.position;
+	
 
 	output.position = mul (output.position, viewMatrix);
 	output.position = mul (output.position, projectionMatrix);
@@ -98,6 +97,7 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 
 	// Store the texture coordinates for the pixel shader.
 	output.tex = input.tex;
+
 
 	// Calculate the normal vector against the world matrix only.
 	output.normal = mul (input.normal, (float3x3)worldMatrix);
@@ -117,65 +117,46 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 [maxvertexcount(4)]
 void ShadowGeometryShader(triangle PixelInputType input[3], inout TriangleStream<PixelInputType> triStream)
 {	
-	//input[0].viewDirection = (1.0f, 0.0f, 0.0f, 1.0f);
-	//input[1].viewDirection = (1.0f, 0.0f, 0.0f, 1.0f);
-	//input[2].viewDirection = (1.0f, 0.0f, 0.0f, 1.0f);
+	PixelInputType output;
 
+	float4 dir = mul (input[0].position, worldMatrix);
+	dir = mul(input[1].position, worldMatrix);
+	dir = mul(input[2].position, worldMatrix);
+	dir = mul(dir, viewMatrix);
+	dir = mul(dir, projectionMatrix);
+	dir = normalize(dir);
 
-	//
-	//if (input[0].normal.x > 0.0f && input[1].normal.x > 0.0f && input[2].normal.x > 0.0f &&
-	//	input[0].normal.y > 0.0f && input[1].normal.y > 0.0f && input[2].normal.y > 0.0f &&
-	//	input[0].normal.z > 0.0f && input[1].normal.z > 0.0f && input[2].normal.z > 0.0f )
-	//{
-	//	triStream.Append(input[0]);
-	//	triStream.Append(input[1]);
-	//	triStream.Append(input[2]);
-	//}
-
-	/*float3 normalized_0 = input[0].position.xyz;
-	normalized_0 = normalize(normalized_0);
-	if (input[0].normal > cameraPosition - normalized_0)
-		triStream.Append(input[0]);
-
-	float3 normalized_1 = input[1].position.xyz;
-	normalized_1 = normalize(normalized_1);
-	if (input[1].normal > cameraPosition - normalized_1)
-		triStream.Append(input[1]);
-
-	float3 normalized_2 = input[2].position.xyz;
-	normalized_2 = normalize(normalized_2);
-	if (input[2].normal > cameraPosition - normalized_2)
-		triStream.Append(input[2]);
-
-*/
-	float3 dir = (viewMatrix._13, viewMatrix._23, viewMatrix._33);
-	//float3 dir;
-	//dir	= float3(0.0f, 0.0f, 1.0f);
 
 	float3 vec1 = (input[1].geopos - input[0].geopos);
 	float3 vec2 = (input[2].geopos - input[0].geopos);
-	//float3 surface = cross(vec1, vec2);
+	float3 surface = cross(vec1, vec2);
 
-	float normalX, normalY, normalZ;
-	normalX = (vec1.y * vec2.z) - (vec1.z * vec2.y);
-	normalY = (vec1.z * vec2.x) - (vec1.x * vec2.z);
-	normalZ = (vec1.x * vec2.y) - (vec1.y * vec2.x);
-	float3 surface = (normalX, normalY, normalZ);
+	surface = mul(surface, worldMatrix);
+	surface = mul(surface, viewMatrix);
+	surface = mul(surface, projectionMatrix);
+	
+	;
+	surface = normalize(surface);
+	dir = -dir;
+	
 
-	//dir = normalize(dir);
-	//surface = normalize(surface);
-
-	float test = dot(dir, surface);
-	test = cos(test);
-	//test = mul(test, 10);
-
-	if (test > 0.0)
+	float isVisable = (dot(dir, surface));
+	if (isVisable > 0.0f)
 	{
-		triStream.Append(input[0]);
-		triStream.Append(input[1]);
-		triStream.Append(input[2]);
+		for (uint i = 0; i < 3; i++)
+		{
+			output.position = input[i].position;
+			output.tex = input[i].tex;
+			output.normal = input[i].normal;
+			output.lightViewPosition = input[i].lightViewPosition;
+			output.viewDirection = input[i].viewDirection;
+			output.geopos = input[i].geopos;
+
+			triStream.Append(output);
+		}
 	}
 
+	triStream.RestartStrip();
 }
 
 
@@ -194,6 +175,8 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 	float3 lightDir;
 	float3 reflection;
 	float4 specular;
+
+
 
 	lightDir = -lightDirection;
 
@@ -273,7 +256,7 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 	if (specularPower != 0.0f)
 		color = saturate(color + specular);
 
-	return color;
+	return float4 (input.normal, 1.0f);
 }
 
 
