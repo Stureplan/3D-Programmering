@@ -54,6 +54,7 @@ struct GeometryInputType
 	float3 normal : NORMAL;
 	float4 lightViewPosition : TEXCOORD1;
 	float3 viewDirection : TEXCOORD2;
+	//float4 geopos : TEXCOORD3;
 };
 
 struct PixelInputType
@@ -63,6 +64,7 @@ struct PixelInputType
 	float3 normal : NORMAL;
 	float4 lightViewPosition : TEXCOORD1;
 	float3 viewDirection : TEXCOORD2;
+	//float4 geopos : TEXCOORD3;
 };
 
 
@@ -80,6 +82,8 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul (input.position, worldMatrix);
+	//Geopos is proof
+	//output.geopos = output.position;
 	output.position = mul (output.position, viewMatrix);
 	output.position = mul (output.position, projectionMatrix);
 
@@ -112,14 +116,21 @@ void ShadowGeometryShader(triangle PixelInputType input[3], inout TriangleStream
 {	
 	float4 dir = input[0].position;
 	dir = normalize(dir);
+	dir = -dir;
+
+	//----------------------------------------------------------
+	//PROOF VARIABLES - change input positions below to geopos
+	//float4 test = input[0].position;
+	//test = float4(1.0f, 0.0f, 0.0f, 1.0f);
+	//float3 vec1 = (input[1].geopos - input[0].geopos);
+	//float3 vec2 = (input[2].geopos - input[0].geopos);
+	//----------------------------------------------------------
 
 	float3 vec1 = (input[1].position - input[0].position);
 	float3 vec2 = (input[2].position - input[0].position);
 	float3 surface = cross(vec1, vec2);
-
 	surface = normalize(surface);
 
-	dir = -dir;
 
 	bool v1 = false;
 	bool v2 = false;
