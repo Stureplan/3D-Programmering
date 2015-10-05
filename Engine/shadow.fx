@@ -54,7 +54,6 @@ struct GeometryInputType
 	float3 normal : NORMAL;
 	float4 lightViewPosition : TEXCOORD1;
 	float3 viewDirection : TEXCOORD2;
-	float3 geopos : TEXCOORD3;
 };
 
 struct PixelInputType
@@ -64,7 +63,6 @@ struct PixelInputType
 	float3 normal : NORMAL;
 	float4 lightViewPosition : TEXCOORD1;
 	float3 viewDirection : TEXCOORD2;
-	float3 geopos : TEXCOORD3;
 };
 
 
@@ -80,13 +78,8 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 	// Change the position vector to be 4 units for proper matrix calculations.
 	input.position.w = 1.0f;
 
-	
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul (input.position, worldMatrix);
-
-	output.geopos = input.position;
-	
-
 	output.position = mul (output.position, viewMatrix);
 	output.position = mul (output.position, projectionMatrix);
 
@@ -117,46 +110,48 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 [maxvertexcount(4)]
 void ShadowGeometryShader(triangle PixelInputType input[3], inout TriangleStream<PixelInputType> triStream)
 {	
-	PixelInputType output;
-
-	float4 dir = mul (input[0].position, worldMatrix);
-	dir = mul(input[1].position, worldMatrix);
-	dir = mul(input[2].position, worldMatrix);
-	dir = mul(dir, viewMatrix);
-	dir = mul(dir, projectionMatrix);
+	float4 dir = input[0].position;
 	dir = normalize(dir);
 
-
-	float3 vec1 = (input[1].geopos - input[0].geopos);
-	float3 vec2 = (input[2].geopos - input[0].geopos);
+	float3 vec1 = (input[1].position - input[0].position);
+	float3 vec2 = (input[2].position - input[0].position);
 	float3 surface = cross(vec1, vec2);
 
-	surface = mul(surface, worldMatrix);
-	surface = mul(surface, viewMatrix);
-	surface = mul(surface, projectionMatrix);
-	
-	;
 	surface = normalize(surface);
+
 	dir = -dir;
-	
 
-	float isVisable = (dot(dir, surface));
-	if (isVisable > 0.0f)
+	bool v1 = false;
+	bool v2 = false;
+	bool v3 = false;
+
+	float isVisible = (dot(dir, surface));
+	if (isVisible > 0.0f)
 	{
-		for (uint i = 0; i < 3; i++)
-		{
-			output.position = input[i].position;
-			output.tex = input[i].tex;
-			output.normal = input[i].normal;
-			output.lightViewPosition = input[i].lightViewPosition;
-			output.viewDirection = input[i].viewDirection;
-			output.geopos = input[i].geopos;
-
-			triStream.Append(output);
-		}
+		v1 = true;
 	}
 
-	triStream.RestartStrip();
+	isVisible = (dot(dir, surface));
+	if (isVisible > 0.0f)
+	{
+		v2 = true;
+	}
+
+	isVisible = (dot(dir, surface));
+	if (isVisible > 0.0f)
+	{
+		v3 = true;
+	}
+
+	if ((v1 == true) || (v2 == true) || (v3 == true))
+	{
+		triStream.Append(input[0]);
+		triStream.Append(input[1]);
+		triStream.Append(input[2]);
+	}
+
+
+	//triStream.RestartStrip();
 }
 
 
