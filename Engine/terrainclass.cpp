@@ -242,24 +242,24 @@ bool TerrainClass::CalculateNormals()
 			vector1[0] = vertex1[0] - vertex3[0];
 			vector1[1] = vertex1[1] - vertex3[1];
 			vector1[2] = vertex1[2] - vertex3[2];
-			vector2[0] = vertex1[0] - vertex2[0];
-			vector2[1] = vertex1[1] - vertex2[1];
-			vector2[2] = vertex1[2] - vertex2[2];
+			vector2[0] = vertex3[0] - vertex2[0];
+			vector2[1] = vertex3[1] - vertex2[1];
+			vector2[2] = vertex3[2] - vertex2[2];
 
 			index = (j * (m_terrainHeight - 1)) + i;
 
 
 			//float3 surface = cross(vec1, vec2);
 
-			normals[index].x = (vector1[1] * vector2[2]) - (vector2[2] * vector1[1]);
-			normals[index].y = (vector1[2] * vector2[0]) - (vector1[0] * vector2[2]);
-			normals[index].z = (vector1[0] * vector2[2]) - (vector1[2] * vector2[0]);
+			//normals[index].x = (vector1[1] * vector2[2]) - (vector2[2] * vector1[1]);
+			//normals[index].y = (vector1[2] * vector2[0]) - (vector1[0] * vector2[2]);
+			//normals[index].z = (vector1[0] * vector2[2]) - (vector1[2] * vector2[0]);
 
 			//normals[index].x = cross(vector1[0], vector2[0]);
 			//// Calculate the cross product of those two vectors to get the un-normalized value for this face normal.
-			//normals[index].x = (vector1[1] * vector2[2]) - (vector1[2] * vector2[1]);
-			//normals[index].y = (vector1[2] * vector2[0]) - (vector1[0] * vector2[2]);
-			//normals[index].z = (vector1[0] * vector2[1]) - (vector1[1] * vector2[0]);
+			normals[index].x = (vector1[1] * vector2[2]) - (vector1[2] * vector2[1]);
+			normals[index].y = (vector1[2] * vector2[0]) - (vector1[0] * vector2[2]);
+			normals[index].z = (vector1[0] * vector2[1]) - (vector1[1] * vector2[0]);
 		}
 	}
 
