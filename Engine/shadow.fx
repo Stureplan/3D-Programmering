@@ -262,7 +262,7 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 	if (specularPower != 0.0f)
 		color = saturate(color + specular);
 
-	return float4 (input.normal, 1.0f);
+	return color;
 }
 
 
