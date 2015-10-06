@@ -263,6 +263,9 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 		color = saturate(color + specular);
 
 	return color;
+	
+	// Show normals instead of texture.
+	//return float4 (input.normal, 1.0f);
 }
 
 

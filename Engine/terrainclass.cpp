@@ -249,14 +249,7 @@ bool TerrainClass::CalculateNormals()
 			index = (j * (m_terrainHeight - 1)) + i;
 
 
-			//float3 surface = cross(vec1, vec2);
-
-			//normals[index].x = (vector1[1] * vector2[2]) - (vector2[2] * vector1[1]);
-			//normals[index].y = (vector1[2] * vector2[0]) - (vector1[0] * vector2[2]);
-			//normals[index].z = (vector1[0] * vector2[2]) - (vector1[2] * vector2[0]);
-
-			//normals[index].x = cross(vector1[0], vector2[0]);
-			//// Calculate the cross product of those two vectors to get the un-normalized value for this face normal.
+		
 			normals[index].x = (vector1[1] * vector2[2]) - (vector1[2] * vector2[1]);
 			normals[index].y = (vector1[2] * vector2[0]) - (vector1[0] * vector2[2]);
 			normals[index].z = (vector1[0] * vector2[1]) - (vector1[1] * vector2[0]);
