@@ -19,16 +19,6 @@ float4 diffuseColor;
 float3 cameraPosition;
 float specularPower;
 
-
-/*
-cbuffer MatrixBuffer
-{
-	matrix worldMatrix;
-	matrix viewMatrix;
-	matrix projectionMatrix;
-};
-*/
-
 ///////////////////
 // SAMPLE STATES //
 ///////////////////
@@ -57,6 +47,16 @@ struct VertexInputType
 	float3 normal : NORMAL;
 };
 
+struct GeometryInputType
+{
+	float4 position : SV_POSITION;
+	float2 tex : TEXCOORD0;
+	float3 normal : NORMAL;
+	float4 lightViewPosition : TEXCOORD1;
+	float3 viewDirection : TEXCOORD2;
+	//float4 geopos : TEXCOORD3;
+};
+
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
@@ -64,6 +64,7 @@ struct PixelInputType
 	float3 normal : NORMAL;
 	float4 lightViewPosition : TEXCOORD1;
 	float3 viewDirection : TEXCOORD2;
+	//float4 geopos : TEXCOORD3;
 };
 
 
@@ -74,13 +75,15 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 {
 	PixelInputType output;
 	float4 worldPosition;
-
-
+	
+	
 	// Change the position vector to be 4 units for proper matrix calculations.
 	input.position.w = 1.0f;
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul (input.position, worldMatrix);
+	//Geopos is proof
+	//output.geopos = output.position;
 	output.position = mul (output.position, viewMatrix);
 	output.position = mul (output.position, projectionMatrix);
 
@@ -91,6 +94,7 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 
 	// Store the texture coordinates for the pixel shader.
 	output.tex = input.tex;
+
 
 	// Calculate the normal vector against the world matrix only.
 	output.normal = mul (input.normal, (float3x3)worldMatrix);
@@ -103,6 +107,62 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 	output.viewDirection = normalize(output.viewDirection);
 
 	return output;
+}
+
+
+// Geometry Shader
+[maxvertexcount(4)]
+void ShadowGeometryShader(triangle PixelInputType input[3], inout TriangleStream<PixelInputType> triStream)
+{	
+	float4 dir = input[0].position;
+	dir = normalize(dir);
+	dir = -dir;
+
+	//----------------------------------------------------------
+	//PROOF VARIABLES - change input positions below to geopos
+	//float4 test = input[0].position;
+	//test = float4(1.0f, 0.0f, 0.0f, 1.0f);
+	//float3 vec1 = (input[1].geopos - input[0].geopos);
+	//float3 vec2 = (input[2].geopos - input[0].geopos);
+	//----------------------------------------------------------
+
+	float3 vec1 = (input[1].position - input[0].position);
+	float3 vec2 = (input[2].position - input[0].position);
+	float3 surface = cross(vec1, vec2);
+	surface = normalize(surface);
+
+
+	bool v1 = false;
+	bool v2 = false;
+	bool v3 = false;
+
+	float isVisible = (dot(dir, surface));
+	if (isVisible > 0.0f)
+	{
+		v1 = true;
+	}
+
+	isVisible = (dot(dir, surface));
+	if (isVisible > 0.0f)
+	{
+		v2 = true;
+	}
+
+	isVisible = (dot(dir, surface));
+	if (isVisible > 0.0f)
+	{
+		v3 = true;
+	}
+
+	if ((v1 == true) || (v2 == true) || (v3 == true))
+	{
+		triStream.Append(input[0]);
+		triStream.Append(input[1]);
+		triStream.Append(input[2]);
+	}
+
+
+	//triStream.RestartStrip();
 }
 
 
@@ -121,6 +181,8 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 	float3 lightDir;
 	float3 reflection;
 	float4 specular;
+
+
 
 	lightDir = -lightDirection;
 
@@ -201,6 +263,9 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 		color = saturate(color + specular);
 
 	return color;
+	
+	// Show normals instead of texture.
+	//return float4 (input.normal, 1.0f);
 }
 
 
@@ -212,7 +277,7 @@ technique10 ShadowTechnique
 	pass pass0
 	{
 		SetVertexShader (CompileShader(vs_4_0, ShadowVertexShader ()));
+		SetGeometryShader (CompileShader(gs_4_0, ShadowGeometryShader()));
 		SetPixelShader (CompileShader(ps_4_0, ShadowPixelShader ()));
-		SetGeometryShader (NULL);
 	}
 }
