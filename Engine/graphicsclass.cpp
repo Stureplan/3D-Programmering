@@ -66,9 +66,6 @@ GraphicsClass::GraphicsClass()
 	rectangleCpu = { 25, 50, 0, 0 };
 	rectangleRenderCount = { 25, 75, 0, 0 };
 	rectanglePicking = { 25, 100, 0, 0 };
-	rectangleCpu = { 25, 100, 0, 0 };
-	rectangleRenderCount = { 25, 175, 0, 0 };
-
 	pickingText = "None";
 }
 
@@ -85,10 +82,7 @@ GraphicsClass::~GraphicsClass()
 
 bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
-	bool result;
 	D3DXMATRIX baseViewMatrix;
-	char videoCard[128];
-	int videoMemory;
 
 	resolution.x = screenWidth;
 	resolution.y = screenHeight;
@@ -385,14 +379,9 @@ bool GraphicsClass::RenderSceneToTexture(float rotation)
 {
 	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	D3DXMATRIX translateMatrix;
-	D3DXVECTOR3 xyz, scale;
 	D3DXVECTOR3 pos;
 
 	bool render = false;
-
-	D3DXVECTOR3 cameraPosition, modelPosition;
-	double angle;
-	float rotate;
 
 	m_RenderTexture->SetRenderTarget (m_D3D->GetDevice ());
 	m_RenderTexture->ClearRenderTarget(m_D3D->GetDevice(), 0.0f, 0.0f, 0.0f, 1.0f);
@@ -553,24 +542,12 @@ bool GraphicsClass::RaySphereIntersect(D3DXVECTOR3 rayOrigin, D3DXVECTOR3 rayDir
 bool GraphicsClass::Render(float rotation)
 {
 	D3DXMATRIX worldMatrix, baseViewMatrix, orthoMatrix;
-	D3DXMATRIX scaleMatrix, rotationMatrix;
-	D3DXMATRIX translationMatrix;
-
-	D3DXVECTOR3 pos, rotate;
-
 	D3DXMATRIX viewMatrix, projectionMatrix;
 	D3DXMATRIX scaleMatrix, rotationMatrix;
 	D3DXMATRIX translationMatrix;
 
-	D3DXVECTOR3 rotate;
-
-	D3DXVECTOR3 xyz, scale;
-	D3DXVECTOR3 pos, pos2;
-
-	D3DXVECTOR3 cameraPosition, modelPosition;
-	double angle;
-	float rotates;
-
+	D3DXVECTOR3 pos, rotate, cameraPosition;
+	
 	bool rendermodel = false;
 
 	RenderSceneToTexture(rotation);
@@ -583,29 +560,6 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D->GetOrthoMatrix(orthoMatrix);
 
 	m_Camera->Render();
-
-
-	// Render fullscreen quad
-	// ----------\/----------
-	m_D3D->TurnZBufferOff();
-
-	m_Window->Render(m_D3D->GetDevice());
-	m_ShadowShader->Render(m_D3D->GetDevice(), m_Window->GetIndexCount(),
-		worldMatrix, baseViewMatrix, orthoMatrix,
-		m_RenderTexture->GetShaderResourceView(0),
-		m_RenderTexture->GetShaderResourceView(1),
-		m_RenderTexture->GetShaderResourceView(2),
-		m_ObjectLight->GetDirection(),
-		m_ObjectLight->GetAmbientColor(),
-		m_Camera->GetPosition(),
-		specular_shiny);
-	
-	m_D3D->TurnZBufferOn();
-	// ----------/\----------
-	// Render fullscreen quad
-
-
-
 
 	cameraPosition = m_Camera->GetPosition();
 	m_D3D->GetWorldMatrix(worldMatrix);
@@ -626,11 +580,11 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 
-	m_D3D->GetWorldMatrix(worldMatrix);
-
 	// Render fullscreen quad
 	// ----------\/----------
 	m_D3D->TurnZBufferOff();
+
+	m_D3D->GetWorldMatrix(worldMatrix);
 
 	m_Window->Render(m_D3D->GetDevice());
 	m_ShadowShader->Render(m_D3D->GetDevice(), m_Window->GetIndexCount(),

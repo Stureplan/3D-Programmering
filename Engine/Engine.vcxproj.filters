@@ -72,6 +72,12 @@
     <ClCompile Include="textclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="particleclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="particleshaderclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cameraclass.h">
@@ -128,6 +134,12 @@
     <ClInclude Include="textclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="particleclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="particleshaderclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shadow.fx">
@@ -137,6 +149,9 @@
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="deferred.fx">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="particle.fx">
       <Filter>Shader Files</Filter>
     </FxCompile>
   </ItemGroup>

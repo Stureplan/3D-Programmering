@@ -78,20 +78,15 @@ private:
 	ShadowShaderClass*	  m_ShadowShader;
 	RenderTextureClass*	  m_RenderTexture;	//"deferredbuffersclass"
 	NormalMapShaderClass* m_NormalMapShader;
+	ParticleShaderClass* m_ParticleShader;
+	DeferredShaderClass*  m_Deferred;
 
 	ModelClass* m_NormalCube;
 	ModelClass* m_Cube;
 	ParticleClass* m_ParticleSystem[part];
 	
 
-	ConverterClass*		  m_Convert;
-	ShadowShaderClass*	  m_ShadowShader;
-	RenderTextureClass*	  m_RenderTexture;	//"deferredbuffersclass"
-	NormalMapShaderClass* m_NormalMapShader;
 
-	ParticleShaderClass* m_ParticleShader;
-
-	DeferredShaderClass*  m_Deferred;
 	OrthoWindowClass*	  m_Window;
 
 	TerrainClass*		  m_Terrain;

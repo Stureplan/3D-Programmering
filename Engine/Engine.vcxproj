@@ -90,6 +90,8 @@
     <ClCompile Include="lightclass.cpp" />
     <ClCompile Include="normalmapshaderclass.cpp" />
     <ClCompile Include="orthowindowclass.cpp" />
+    <ClCompile Include="particleclass.cpp" />
+    <ClCompile Include="particleshaderclass.cpp" />
     <ClCompile Include="quadtreeclass.cpp" />
     <ClCompile Include="rendertextureclass.cpp" />
     <ClCompile Include="shadowshaderclass.cpp" />
@@ -111,6 +113,8 @@
     <ClInclude Include="lightclass.h" />
     <ClInclude Include="normalmapshaderclass.h" />
     <ClInclude Include="orthowindowclass.h" />
+    <ClInclude Include="particleclass.h" />
+    <ClInclude Include="particleshaderclass.h" />
     <ClInclude Include="quadtreeclass.h" />
     <ClInclude Include="rendertextureclass.h" />
     <ClInclude Include="shadowshaderclass.h" />
@@ -127,6 +131,11 @@
     <FxCompile Include="normalmap.fx">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="particle.fx">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="shadow.fx">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Effect</ShaderType>
