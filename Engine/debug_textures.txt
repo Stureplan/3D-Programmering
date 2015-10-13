@@ -1,0 +1,10 @@
+
+	ID3D10ShaderResourceView* test;
+	ID3D10Resource* t;
+
+	test = m_RenderTexture->GetShaderResourceView (1);
+	test->GetResource (&t);
+	HRESULT result = D3DX10SaveTextureToFile (t, D3DX10_IFF_JPG, L"name.jpg");
+	
+
+This produces a texture from the ID3D10ShaderResourceView.

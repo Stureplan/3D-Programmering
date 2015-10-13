@@ -26,7 +26,6 @@ private:
 		D3DXVECTOR3 position;
 	    D3DXVECTOR2 texture;
 		D3DXVECTOR3 normal;
-		
 		D3DXVECTOR3 tangent;
 		D3DXVECTOR3 binormal;
 	};
@@ -36,7 +35,6 @@ private:
 		float x, y, z;
 		float tu, tv;
 		float nx, ny, nz;
-
 		float tx, ty, tz;
 		float bx, by, bz;
 	};

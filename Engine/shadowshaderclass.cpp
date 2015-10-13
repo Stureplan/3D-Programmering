@@ -14,15 +14,12 @@ ShadowShaderClass::ShadowShaderClass ()
 	m_viewMatrixPtr = 0;
 	m_projectionMatrixPtr = 0;
 
-	m_lightViewMatrixPtr = 0;
-	m_lightProjectionMatrixPtr = 0;
-
 	m_texturePtr = 0;
-	m_depthMapTexturePtr = 0;
+	m_normalTexturePtr = 0;
+	m_diffuseTexturePtr = 0;
 
 	m_lightDirectionPtr = 0;
 	m_ambientColorPtr = 0;
-	m_diffuseColorPtr = 0;
 
 	m_cameraPositionPtr = 0;
 	m_specularPowerPtr = 0;
@@ -67,16 +64,15 @@ void ShadowShaderClass::Shutdown ()
 
 void ShadowShaderClass::Render (ID3D10Device* device, int indexCount, 
 	D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix,
-	D3DXMATRIX lightViewMatrix, D3DXMATRIX lightProjectionMatrix, 
-	ID3D10ShaderResourceView* texture, ID3D10ShaderResourceView* depthMapTexture, 
-	D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor,
+	ID3D10ShaderResourceView* texture, ID3D10ShaderResourceView* normalTexture, 
+	ID3D10ShaderResourceView* diffuse,
+	D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambientColor,
 	D3DXVECTOR3 cameraPosition, float specularPower)
 {
 	// Set the shader parameters that it will use for rendering.
 	SetShaderParameters (worldMatrix, viewMatrix, projectionMatrix, 
-						 lightViewMatrix, lightProjectionMatrix, 
-						 texture, depthMapTexture,
-						 lightDirection, ambientColor, diffuseColor,
+						 texture, normalTexture, diffuse,
+						 lightDirection, ambientColor, 
 						 cameraPosition, specularPower);
 
 	// Now render the prepared buffers with the shader.
@@ -91,7 +87,7 @@ bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR
 {
 	HRESULT result;
 	ID3D10Blob* errorMessage;
-	D3D10_INPUT_ELEMENT_DESC polygonLayout[3];
+	D3D10_INPUT_ELEMENT_DESC polygonLayout[2];
 	unsigned int numElements;
 	D3D10_PASS_DESC passDesc;
 	D3D10_BUFFER_DESC matrixBufferDesc;
@@ -145,14 +141,14 @@ bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR
 	polygonLayout[1].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
 	polygonLayout[1].InstanceDataStepRate = 0;
 
-	polygonLayout[2].SemanticName = "NORMAL";
-	polygonLayout[2].SemanticIndex = 0;
-	polygonLayout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	polygonLayout[2].InputSlot = 0;
-	polygonLayout[2].AlignedByteOffset = D3D10_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[2].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
-	polygonLayout[2].InstanceDataStepRate = 0;
-
+	//polygonLayout[2].SemanticName = "NORMAL";
+	//polygonLayout[2].SemanticIndex = 0;
+	//polygonLayout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	//polygonLayout[2].InputSlot = 0;
+	//polygonLayout[2].AlignedByteOffset = D3D10_APPEND_ALIGNED_ELEMENT;
+	//polygonLayout[2].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
+	//polygonLayout[2].InstanceDataStepRate = 0;
+	
 	// Get a count of the elements in the layout.
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
 
@@ -173,22 +169,18 @@ bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR
 	m_viewMatrixPtr		  = m_effect->GetVariableByName ("viewMatrix")		->AsMatrix ();
 	m_projectionMatrixPtr = m_effect->GetVariableByName ("projectionMatrix")->AsMatrix ();
 
-	//Pointers to Light View & Projection matrixes
-	m_lightViewMatrixPtr	   = m_effect->GetVariableByName ("lightViewMatrix")	  ->AsMatrix ();
-	m_lightProjectionMatrixPtr = m_effect->GetVariableByName ("lightProjectionMatrix")->AsMatrix ();
-
 	//Get pointer to the texture resources inside the shader
-	m_texturePtr		 = m_effect->GetVariableByName ("shaderTexture")  ->AsShaderResource ();
-	m_depthMapTexturePtr = m_effect->GetVariableByName ("depthMapTexture")->AsShaderResource ();
+	m_texturePtr		 = m_effect->GetVariableByName ("colorTexture")  ->AsShaderResource ();
+	m_normalTexturePtr   = m_effect->GetVariableByName ("normalTexture") ->AsShaderResource ();
+	m_diffuseTexturePtr  = m_effect->GetVariableByName ("diffuseTexture")->AsShaderResource ();
 
 	//Pointers to the light position and diffuse in the shader
 	m_lightDirectionPtr = m_effect->GetVariableByName ("lightDirection")->AsVector ();
 	m_ambientColorPtr	= m_effect->GetVariableByName ("ambientColor")  ->AsVector ();
-	m_diffuseColorPtr	= m_effect->GetVariableByName ("diffuseColor")  ->AsVector ();
 
 	//Pointers to specular values
 	m_cameraPositionPtr = m_effect->GetVariableByName("cameraPosition")->AsVector();
-	m_specularPowerPtr = m_effect->GetVariableByName("specularPower")->AsScalar();
+	m_specularPowerPtr  = m_effect->GetVariableByName("specularPower")->AsScalar();
 
 	return true;
 }
@@ -196,27 +188,20 @@ bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR
 
 void ShadowShaderClass::ShutdownShader ()
 {
-	//Release the light pointers
-	m_lightDirectionPtr = 0;
-	m_ambientColorPtr = 0;
-	m_diffuseColorPtr = 0;
-	m_cameraPositionPtr = 0;
-	m_specularPowerPtr = 0;
-
-
-
-	//Release the pointer to the texture in the shader file.
-	m_texturePtr = 0;
-	m_depthMapTexturePtr = 0;
-
-	//Release light matrixes
-	m_lightViewMatrixPtr = 0;
-	m_lightProjectionMatrixPtr = 0;
-
-	// Release the pointers to the matrices inside the shader.
 	m_worldMatrixPtr = 0;
 	m_viewMatrixPtr = 0;
 	m_projectionMatrixPtr = 0;
+
+	//Release the pointer to the texture in the shader file.
+	m_texturePtr = 0;
+	m_normalTexturePtr = 0;
+	m_diffuseTexturePtr = 0;
+
+	//Release the light pointers
+	m_lightDirectionPtr = 0;
+	m_ambientColorPtr = 0;
+	m_cameraPositionPtr = 0;
+	m_specularPowerPtr = 0;
 
 	// Release the pointer to the shader layout.
 	if (m_layout)
@@ -274,54 +259,23 @@ void ShadowShaderClass::OutputShaderErrorMessage (ID3D10Blob* errorMessage, HWND
 	return;
 }
 
-void ShadowShaderClass::SetShaderParametersTerrain(D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix,
-	D3DXMATRIX lightViewMatrix, D3DXMATRIX lightProjectionMatrix,
-	ID3D10ShaderResourceView* texture, ID3D10ShaderResourceView* depthMapTexture,
-	D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor,
-	D3DXVECTOR3 cameraPosition, float specularPower)
-{
-	//Set pointers inside the shader
-	m_worldMatrixPtr->SetMatrix((float*)&worldMatrix);
-	m_viewMatrixPtr->SetMatrix((float*)&viewMatrix);
-	m_projectionMatrixPtr->SetMatrix((float*)&projectionMatrix);
-
-	m_lightViewMatrixPtr->SetMatrix((float*)&lightViewMatrix);
-	m_lightProjectionMatrixPtr->SetMatrix((float*)&lightProjectionMatrix);
-
-	m_texturePtr->SetResource(texture);
-	m_depthMapTexturePtr->SetResource(depthMapTexture);
-
-	m_lightDirectionPtr->SetFloatVector((float*)&lightDirection);
-	m_ambientColorPtr->SetFloatVector((float*)&ambientColor);
-	m_diffuseColorPtr->SetFloatVector((float*)&diffuseColor);
-
-	m_cameraPositionPtr->SetFloatVector((float*)&cameraPosition);
-	m_specularPowerPtr->SetFloat(specularPower);
-
-	return;
-}
-
 void ShadowShaderClass::SetShaderParameters(
-	D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 
-	D3DXMATRIX lightViewMatrix, D3DXMATRIX lightProjectionMatrix, 
-	ID3D10ShaderResourceView* texture, ID3D10ShaderResourceView* depthMapTexture,
-	D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor,
+	D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix,
+	ID3D10ShaderResourceView* texture, ID3D10ShaderResourceView* normalTexture,
+	ID3D10ShaderResourceView* diffuse,
+	D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambientColor,
 	D3DXVECTOR3 cameraPosition, float specularPower)
 {
-	//Set pointers inside the shader
 	m_worldMatrixPtr			->SetMatrix ((float*) &worldMatrix);
 	m_viewMatrixPtr				->SetMatrix ((float*) &viewMatrix);
 	m_projectionMatrixPtr		->SetMatrix ((float*) &projectionMatrix);
 
-	m_lightViewMatrixPtr		->SetMatrix ((float*) &lightViewMatrix);
-	m_lightProjectionMatrixPtr	->SetMatrix ((float*) &lightProjectionMatrix);
-
 	m_texturePtr				->SetResource (texture);
-	m_depthMapTexturePtr		->SetResource (depthMapTexture);
+	m_normalTexturePtr			->SetResource (normalTexture);
+	m_diffuseTexturePtr			->SetResource (diffuse);
 
 	m_lightDirectionPtr			->SetFloatVector ((float*) &lightDirection);
 	m_ambientColorPtr			->SetFloatVector ((float*) &ambientColor);
-	m_diffuseColorPtr			->SetFloatVector ((float*) &diffuseColor);
 
 	m_cameraPositionPtr			->SetFloatVector((float*)&cameraPosition);
 	m_specularPowerPtr			->SetFloat(specularPower);

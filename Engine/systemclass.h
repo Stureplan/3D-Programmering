@@ -15,6 +15,7 @@
 // INCLUDES //
 //////////////
 #include <windows.h>
+#include <time.h>
 
 
 ///////////////////////
@@ -23,7 +24,6 @@
 #include "inputclass.h"
 #include "graphicsclass.h"
 #include "textclass.h"
-#include "quadtreeclass.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,6 @@ private:
 	GraphicsClass* m_Graphics;
 
 	TextClass* m_Text;
-
 };
 
 

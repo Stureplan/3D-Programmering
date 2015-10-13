@@ -76,8 +76,7 @@ bool ModelClass::Initialize(ID3D10Device* device, WCHAR* model)
 	if (m_normalMapped == true)
 	{
 		WCHAR* normalMap = L"../Engine/data/floor.jpg";
-		//Currently only supports ONE normalmap,
-		//expand with if/else, if we want to use more normalmaps...
+		//Currently only supports ONE normalmap
 
 		LoadNormalmap (device, normalMap);
 	}

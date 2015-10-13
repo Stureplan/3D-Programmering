@@ -82,7 +82,7 @@ void QuadTreeClass::Shutdown()
 }
 
 
-void QuadTreeClass::Render(FrustumClass* frustum, ID3D10Device* device, ShadowShaderClass* shader)
+void QuadTreeClass::Render(FrustumClass* frustum, ID3D10Device* device, DeferredShaderClass* shader)
 {
 	// Reset the number of triangles that are drawn for this frame.
 	m_drawCount = 0;
@@ -457,7 +457,7 @@ void QuadTreeClass::ReleaseNode(NodeType* node)
 }
 
 
-void QuadTreeClass::RenderNode(NodeType* node, FrustumClass* frustum, ID3D10Device* device, ShadowShaderClass* shader)
+void QuadTreeClass::RenderNode(NodeType* node, FrustumClass* frustum, ID3D10Device* device, DeferredShaderClass* shader)
 {
 	bool result;
 	int count, i, indexCount;
@@ -466,6 +466,10 @@ void QuadTreeClass::RenderNode(NodeType* node, FrustumClass* frustum, ID3D10Devi
 
 	// Check to see if the node can be viewed, height doesn't matter in a quad tree.
 	result = frustum->CheckCube(node->positionX + terrain_offset.x, 0.0f, node->positionZ + terrain_offset.z, (node->width / 2.0f));
+
+	//Use this line instead to check the quad tree culling
+	//result = frustum->CheckCube(node->positionX, 0.0f, node->positionZ, (node->width / 2.0f));
+
 
 	// If it can't be seen then none of its children can either so don't continue down the tree, this is where the speed is gained.
 	if (!result)
@@ -513,7 +517,7 @@ void QuadTreeClass::RenderNode(NodeType* node, FrustumClass* frustum, ID3D10Devi
 
 	// Increase the count of the number of polygons that have been rendered during this frame.
 	m_drawCount += node->triangleCount;
-
+	
 	return;
 }
 
