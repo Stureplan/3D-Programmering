@@ -195,8 +195,17 @@ bool SystemClass::Frame()
 	{
 		m_Graphics->Move (6);
 	}
-	//---END OF ROTATION---//
 
+	if (m_Input->IsKeyDown(VK_F3))
+	{
+		m_Graphics->Move(7);
+	}
+
+	if (m_Input->IsKeyDown(VK_F4))
+	{
+		m_Graphics->Move(8);
+	}
+	//---END OF ROTATION---//
 
 	//---MOUSE POSITION---//	
 	if (m_Input->IsKeyDown(VK_TAB))

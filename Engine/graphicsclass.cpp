@@ -11,13 +11,18 @@ GraphicsClass::GraphicsClass()
 	m_D3D = 0;
 	m_Camera = 0;
 	m_ObjectLight = 0;
-
 	m_Cube = 0;
+
+	for (int i = 0; i < part; i++)
+	{
+		m_ParticleSystem[i] = 0;
+	}
 
 	m_ShadowShader = 0;
 	m_RenderTexture = 0;
 	m_NormalMapShader = 0;
 
+	m_ParticleShader = 0;
 	m_Deferred = 0;
 	m_Window = 0;
 
@@ -31,7 +36,8 @@ GraphicsClass::GraphicsClass()
 	rotatespeed = 1.0f;
 
 	//These are the POSITIONS for each object in the scene
-	cube = D3DXVECTOR3(0.0f, 0.3f, 0.0f);
+	cube = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	normalcube = D3DXVECTOR3 (2.0f, 0.0f, 0.0f);
 	def = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	ground = D3DXVECTOR3(0.0f, -2.0f, 0.0f);
 	terrain = D3DXVECTOR3(20.0f, 0.0f, 50.0f);
@@ -60,6 +66,8 @@ GraphicsClass::GraphicsClass()
 	rectangleCpu = { 25, 50, 0, 0 };
 	rectangleRenderCount = { 25, 75, 0, 0 };
 	rectanglePicking = { 25, 100, 0, 0 };
+	rectangleCpu = { 25, 100, 0, 0 };
+	rectangleRenderCount = { 25, 175, 0, 0 };
 
 	pickingText = "None";
 }
@@ -81,6 +89,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	D3DXMATRIX baseViewMatrix;
 	char videoCard[128];
 	int videoMemory;
+
 	resolution.x = screenWidth;
 	resolution.y = screenHeight;
 
@@ -110,17 +119,34 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Convert->Convert(L"../Engine/data/cubeTextured.obj", 2);	//Convert cube
 
 	// Create the model objects.
-	m_Cube = new ModelClass(cube, m_D3D->GetDevice(), L"../Engine/data/model01.txt", false);
 
 	m_ObjectLight->SetAmbientColor(0.4f, 0.4f, 0.4f, 1.0f);
 	m_ObjectLight->SetPosition(4.0f, 4.0f, 0.0f);
 	m_ObjectLight->SetDirection(0.0f, -1.0f, -1.0f);
+
+	m_Cube		 = new ModelClass (cube, m_D3D->GetDevice(), L"../Engine/data/model01.txt", false);
+	m_NormalCube = new ModelClass (normalcube, m_D3D->GetDevice(), L"../Engine/data/model02.txt", true);
+
+	for (int i = 0; i < part; i++)
+	{
+		m_ParticleSystem[i] = new ParticleClass(m_D3D->GetDevice());
+	}
+	
+
+	m_ObjectLight->SetAmbientColor(0.4f, 0.4f, 0.4f, 1.0f);
+	m_ObjectLight->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_ObjectLight->SetPosition(4.0f, 4.0f, 0.0f);
+	m_ObjectLight->SetDirection(0.0f, -1.0f, -4.0f);
 	m_ObjectLight->GenerateOrthoMatrix(20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
 	m_ObjectLight->GenerateViewMatrix();
 
 	m_RenderTexture = new RenderTextureClass;
 	m_ShadowShader = new ShadowShaderClass;
 	m_NormalMapShader = new NormalMapShaderClass;
+	m_ParticleShader = new ParticleShaderClass;
+
+	m_Deferred = new DeferredShaderClass;
+	m_Window = new OrthoWindowClass;
 
 	m_Deferred = new DeferredShaderClass;
 	m_Window = new OrthoWindowClass;
@@ -128,7 +154,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_RenderTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
 	m_ShadowShader->Initialize(m_D3D->GetDevice(), hwnd);
 	m_NormalMapShader->Initialize(m_D3D->GetDevice(), hwnd);
-
+	m_ParticleShader->Initialize(m_D3D->GetDevice(), hwnd);
 	m_Window->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight);
 	m_Deferred->Initialize(m_D3D->GetDevice(), hwnd);
 
@@ -227,6 +253,32 @@ void GraphicsClass::Shutdown()
 		m_Frustum = 0;
 	}
 
+	if (m_Terrain)
+	{
+		delete m_Terrain;
+		m_Terrain = 0;
+	}
+
+	if (m_Frustum)
+	{
+		delete m_Frustum;
+		m_Frustum = 0;
+	}
+
+	if (m_ParticleShader)
+	{
+		delete m_ParticleShader;
+		m_ParticleShader = 0;
+	}
+
+	if (m_ParticleSystem)
+	{
+		for (int i = 0; i < part; i++)
+		{
+			delete m_ParticleSystem[i];
+			m_ParticleSystem[i] = 0;
+		}
+	}
 	return;
 }
 
@@ -234,7 +286,7 @@ void GraphicsClass::Shutdown()
 bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 {
 	static float rotation = 0.0f;
-	rotation += (float)D3DX_PI * 0.005f;
+	rotation += (float)D3DX_PI * 0.002f;
 	if (rotation > 360.0f)
 	{
 		rotation -= 360.0f;
@@ -305,6 +357,16 @@ void GraphicsClass::Move(int dir)
 		m_Camera->SetRotation(rotate.x, rotate.y + rotatespeed, rotate.z);
 	}
 
+	if (dir == 7) //ROTATE UP
+	{
+		m_Camera->SetRotation(rotate.x + rotatespeed, rotate.y, rotate.z);
+	}
+
+	if (dir == 8) //ROTATE UP
+	{
+		m_Camera->SetRotation(rotate.x - rotatespeed, rotate.y, rotate.z);
+	}
+
 	position = m_Camera->GetPosition();
 
 	foundHeight = m_QuadTree->GetHeightAtPosition(position.x - terrain.x, position.z - terrain.z, height);
@@ -325,7 +387,13 @@ bool GraphicsClass::RenderSceneToTexture(float rotation)
 	D3DXMATRIX translateMatrix;
 	D3DXVECTOR3 xyz, scale;
 	D3DXVECTOR3 pos;
+
 	bool render = false;
+
+	D3DXVECTOR3 cameraPosition, modelPosition;
+	double angle;
+	float rotate;
+
 	m_RenderTexture->SetRenderTarget (m_D3D->GetDevice ());
 	m_RenderTexture->ClearRenderTarget(m_D3D->GetDevice(), 0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -333,7 +401,6 @@ bool GraphicsClass::RenderSceneToTexture(float rotation)
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	
-
 	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
 
 	//Cube --->
@@ -349,6 +416,23 @@ bool GraphicsClass::RenderSceneToTexture(float rotation)
 			worldMatrix, viewMatrix, projectionMatrix,
 			m_Cube->GetTexture(),
 			m_Cube->GetDiffuse());
+	}
+
+	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
+
+	//Cube --->
+	pos = m_Cube->GetPosition();
+
+	if (m_Frustum->CheckSphere(pos.x, pos.y, pos.z, 0.5f) == true)
+	{
+	m_Cube->SetPosition(pos.x, pos.y, pos.z);
+	D3DXMatrixTranslation(&worldMatrix, pos.x, pos.y, pos.z);
+
+	m_Cube->Render(m_D3D->GetDevice());
+	m_Deferred->Render(m_D3D->GetDevice(), m_Cube->GetIndexCount(),
+		worldMatrix, viewMatrix, projectionMatrix,
+		m_Cube->GetTexture(),
+		m_Cube->GetDiffuse());
 	}
 	//Cube --->
 
@@ -375,7 +459,6 @@ bool GraphicsClass::RenderText()
 	LPCSTR cpuText;
 	LPCSTR renderCountText;
 
-
 	string convertedFpsText;
 	string convertedCpuText;
 	string convertedRenderCountText;
@@ -396,8 +479,6 @@ bool GraphicsClass::RenderText()
 	renderCountText = convertedRenderCountText.c_str();
 
 	font->DrawTextA(0, renderCountText, -1, &rectangleRenderCount, DT_NOCLIP, fontColor);
-
-
 	font->DrawTextA(0, pickingText, -1, &rectanglePicking, DT_NOCLIP, fontColor);
 
 	return true;
@@ -464,6 +545,7 @@ bool GraphicsClass::RaySphereIntersect(D3DXVECTOR3 rayOrigin, D3DXVECTOR3 rayDir
 	{
 		return false;
 	}
+
 	return true;
 }
 
@@ -475,6 +557,19 @@ bool GraphicsClass::Render(float rotation)
 	D3DXMATRIX translationMatrix;
 
 	D3DXVECTOR3 pos, rotate;
+
+	D3DXMATRIX viewMatrix, projectionMatrix;
+	D3DXMATRIX scaleMatrix, rotationMatrix;
+	D3DXMATRIX translationMatrix;
+
+	D3DXVECTOR3 rotate;
+
+	D3DXVECTOR3 xyz, scale;
+	D3DXVECTOR3 pos, pos2;
+
+	D3DXVECTOR3 cameraPosition, modelPosition;
+	double angle;
+	float rotates;
 
 	bool rendermodel = false;
 
@@ -512,35 +607,63 @@ bool GraphicsClass::Render(float rotation)
 
 
 
-	//					--v-- OBJECT HANDLING --v--
-	//2. Cube
-	//-------------------------------------------------------------------------//
+	cameraPosition = m_Camera->GetPosition();
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	/*pos = m_Cube->GetPosition();
-	rendermodel = m_Frustum->CheckSphere(pos.x, pos.y, pos.z, 0.8f);
-
-	if (rendermodel == true)
+	for (int i = 0; i < part; i++)
 	{
-		m_D3D->GetWorldMatrix(worldMatrix);
+		m_ParticleSystem[i]->Render(m_D3D->GetDevice());
+
+		pos = m_ParticleSystem[i]->GetPosition();
 		D3DXMatrixTranslation(&worldMatrix, pos.x, pos.y, pos.z);
 
-
-		//rotation
-		D3DXMatrixRotationY(&worldMatrix, rotation);
-		D3DXMatrixRotationY(&rot, rotation);
-
-		D3DXMatrixTranslation(&translationMatrix, pos.x, pos.y, pos.z);
-		D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translationMatrix);
-
-		m_Cube->Render(m_D3D->GetDevice());
-		m_ShadowShader->Render(m_D3D->GetDevice(), m_Cube->GetIndexCount(),
+		m_ParticleShader->Render(m_D3D->GetDevice(), 1,
 			worldMatrix, viewMatrix, projectionMatrix,
-			m_Cube->GetTexture(), m_RenderTexture->GetShaderResourceView(1),
-			m_ObjectLight->GetDirection(), m_EnvironmentLight->GetAmbientColor(), m_Cube->GetDiffuse(),
-			m_Camera->GetPosition(), specular_shiny);
-	}*/
-	//-------------------------------------------------------------------------//
-	
+			cameraPosition,
+			m_ParticleSystem[i]->GetTexture());
+	}
+
+
+	m_D3D->GetWorldMatrix(worldMatrix);
+
+	// Render fullscreen quad
+	// ----------\/----------
+	m_D3D->TurnZBufferOff();
+
+	m_Window->Render(m_D3D->GetDevice());
+	m_ShadowShader->Render(m_D3D->GetDevice(), m_Window->GetIndexCount(),
+		worldMatrix, baseViewMatrix, orthoMatrix,
+		m_RenderTexture->GetShaderResourceView(0),
+		m_RenderTexture->GetShaderResourceView(1),
+		m_RenderTexture->GetShaderResourceView(2),
+		m_ObjectLight->GetDirection(),
+		m_ObjectLight->GetAmbientColor(),
+		m_Camera->GetPosition(),
+		specular_shiny);
+
+	m_D3D->TurnZBufferOn ();
+	// ----------/\----------
+	// Render fullscreen quad
+
+	pos = m_NormalCube->GetPosition ();
+	m_D3D->GetWorldMatrix (worldMatrix);
+	m_Camera->GetViewMatrix (viewMatrix);
+	m_D3D->GetProjectionMatrix (projectionMatrix);
+
+	//rotation
+	D3DXMatrixRotationY (&rotationMatrix, rotation);
+	D3DXMatrixTranslation (&translationMatrix, pos.x, pos.y, pos.z);
+	D3DXMatrixMultiply (&worldMatrix, &rotationMatrix, &translationMatrix);
+
+	m_NormalCube->Render (m_D3D->GetDevice ());
+	m_NormalMapShader->Render (m_D3D->GetDevice (), m_NormalCube->GetIndexCount (),
+		worldMatrix, viewMatrix, projectionMatrix,
+		m_NormalCube->GetTexture (), m_NormalCube->GetNormalmap (),
+		m_ObjectLight->GetDirection (), m_ObjectLight->GetAmbientColor (), m_ObjectLight->GetDiffuseColor ());
+
+
 	m_D3D->TurnZBufferOff();
 	RenderText();
 	m_D3D->TurnZBufferOn();

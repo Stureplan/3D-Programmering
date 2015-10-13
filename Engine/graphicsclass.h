@@ -14,7 +14,6 @@
 #include "lightclass.h"
 #include "converter.h"
 #include "rendertextureclass.h"
-#include "depthshaderclass.h"
 #include "shadowshaderclass.h"
 #include "normalmapshaderclass.h"
 #include "terrainclass.h"
@@ -23,6 +22,8 @@
 #include "deferredshaderclass.h"
 #include "orthowindowclass.h"
 #include "textclass.h"
+#include "particleshaderclass.h"
+#include "particleclass.h"
 
 
 /////////////
@@ -36,6 +37,7 @@ const int SHADOWMAP_WIDTH = 1024;
 const int SHADOWMAP_HEIGHT = 1024;
 const float SHADOWMAP_DEPTH = 50.0f;
 const float SHADOWMAP_NEAR = 1.0f;
+const int part = 100;
 
 struct TwoInt
 {
@@ -58,27 +60,36 @@ public:
 	bool Frame(int, int, float);
 	void Move(int);
 	void Launch();
-	bool RenderText();
 	void TestIntersection(int, int);
 	bool RaySphereIntersect(D3DXVECTOR3, D3DXVECTOR3, float);
 
 private:
 	bool RenderSceneToTexture(float);
 	bool Render(float);
-
+	bool RenderText();
 
 private:
 	D3DClass*	 m_D3D;
 	CameraClass* m_Camera;
 	LightClass*  m_ObjectLight;
 
-	ModelClass* m_Cube;
 
 	ConverterClass*		  m_Convert;
 	ShadowShaderClass*	  m_ShadowShader;
-	DepthShaderClass*	  m_DepthShader;
 	RenderTextureClass*	  m_RenderTexture;	//"deferredbuffersclass"
 	NormalMapShaderClass* m_NormalMapShader;
+
+	ModelClass* m_NormalCube;
+	ModelClass* m_Cube;
+	ParticleClass* m_ParticleSystem[part];
+	
+
+	ConverterClass*		  m_Convert;
+	ShadowShaderClass*	  m_ShadowShader;
+	RenderTextureClass*	  m_RenderTexture;	//"deferredbuffersclass"
+	NormalMapShaderClass* m_NormalMapShader;
+
+	ParticleShaderClass* m_ParticleShader;
 
 	DeferredShaderClass*  m_Deferred;
 	OrthoWindowClass*	  m_Window;
@@ -91,7 +102,7 @@ private:
 	ID3DX10Font*		  font;
 
 	float movespeed, rotatespeed;
-	D3DXVECTOR3 cube, def, ground, terrain;
+	D3DXVECTOR3 cube, normalcube, def, ground, terrain;
 	D3DXVECTOR3 cam_pos, rotate;
 	D3DXVECTOR3 camera_forward, camera_lookat, camera_up;
 	D3DXVECTOR3 camera_left, camera_right;
@@ -111,7 +122,6 @@ private:
 	float frametime;
 
 	LPCSTR pickingText;
-
 	TwoInt resolution;
 };
 

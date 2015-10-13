@@ -56,7 +56,7 @@ bool ModelClass::Initialize(ID3D10Device* device, WCHAR* model)
 
 	if (m_normalMapped == true)
 	{
-		//	CalculateModelVectors ();
+		CalculateModelVectors ();
 	}
 
 	// Initialize the vertex and index buffer that hold the geometry for the triangle.
@@ -76,8 +76,7 @@ bool ModelClass::Initialize(ID3D10Device* device, WCHAR* model)
 	if (m_normalMapped == true)
 	{
 		WCHAR* normalMap = L"../Engine/data/floor.jpg";
-		//Currently only supports ONE normalmap,
-		//expand with if/else, if we want to use more normalmaps...
+		//Currently only supports ONE normalmap
 
 		LoadNormalmap (device, normalMap);
 	}
@@ -203,7 +202,7 @@ bool ModelClass::InitializeBuffers(ID3D10Device* device)
 	}
 
 	//However, if it is - we need the tangents and binormals
-	/*else if (m_normalMapped == true)
+	else if (m_normalMapped == true)
 	{
 		for (int i = 0; i < m_vertexCount; i++)
 		{
@@ -215,7 +214,7 @@ bool ModelClass::InitializeBuffers(ID3D10Device* device)
 
 			indices[i] = i;
 		}
-	}*/
+	}
 
 	// Set up the description of the vertex buffer.
     vertexBufferDesc.Usage = D3D10_USAGE_DEFAULT;
@@ -502,41 +501,41 @@ void ModelClass::CalculateModelVectors ()
 		index++;
 
 		// Calculate the tangent and binormal of that face.
-		//CalculateTangentBinormal (vertex1, vertex2, vertex3, tangent, binormal);
+		CalculateTangentBinormal (vertex1, vertex2, vertex3, tangent, binormal);
 
 		// Calculate the new normal using the tangent and binormal.
-		//CalculateNormal (tangent, binormal, normal);
+		CalculateNormal (tangent, binormal, normal);
 
 		// Store the normal, tangent, and binormal for this face back in the model structure.
 		m_model[index - 1].nx = normal.x;
 		m_model[index - 1].ny = normal.y;
 		m_model[index - 1].nz = normal.z;
-		//m_model[index - 1].tx = tangent.x;
-		//m_model[index - 1].ty = tangent.y;
-		//m_model[index - 1].tz = tangent.z;
-		//m_model[index - 1].bx = binormal.x;
-		//m_model[index - 1].by = binormal.y;
-		//m_model[index - 1].bz = binormal.z;
+		m_model[index - 1].tx = tangent.x;
+		m_model[index - 1].ty = tangent.y;
+		m_model[index - 1].tz = tangent.z;
+		m_model[index - 1].bx = binormal.x;
+		m_model[index - 1].by = binormal.y;
+		m_model[index - 1].bz = binormal.z;
 
 		m_model[index - 2].nx = normal.x;
 		m_model[index - 2].ny = normal.y;
 		m_model[index - 2].nz = normal.z;
-		//m_model[index - 2].tx = tangent.x;
-		//m_model[index - 2].ty = tangent.y;
-		//m_model[index - 2].tz = tangent.z;
-		//m_model[index - 2].bx = binormal.x;
-		//m_model[index - 2].by = binormal.y;
-		//m_model[index - 2].bz = binormal.z;
+		m_model[index - 2].tx = tangent.x;
+		m_model[index - 2].ty = tangent.y;
+		m_model[index - 2].tz = tangent.z;
+		m_model[index - 2].bx = binormal.x;
+		m_model[index - 2].by = binormal.y;
+		m_model[index - 2].bz = binormal.z;
 
 		m_model[index - 3].nx = normal.x;
 		m_model[index - 3].ny = normal.y;
 		m_model[index - 3].nz = normal.z;
-		//m_model[index - 3].tx = tangent.x;
-		//m_model[index - 3].ty = tangent.y;
-		//m_model[index - 3].tz = tangent.z;
-		//m_model[index - 3].bx = binormal.x;
-		//m_model[index - 3].by = binormal.y;
-		//m_model[index - 3].bz = binormal.z;
+		m_model[index - 3].tx = tangent.x;
+		m_model[index - 3].ty = tangent.y;
+		m_model[index - 3].tz = tangent.z;
+		m_model[index - 3].bx = binormal.x;
+		m_model[index - 3].by = binormal.y;
+		m_model[index - 3].bz = binormal.z;
 	}
 
 	return;

@@ -72,7 +72,6 @@ void ShadowGeometryShader(triangle PixelInputType input[3], inout TriangleStream
 
 	//----------------------------------------------------------
 	//PROOF VARIABLES - change input positions below to geopos
-	//float4 test = input[0].position;
 	//float4 test = float4(0.0f, 1.0f, 0.0f, 1.0f);
 	//float3 vec1 = (input[1].geopos - input[0].geopos);
 	//float3 vec2 = (input[2].geopos - input[0].geopos);

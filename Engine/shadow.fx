@@ -102,13 +102,17 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 	outputColor = ambientColor;
 	specular = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
-
 	//Calculate with normals
 	lightDir = -lightDirection;
 
 	lightIntensity = saturate(dot(normals.xyz, lightDir));
 
 
+
+	//Calculate with normals
+	lightDir = -lightDirection;
+
+	lightIntensity = saturate(dot(normals.xyz, lightDir));
 
 	//Check if pixel is supposed to have light
 	if (lightIntensity > 0.0f)
@@ -135,6 +139,11 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 	if (specularPower != 0.0f)
 	{
 		outputColor = saturate(outputColor + specular);
+	}
+
+	if (!textureColor.x && !diffuse.x)
+	{
+		outputColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 
 	//return normals

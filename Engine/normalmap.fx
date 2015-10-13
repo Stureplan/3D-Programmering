@@ -72,7 +72,7 @@ float4 NormalMapPixelShader (PixelInputType input) : SV_Target
 	textureColor = shaderTexture.Sample (SampleType, input.tex);
 
 	normalMap = shaderNormalTexture.Sample (SampleType, input.tex);
-	normalMap = (normalMap * 15.0f) - 1.0f;
+	normalMap = (normalMap * 15.0f) - 5.0f;
 	bumpNormal = (normalMap.x * input.tangent) + (normalMap.y * input.binormal) + (normalMap.z * input.normal);
 	bumpNormal = normalize (bumpNormal);
 

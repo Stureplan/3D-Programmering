@@ -138,7 +138,7 @@ void TextClass::Render()
 
 float TextClass::GetTime()
 {
-	return true;
+	return m_startTime;
 }
 
 int TextClass::GetFps()

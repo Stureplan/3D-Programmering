@@ -15,6 +15,7 @@
 // INCLUDES //
 //////////////
 #include <windows.h>
+#include <time.h>
 
 
 ///////////////////////
@@ -55,6 +56,7 @@ private:
 	GraphicsClass* m_Graphics;
 
 	TextClass* m_Text;
+
 	int height, width;
 	int mouseX, mouseY;
 };
