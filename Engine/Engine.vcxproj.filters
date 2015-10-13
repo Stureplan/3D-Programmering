@@ -48,9 +48,6 @@
     <ClCompile Include="terrainclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="depthshaderclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="normalmapshaderclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,10 +57,16 @@
     <ClCompile Include="shadowshaderclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="frustumclass.cpp">
+    <ClCompile Include="deferredshaderclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="orthowindowclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="quadtreeclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frustumclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="textclass.cpp">
@@ -101,9 +104,6 @@
     <ClInclude Include="terrainclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="depthshaderclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="normalmapshaderclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -113,10 +113,16 @@
     <ClInclude Include="shadowshaderclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="frustumclass.h">
+    <ClInclude Include="deferredshaderclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="orthowindowclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="quadtreeclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frustumclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="textclass.h">
@@ -130,7 +136,7 @@
     <FxCompile Include="normalmap.fx">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="depth.fx">
+    <FxCompile Include="deferred.fx">
       <Filter>Shader Files</Filter>
     </FxCompile>
   </ItemGroup>

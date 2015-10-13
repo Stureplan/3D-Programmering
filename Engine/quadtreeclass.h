@@ -16,7 +16,7 @@ const int MAX_TRIANGLES = 10000;
 ///////////////////////
 #include "terrainclass.h"
 #include "frustumclass.h"
-#include "shadowshaderclass.h"
+#include "deferredshaderclass.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ public:
 
 	bool Initialize(TerrainClass*, ID3D10Device*, D3DXVECTOR3);
 	void Shutdown();
-	void Render(FrustumClass*, ID3D10Device*, ShadowShaderClass*);
+	void Render(FrustumClass*, ID3D10Device*, DeferredShaderClass*);
 
 	int GetDrawCount();
 	bool GetHeightAtPosition(float, float, float&);
@@ -64,7 +64,7 @@ private:
 	int CountTriangles(float, float, float);
 	bool IsTriangleContained(int, float, float, float);
 	void ReleaseNode(NodeType*);
-	void RenderNode(NodeType*, FrustumClass*, ID3D10Device*, ShadowShaderClass*);
+	void RenderNode(NodeType*, FrustumClass*, ID3D10Device*, DeferredShaderClass*);
 
 	void FindNode(NodeType*, float, float, float&);
 	bool CheckHeightOfTriangle(float, float, float&, float[3], float[3], float[3]);

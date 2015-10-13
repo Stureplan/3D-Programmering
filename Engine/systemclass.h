@@ -23,7 +23,6 @@
 #include "inputclass.h"
 #include "graphicsclass.h"
 #include "textclass.h"
-#include "quadtreeclass.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,6 +43,7 @@ public:
 
 private:
 	bool Frame();
+	void ConstrainMouse (int, int);
 	void InitializeWindows(int&, int&);
 	void ShutdownWindows();
 
@@ -51,12 +51,12 @@ private:
 	LPCWSTR m_applicationName;
 	HINSTANCE m_hinstance;
 	HWND m_hwnd;
-
 	InputClass* m_Input;
 	GraphicsClass* m_Graphics;
 
 	TextClass* m_Text;
-
+	int height, width;
+	int mouseX, mouseY;
 };
 
 
@@ -70,6 +70,8 @@ static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 // GLOBALS //
 /////////////
 static SystemClass* ApplicationHandle = 0;
+
+
 
 
 #endif

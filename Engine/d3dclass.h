@@ -32,7 +32,7 @@ public:
 
 	bool Initialize(int, int, bool, HWND, bool, float, float);
 	void Shutdown();
-
+	
 	void BeginScene(float, float, float, float);
 	void EndScene();
 
@@ -44,11 +44,11 @@ public:
 
 	void GetVideoCardInfo(char*, int&);
 
-	void TurnZBufferOn();
-	void TurnZBufferOff();
+	void TurnZBufferOn ();
+	void TurnZBufferOff ();
 
-	void SetBackBufferRenderTarget();
-	void ResetViewport();
+	void SetBackBufferRenderTarget ();
+	void ResetViewport ();
 
 private:
 	bool m_vsync_enabled;

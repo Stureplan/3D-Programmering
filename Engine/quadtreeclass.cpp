@@ -82,7 +82,7 @@ void QuadTreeClass::Shutdown()
 }
 
 
-void QuadTreeClass::Render(FrustumClass* frustum, ID3D10Device* device, ShadowShaderClass* shader)
+void QuadTreeClass::Render(FrustumClass* frustum, ID3D10Device* device, DeferredShaderClass* shader)
 {
 	// Reset the number of triangles that are drawn for this frame.
 	m_drawCount = 0;
@@ -457,7 +457,7 @@ void QuadTreeClass::ReleaseNode(NodeType* node)
 }
 
 
-void QuadTreeClass::RenderNode(NodeType* node, FrustumClass* frustum, ID3D10Device* device, ShadowShaderClass* shader)
+void QuadTreeClass::RenderNode(NodeType* node, FrustumClass* frustum, ID3D10Device* device, DeferredShaderClass* shader)
 {
 	bool result;
 	int count, i, indexCount;

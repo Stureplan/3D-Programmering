@@ -249,7 +249,7 @@ bool TerrainClass::CalculateNormals()
 			index = (j * (m_terrainHeight - 1)) + i;
 
 
-		
+
 			normals[index].x = (vector1[1] * vector2[2]) - (vector1[2] * vector2[1]);
 			normals[index].y = (vector1[2] * vector2[0]) - (vector1[0] * vector2[2]);
 			normals[index].z = (vector1[0] * vector2[1]) - (vector1[1] * vector2[0]);
@@ -475,7 +475,7 @@ bool TerrainClass::InitializeBuffers(ID3D10Device* device)
 			index3 = (m_terrainHeight * (j + 1)) + i;      // Upper left.
 			index4 = (m_terrainHeight * (j + 1)) + (i + 1);  // Upper right.
 
-			// Upper left.
+															 // Upper left.
 			tv = m_heightMap[index3].tv;
 
 			// Modify the texture coordinates to cover the top edge.

@@ -10,7 +10,6 @@
 //////////////
 #include <d3d10.h>
 #include <d3dx10math.h>
-//#include <d3dx10async.h>
 #include <fstream>
 using namespace std;
 
@@ -27,18 +26,11 @@ public:
 
 	bool Initialize (ID3D10Device*, HWND);
 	void Shutdown ();
-	void Render (ID3D10Device*, int, 
-			 	 D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
-				 ID3D10ShaderResourceView*, ID3D10ShaderResourceView*, 
-				 D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
-				 D3DXVECTOR3, float);
-
-	void SetShaderParametersTerrain(
-		D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX,
-		ID3D10ShaderResourceView*, ID3D10ShaderResourceView*,
-		D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
+	void Render(ID3D10Device*, int,
+		D3DXMATRIX, D3DXMATRIX, D3DXMATRIX,
+		ID3D10ShaderResourceView*, ID3D10ShaderResourceView*, ID3D10ShaderResourceView*,
+		D3DXVECTOR3, D3DXVECTOR4,
 		D3DXVECTOR3, float);
-
 	void RenderShader(ID3D10Device*, int);
 
 private:
@@ -46,10 +38,13 @@ private:
 	void ShutdownShader ();
 	void OutputShaderErrorMessage (ID3D10Blob*, HWND, WCHAR*);
 
-	void SetShaderParameters (D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
-							  ID3D10ShaderResourceView*, ID3D10ShaderResourceView*,
-							  D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
+	void SetShaderParameters (D3DXMATRIX, D3DXMATRIX, D3DXMATRIX,
+							  ID3D10ShaderResourceView*, ID3D10ShaderResourceView*, ID3D10ShaderResourceView*,
+							  D3DXVECTOR3, D3DXVECTOR4,
 							  D3DXVECTOR3, float);
+
+	
+
 
 private:
 	//Shader pointers
@@ -62,18 +57,14 @@ private:
 	ID3D10EffectMatrixVariable* m_viewMatrixPtr;
 	ID3D10EffectMatrixVariable* m_projectionMatrixPtr;
 
-	//Light View & Projection matrix pointers
-	ID3D10EffectMatrixVariable* m_lightViewMatrixPtr;
-	ID3D10EffectMatrixVariable* m_lightProjectionMatrixPtr;
-
 	//Texture pointers
 	ID3D10EffectShaderResourceVariable* m_texturePtr;
-	ID3D10EffectShaderResourceVariable* m_depthMapTexturePtr;
+	ID3D10EffectShaderResourceVariable* m_normalTexturePtr;
+	ID3D10EffectShaderResourceVariable* m_diffuseTexturePtr;
 
 	//Light pointers
 	ID3D10EffectVectorVariable* m_lightDirectionPtr;
 	ID3D10EffectVectorVariable* m_ambientColorPtr;
-	ID3D10EffectVectorVariable* m_diffuseColorPtr;
 
 	//Specular pointers
 	ID3D10EffectVectorVariable* m_cameraPositionPtr;
