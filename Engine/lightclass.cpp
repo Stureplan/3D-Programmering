@@ -55,11 +55,6 @@ D3DXVECTOR4 LightClass::GetDiffuseColor()
 	return m_diffuseColor;
 }
 
-D3DXVECTOR4 LightClass::GetSpecularColor()
-{
-	return m_specularColor;
-}
-
 D3DXVECTOR3 LightClass::GetPosition()
 {
 	return m_position;
@@ -74,9 +69,8 @@ void LightClass::GenerateViewMatrix ()
 {
 	D3DXVECTOR3 up;
 	up.x = 0.0f;
-	up.y = 1.0f;
+	up.y = 1.0f; 
 	up.z = 0.0f;
-
 	D3DXMatrixLookAtLH (&m_viewMatrix, &m_position, &m_direction, &up);
 	return;
 }
@@ -90,11 +84,15 @@ void LightClass::GenerateOrthoMatrix (float width, float depthPlane, float nearP
 void LightClass::GenerateProjMatrix (float screenDepth, float screenNear)
 {
 	float fieldOfView, screenAspect;
+
+
+	// Setup field of view and screen aspect for a square light source.
 	fieldOfView = (float) D3DX_PI / 2.0f;
 	screenAspect = 1.0f;
 
+	// Create the projection matrix for the light.
+	D3DXMatrixPerspectiveFovLH (&m_projectionMatrix, fieldOfView, screenAspect, screenNear, screenDepth);
 
-	D3DXMatrixPerspectiveFovLH (&m_projMatrix, fieldOfView, screenAspect, screenNear, screenDepth);
 	return;
 }
 
@@ -112,6 +110,6 @@ void LightClass::GetOrthoMatrix (D3DXMATRIX& orthoMatrix)
 
 void LightClass::GetProjMatrix (D3DXMATRIX& projMatrix)
 {
-	projMatrix = m_projMatrix;
+	projMatrix = m_projectionMatrix;
 	return;
 }

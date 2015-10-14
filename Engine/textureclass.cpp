@@ -24,31 +24,14 @@ bool TextureClass::Initialize(ID3D10Device* device, WCHAR* filename)
 {
 	HRESULT result;
 
+
 	// Load the texture in.
 	result = D3DX10CreateShaderResourceViewFromFile(device, filename, NULL, NULL, &m_texture, NULL);
-	if (FAILED (result))
-	{
-		return false;
-	}
-	return true;
-}
-
-bool TextureClass::Initialize(ID3D10Device* device, string filename)
-{
-	HRESULT result;
-
-
-	//-- convert from string to LPCWSTR --//
-	wstring test = std::wstring(filename.begin(), filename.end());
-	LPCWSTR sw = test.c_str ();
-
-
-	// Load the texture in.
-	result = D3DX10CreateShaderResourceViewFromFile(device, sw, NULL, NULL, &m_texture, NULL);
 	if (FAILED(result))
 	{
 		return false;
 	}
+
 	return true;
 }
 

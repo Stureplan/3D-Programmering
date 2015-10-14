@@ -22,8 +22,6 @@
 ///////////////////////
 #include "inputclass.h"
 #include "graphicsclass.h"
-#include "textclass.h"
-#include "quadtreeclass.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,9 +52,6 @@ private:
 
 	InputClass* m_Input;
 	GraphicsClass* m_Graphics;
-
-	TextClass* m_Text;
-
 };
 
 

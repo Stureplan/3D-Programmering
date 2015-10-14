@@ -10,7 +10,6 @@
 //////////////
 #include <d3d10.h>
 #include <d3dx10math.h>
-//#include <d3dx10async.h>
 #include <fstream>
 using namespace std;
 
@@ -30,16 +29,7 @@ public:
 	void Render (ID3D10Device*, int, 
 			 	 D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
 				 ID3D10ShaderResourceView*, ID3D10ShaderResourceView*, 
-				 D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
-				 D3DXVECTOR3, float);
-
-	void SetShaderParametersTerrain(
-		D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX,
-		ID3D10ShaderResourceView*, ID3D10ShaderResourceView*,
-		D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
-		D3DXVECTOR3, float);
-
-	void RenderShader(ID3D10Device*, int);
+				 D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4);
 
 private:
 	bool InitializeShader (ID3D10Device*, HWND, WCHAR*);
@@ -48,8 +38,8 @@ private:
 
 	void SetShaderParameters (D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, 
 							  ID3D10ShaderResourceView*, ID3D10ShaderResourceView*,
-							  D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4,
-							  D3DXVECTOR3, float);
+							  D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4);
+	void RenderShader (ID3D10Device*, int);
 
 private:
 	//Shader pointers
@@ -71,13 +61,9 @@ private:
 	ID3D10EffectShaderResourceVariable* m_depthMapTexturePtr;
 
 	//Light pointers
-	ID3D10EffectVectorVariable* m_lightDirectionPtr;
+	ID3D10EffectVectorVariable* m_lightPositionPtr;
 	ID3D10EffectVectorVariable* m_ambientColorPtr;
 	ID3D10EffectVectorVariable* m_diffuseColorPtr;
-
-	//Specular pointers
-	ID3D10EffectVectorVariable* m_cameraPositionPtr;
-	ID3D10EffectScalarVariable* m_specularPowerPtr;
 };
 
 #endif

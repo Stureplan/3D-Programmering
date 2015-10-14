@@ -24,7 +24,6 @@ public:
 
 	D3DXVECTOR4 GetAmbientColor();
 	D3DXVECTOR4 GetDiffuseColor();
-	D3DXVECTOR4 GetSpecularColor();
 	D3DXVECTOR3 GetPosition();
 	D3DXVECTOR3 GetDirection ();
 
@@ -39,13 +38,12 @@ public:
 private:
 	D3DXVECTOR4 m_ambientColor;
 	D3DXVECTOR4 m_diffuseColor;
-	D3DXVECTOR4 m_specularColor;
 	D3DXVECTOR3 m_position;
 	D3DXVECTOR3 m_lookAt;
 	D3DXVECTOR3 m_direction;
 	D3DXMATRIX  m_viewMatrix;
 	D3DXMATRIX  m_orthoMatrix;
-	D3DXMATRIX  m_projMatrix;
+	D3DXMATRIX  m_projectionMatrix;
 };
 
 

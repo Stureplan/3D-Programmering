@@ -3,21 +3,30 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-/////////////
-// GLOBALS //
-/////////////
+//////////////
+// MATRICES //
+//////////////
 matrix worldMatrix;
 matrix viewMatrix;
 matrix projectionMatrix;
 matrix lightViewMatrix;
 matrix lightProjectionMatrix;
+
+
+//////////////
+// TEXTURES //
+//////////////
 Texture2D shaderTexture;
 Texture2D depthMapTexture;
-float3 lightDirection;
+
+
+/////////////
+// GLOBALS //
+/////////////
 float4 ambientColor;
 float4 diffuseColor;
-float3 cameraPosition;
-float specularPower;
+float3 lightPosition;
+
 
 ///////////////////
 // SAMPLE STATES //
@@ -47,24 +56,13 @@ struct VertexInputType
 	float3 normal : NORMAL;
 };
 
-struct GeometryInputType
-{
-	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD0;
-	float3 normal : NORMAL;
-	float4 lightViewPosition : TEXCOORD1;
-	float3 viewDirection : TEXCOORD2;
-	//float4 geopos : TEXCOORD3;
-};
-
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
 	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
 	float4 lightViewPosition : TEXCOORD1;
-	float3 viewDirection : TEXCOORD2;
-	//float4 geopos : TEXCOORD3;
+	float3 lightPos : TEXCOORD2;
 };
 
 
@@ -75,15 +73,13 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 {
 	PixelInputType output;
 	float4 worldPosition;
-	
-	
+
+
 	// Change the position vector to be 4 units for proper matrix calculations.
 	input.position.w = 1.0f;
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul (input.position, worldMatrix);
-	//Geopos is proof
-	//output.geopos = output.position;
 	output.position = mul (output.position, viewMatrix);
 	output.position = mul (output.position, projectionMatrix);
 
@@ -95,74 +91,22 @@ PixelInputType ShadowVertexShader (VertexInputType input)
 	// Store the texture coordinates for the pixel shader.
 	output.tex = input.tex;
 
-
 	// Calculate the normal vector against the world matrix only.
 	output.normal = mul (input.normal, (float3x3)worldMatrix);
 
 	// Normalize the normal vector.
 	output.normal = normalize (output.normal);
 
-	worldPosition = mul(input.position, worldMatrix);
-	output.viewDirection = cameraPosition.xyz - worldPosition.xyz;
-	output.viewDirection = normalize(output.viewDirection);
+	// Calculate the position of the vertex in the world.
+	worldPosition = mul (input.position, worldMatrix);
+
+	// Determine the light position based on the position of the light and the position of the vertex in the world.
+	output.lightPos = lightPosition.xyz - worldPosition.xyz;
+
+	// Normalize the light position vector.
+	output.lightPos = normalize (output.lightPos);
 
 	return output;
-}
-
-
-// Geometry Shader
-[maxvertexcount(4)]
-void ShadowGeometryShader(triangle PixelInputType input[3], inout TriangleStream<PixelInputType> triStream)
-{	
-	float4 dir = input[0].position;
-	dir = normalize(dir);
-	dir = -dir;
-
-	//----------------------------------------------------------
-	//PROOF VARIABLES - change input positions below to geopos
-	//float4 test = input[0].position;
-	//test = float4(1.0f, 0.0f, 0.0f, 1.0f);
-	//float3 vec1 = (input[1].geopos - input[0].geopos);
-	//float3 vec2 = (input[2].geopos - input[0].geopos);
-	//----------------------------------------------------------
-
-	float3 vec1 = (input[1].position - input[0].position);
-	float3 vec2 = (input[2].position - input[0].position);
-	float3 surface = cross(vec1, vec2);
-	surface = normalize(surface);
-
-
-	bool v1 = false;
-	bool v2 = false;
-	bool v3 = false;
-
-	float isVisible = (dot(dir, surface));
-	if (isVisible > 0.0f)
-	{
-		v1 = true;
-	}
-
-	isVisible = (dot(dir, surface));
-	if (isVisible > 0.0f)
-	{
-		v2 = true;
-	}
-
-	isVisible = (dot(dir, surface));
-	if (isVisible > 0.0f)
-	{
-		v3 = true;
-	}
-
-	if ((v1 == true) || (v2 == true) || (v3 == true))
-	{
-		triStream.Append(input[0]);
-		triStream.Append(input[1]);
-		triStream.Append(input[2]);
-	}
-
-
-	//triStream.RestartStrip();
 }
 
 
@@ -178,20 +122,13 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 	float lightDepthValue;
 	float lightIntensity;
 	float4 textureColor;
-	float3 lightDir;
-	float3 reflection;
-	float4 specular;
 
-
-
-	lightDir = -lightDirection;
 
 	// Set the bias value for fixing the floating point precision issues.
 	bias = 0.001f;
 
 	// Set the default output color to the ambient light value for all pixels.
 	color = ambientColor;
-	specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Calculate the projected texture coordinates.
 	projectTexCoord.x = input.lightViewPosition.x / input.lightViewPosition.w / 2.0f + 0.5f;
@@ -214,58 +151,36 @@ float4 ShadowPixelShader (PixelInputType input) : SV_Target
 		if (lightDepthValue < depthValue)
 		{
 			// Calculate the amount of light on this pixel.
-			lightIntensity = saturate (dot (input.normal, lightDir));
+			lightIntensity = saturate (dot (input.normal, input.lightPos));
 
 			if (lightIntensity > 0.0f)
 			{
-				//Calculate diffuse
+				// Determine the final diffuse color based on the diffuse color and the amount of light intensity.
 				color += (diffuseColor * lightIntensity);
-				color = saturate (color);
 
-				if (specularPower != 0.0f)
-				{
-					reflection = normalize (2 * lightIntensity * input.normal - input.viewDirection);
-					specular = pow (saturate (dot (reflection, input.viewDirection)), specularPower);
-				}
+				// Saturate the final light color.
+				color = saturate (color);
 			}
 		}
 	}
 
 	else
 	{
-		// If this is outside the area of shadow map range then draw things normally with regular lighting.
-		lightIntensity = saturate (dot (input.normal, lightDir));
-		if (lightIntensity > 0.0f)
-		{
-			//Calculate diffuse
-			color += (diffuseColor * lightIntensity);
-			color = saturate (color);
+		lightIntensity = saturate (dot (input.normal, input.lightPos));
+			// Determine the final diffuse color based on the diffuse color and the amount of light intensity.
+		color += (diffuseColor * lightIntensity);
 
-
-			//If we sent a 0 value as a parameter to the shader, DON'T calculate specular
-			if (specularPower != 0.0f)
-			{
-				reflection = normalize (2 * lightIntensity * input.normal - lightDir);
-				specular = pow (saturate (dot (reflection, input.viewDirection)), specularPower);
-			}
-		}
+			// Saturate the final light color.
+		color = saturate (color);
 	}
-
-
 
 	// Sample the pixel color from the texture using the sampler at this texture coordinate location.
 	textureColor = shaderTexture.Sample (SampleTypeWrap, input.tex);
 
-	if (textureColor.x)
-		color = color * textureColor;
-
-	if (specularPower != 0.0f)
-		color = saturate(color + specular);
+	// Combine the light and texture color.
+	color = color * textureColor;
 
 	return color;
-	
-	// Show normals instead of texture.
-	//return float4 (input.normal, 1.0f);
 }
 
 
@@ -277,7 +192,7 @@ technique10 ShadowTechnique
 	pass pass0
 	{
 		SetVertexShader (CompileShader(vs_4_0, ShadowVertexShader ()));
-		SetGeometryShader (CompileShader(gs_4_0, ShadowGeometryShader()));
 		SetPixelShader (CompileShader(ps_4_0, ShadowPixelShader ()));
+		SetGeometryShader (NULL);
 	}
 }
