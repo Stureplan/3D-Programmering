@@ -234,12 +234,12 @@ void ModelClass::RenderBuffers(ID3D10Device* device)
 
 
 	// Set vertex buffer stride and offset.
-    stride = sizeof(VertexType); 
+    stride = sizeof(VertexType);
 	offset = 0;
     
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
 	device->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
-
+	
     // Set the index buffer to active in the input assembler so it can be rendered.
     device->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 

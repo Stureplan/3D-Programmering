@@ -228,7 +228,6 @@ bool GraphicsClass::Render(float rotation)
 {
 	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	D3DXMATRIX rotationMatrix;
-	D3DXMATRIX translationMatrix;
 
 	D3DXMATRIX lightViewMatrix, lightProjMatrix;
 

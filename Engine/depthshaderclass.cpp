@@ -71,38 +71,13 @@ bool DepthShaderClass::InitializeShader(ID3D10Device* device, HWND hwnd, WCHAR* 
 	unsigned int numElements;
     D3D10_PASS_DESC passDesc;
 
-
-	// Initialize the error message.
 	errorMessage = 0;
 
-	// Load the shader in from the file.
-	result = D3DX10CreateEffectFromFile(filename, NULL, NULL, "fx_4_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, 
+	D3DX10CreateEffectFromFile(filename, NULL, NULL, "fx_4_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, 
 										device, NULL, NULL, &m_effect, &errorMessage, NULL);
-	if(FAILED(result))
-	{
-		// If the shader failed to compile it should have writen something to the error message.
-		if(errorMessage)
-		{
-			OutputShaderErrorMessage(errorMessage, hwnd, filename);
-		}
-		// If there was  nothing in the error message then it simply could not find the shader file itself.
-		else
-		{
-			MessageBox(hwnd, filename, L"Missing Shader File", MB_OK);
-		}
 
-		return false;
-	}
-
-	// Get a pointer to the technique inside the shader.
 	m_technique = m_effect->GetTechniqueByName("DepthTechnique");
-	if(!m_technique)
-	{
-		return false;
-	}
 
-	// Now setup the layout of the data that goes into the shader.
-	// This setup needs to match the VertexType stucture in this class and in the shader.
 	polygonLayout[0].SemanticName = "POSITION";
 	polygonLayout[0].SemanticIndex = 0;
 	polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -161,51 +136,10 @@ void DepthShaderClass::ShutdownShader()
 }
 
 
-void DepthShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
-{
-	char* compileErrors;
-	unsigned long bufferSize, i;
-	ofstream fout;
-
-
-	// Get a pointer to the error message text buffer.
-	compileErrors = (char*)(errorMessage->GetBufferPointer());
-
-	// Get the length of the message.
-	bufferSize = errorMessage->GetBufferSize();
-
-	// Open a file to write the error message to.
-	fout.open("shader-error.txt");
-
-	// Write out the error message.
-	for(i=0; i<bufferSize; i++)
-	{
-		fout << compileErrors[i];
-	}
-
-	// Close the file.
-	fout.close();
-
-	// Release the error message.
-	errorMessage->Release();
-	errorMessage = 0;
-
-	// Pop a message up on the screen to notify the user to check the text file for compile errors.
-	MessageBox(hwnd, L"Error compiling shader.  Check shader-error.txt for message.", shaderFilename, MB_OK);
-
-	return;
-}
-
-
 void DepthShaderClass::SetShaderParameters(D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix)
 {
-	// Set the world matrix variable inside the shader.
     m_worldMatrixPtr->SetMatrix((float*)&worldMatrix);
-
-	// Set the view matrix variable inside the shader.
 	m_viewMatrixPtr->SetMatrix((float*)&viewMatrix);
-
-	// Set the projection matrix variable inside the shader.
     m_projectionMatrixPtr->SetMatrix((float*)&projectionMatrix);
 
 	return;
@@ -218,14 +152,10 @@ void DepthShaderClass::RenderShader(ID3D10Device* device, int indexCount)
 	unsigned int i;
 	
 
-	// Set the input layout.
 	device->IASetInputLayout(m_layout);
+	m_technique->GetDesc(&techniqueDesc);
 
-	// Get the description structure of the technique from inside the shader so it can be used for rendering.
-    m_technique->GetDesc(&techniqueDesc);
-
-    // Go through each pass in the technique (should be just one currently) and render the triangles.
-	for(i=0; i<techniqueDesc.Passes; ++i)
+ 	for(i=0; i<techniqueDesc.Passes; ++i)
     {
         m_technique->GetPassByIndex(i)->Apply(0);
         device->DrawIndexed(indexCount, 0, 0);
