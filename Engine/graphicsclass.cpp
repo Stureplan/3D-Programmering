@@ -601,6 +601,8 @@ bool GraphicsClass::Render(float rotation)
 	// ----------/\----------
 	// Render fullscreen quad
 
+
+	// Render Normal Mapped Cube
 	pos = m_NormalCube->GetPosition ();
 	m_D3D->GetWorldMatrix (worldMatrix);
 	m_Camera->GetViewMatrix (viewMatrix);
@@ -616,7 +618,7 @@ bool GraphicsClass::Render(float rotation)
 		worldMatrix, viewMatrix, projectionMatrix,
 		m_NormalCube->GetTexture (), m_NormalCube->GetNormalmap (),
 		m_ObjectLight->GetDirection (), m_ObjectLight->GetAmbientColor (), m_ObjectLight->GetDiffuseColor ());
-
+	// Render Normal Mapped Cube -^
 
 	m_D3D->TurnZBufferOff();
 	RenderText();
