@@ -36,11 +36,11 @@ GraphicsClass::GraphicsClass()
 	rotatespeed = 1.0f;
 
 	//These are the POSITIONS for each object in the scene
-	cube = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	normalcube = D3DXVECTOR3 (2.0f, 0.0f, 0.0f);
-	def = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	ground = D3DXVECTOR3(0.0f, -2.0f, 0.0f);
-	terrain = D3DXVECTOR3(20.0f, 0.0f, 50.0f);
+	cube		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	normalcube	= D3DXVECTOR3(2.0f, 0.0f, 0.0f);
+	def			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	ground		= D3DXVECTOR3(0.0f, -2.0f, 0.0f);
+	terrain		= D3DXVECTOR3(20.0f, 0.0f, 50.0f);
 
 	terrain_diffuse = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -61,11 +61,11 @@ GraphicsClass::GraphicsClass()
 	fd.PitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 	wcscpy(fd.FaceName, L"Arial");
 
-	fontColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-	rectangleFps = { 25, 25, 0, 0 };
-	rectangleCpu = { 25, 50, 0, 0 };
+	fontColor			 = { 1.0f, 1.0f, 1.0f, 1.0f };
+	rectangleFps		 = { 25, 25, 0, 0 };
+	rectangleCpu		 = { 25, 50, 0, 0 };
 	rectangleRenderCount = { 25, 75, 0, 0 };
-	rectanglePicking = { 25, 100, 0, 0 };
+	rectanglePicking	 = { 25, 100, 0, 0 };
 	pickingText = "None";
 }
 
@@ -127,10 +127,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 	
 
-	m_ObjectLight->SetAmbientColor(0.4f, 0.4f, 0.4f, 1.0f);
-	m_ObjectLight->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_ObjectLight->SetPosition(4.0f, 4.0f, 0.0f);
-	m_ObjectLight->SetDirection(0.0f, -1.0f, -4.0f);
+	m_ObjectLight->SetAmbientColor	(0.4f, 0.4f, 0.4f, 1.0f);
+	m_ObjectLight->SetDiffuseColor	(1.0f, 1.0f, 1.0f, 1.0f);
+	m_ObjectLight->SetPosition		(4.0f, 4.0f, 0.0f);
+	m_ObjectLight->SetDirection		(0.0f, -1.0f, -4.0f);
 	m_ObjectLight->GenerateOrthoMatrix(20.0f, SHADOWMAP_DEPTH, SHADOWMAP_NEAR);
 	m_ObjectLight->GenerateViewMatrix();
 
@@ -145,12 +145,12 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Deferred = new DeferredShaderClass;
 	m_Window = new OrthoWindowClass;
 
-	m_RenderTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
-	m_ShadowShader->Initialize(m_D3D->GetDevice(), hwnd);
-	m_NormalMapShader->Initialize(m_D3D->GetDevice(), hwnd);
-	m_ParticleShader->Initialize(m_D3D->GetDevice(), hwnd);
-	m_Window->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight);
-	m_Deferred->Initialize(m_D3D->GetDevice(), hwnd);
+	m_RenderTexture		->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
+	m_ShadowShader		->Initialize(m_D3D->GetDevice(), hwnd);
+	m_NormalMapShader	->Initialize(m_D3D->GetDevice(), hwnd);
+	m_ParticleShader	->Initialize(m_D3D->GetDevice(), hwnd);
+	m_Window			->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight);
+	m_Deferred			->Initialize(m_D3D->GetDevice(), hwnd);
 
 	D3DX10CreateFontIndirect(m_D3D->GetDevice(), &fd, &font);
 

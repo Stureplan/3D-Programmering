@@ -286,19 +286,12 @@ void ModelClass::RenderBuffers(ID3D10Device* device)
 	unsigned int stride;
 	unsigned int offset;
 
-
-	// Set vertex buffer stride and offset.
-    stride = sizeof(VertexType); 
+	stride = sizeof(VertexType); 
 	offset = 0;
     
-	// Set the vertex buffer to active in the input assembler so it can be rendered.
 	device->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
-
-    // Set the index buffer to active in the input assembler so it can be rendered.
-    device->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-    // Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-    device->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	device->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	device->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return;
 }
@@ -349,34 +342,21 @@ bool ModelClass::LoadModel(WCHAR* filename)
 	char input;
 	int i;
 
-	//Open the model file
 	fin.open(filename);
-
-	//If  it could notg open the file, then exit
 	if (fin.fail())
 	{
 		return false;
 	}
 
-	//Read up to the value of vertex count.
 	fin.get(input);
 	while (input != ':')
 	{
 		fin.get(input);
 	}
 
-	//Read in the vertex count.
 	fin >> m_vertexCount;
-
-	//Set the number of indices to be the same as the vertex count.
 	m_indexCount = m_vertexCount;
-
-	//Create the model using the vertex coutn that was read in.
 	m_model = new ModelType[m_vertexCount];
-	if (!m_model)
-	{
-		return false;
-	}
 
 	//Read up to the beginning of the data.
 	fin.get(input);
@@ -431,7 +411,6 @@ bool ModelClass::LoadModel(WCHAR* filename)
 		}
 	}
 
-	//Close the model file
 	fin.close();
 	return true;
 }
@@ -600,7 +579,9 @@ void ModelClass::CalculateTangentBinormal (TempVertexType vertex1, TempVertexTyp
 void ModelClass::CalculateNormal (VectorType tangent, VectorType binormal, VectorType& normal)
 {
 	float length;
-
+	D3DXVECTOR3 nor, tan, bin;
+	nor = D3DXVECTOR3(normal.x, normal.y, normal.z);
+	tan = D3DXVECTOR3(tangent.x, tangent.y, tangent.z);
 
 	// Calculate the cross product of the tangent and binormal which will give the normal vector.
 	normal.x = (tangent.y * binormal.z) - (tangent.z * binormal.y);

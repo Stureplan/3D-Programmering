@@ -81,7 +81,7 @@ void ShadowGeometryShader(triangle PixelInputType input[3], inout TriangleStream
 	float3 vec2 = (input[2].position - input[0].position);
 	float3 surface = cross(vec1, vec2);
 	surface = normalize(surface);
-
+	//surface = -surface;
 
 	bool v1 = false;
 	bool v2 = false;
