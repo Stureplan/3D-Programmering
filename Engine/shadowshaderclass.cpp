@@ -94,27 +94,12 @@ bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR
 	D3D10_BUFFER_DESC lightBufferDesc;
 
 
-	// Initialize the error message.
 	errorMessage = 0;
 
 	// Load the shader in from the file.
-	result = D3DX10CreateEffectFromFile (filename, NULL, NULL, "fx_4_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
+	D3DX10CreateEffectFromFile (filename, NULL, NULL, "fx_4_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
 		device, NULL, NULL, &m_effect, &errorMessage, NULL);
-	if (FAILED (result))
-	{
-		// If the shader failed to compile it should have writen something to the error message.
-		if (errorMessage)
-		{
-			OutputShaderErrorMessage (errorMessage, hwnd, filename);
-		}
-		// If there was  nothing in the error message then it simply could not find the shader file itself.
-		else
-		{
-			MessageBox (hwnd, filename, L"Missing Shader File", MB_OK);
-		}
 
-		return false;
-	}
 
 	// Get a pointer to the technique inside the shader.
 	m_technique = m_effect->GetTechniqueByName ("ShadowTechnique");
@@ -124,7 +109,7 @@ bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR
 	}
 
 	// Now setup the layout of the data that goes into the shader.
-	// This setup needs to match the VertexType stucture in the ModelClass and in the shader.
+	// This setup needs to match the VertexType stucture in the Orthowindowclass and in the shader.
 	polygonLayout[0].SemanticName = "POSITION";
 	polygonLayout[0].SemanticIndex = 0;
 	polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -140,14 +125,6 @@ bool ShadowShaderClass::InitializeShader (ID3D10Device* device, HWND hwnd, WCHAR
 	polygonLayout[1].AlignedByteOffset = D3D10_APPEND_ALIGNED_ELEMENT;
 	polygonLayout[1].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
 	polygonLayout[1].InstanceDataStepRate = 0;
-
-	//polygonLayout[2].SemanticName = "NORMAL";
-	//polygonLayout[2].SemanticIndex = 0;
-	//polygonLayout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	//polygonLayout[2].InputSlot = 0;
-	//polygonLayout[2].AlignedByteOffset = D3D10_APPEND_ALIGNED_ELEMENT;
-	//polygonLayout[2].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
-	//polygonLayout[2].InstanceDataStepRate = 0;
 	
 	// Get a count of the elements in the layout.
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
@@ -223,41 +200,6 @@ void ShadowShaderClass::ShutdownShader ()
 	return;
 }
 
-
-void ShadowShaderClass::OutputShaderErrorMessage (ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
-{
-	char* compileErrors;
-	unsigned long bufferSize, i;
-	ofstream fout;
-
-
-	// Get a pointer to the error message text buffer.
-	compileErrors = (char*) (errorMessage->GetBufferPointer ());
-
-	// Get the length of the message.
-	bufferSize = errorMessage->GetBufferSize ();
-
-	// Open a file to write the error message to.
-	fout.open ("shader-error.txt");
-
-	// Write out the error message.
-	for (i = 0; i<bufferSize; i++)
-	{
-		fout << compileErrors[i];
-	}
-
-	// Close the file.
-	fout.close ();
-
-	// Release the error message.
-	errorMessage->Release ();
-	errorMessage = 0;
-
-	// Pop a message up on the screen to notify the user to check the text file for compile errors.
-	MessageBox (hwnd, L"Error compiling shader.  Check shader-error.txt for info.", shaderFilename, MB_OK);
-
-	return;
-}
 
 void ShadowShaderClass::SetShaderParameters(
 	D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix,

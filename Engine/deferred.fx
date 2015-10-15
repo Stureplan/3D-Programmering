@@ -112,8 +112,6 @@ void ShadowGeometryShader(triangle PixelInputType input[3], inout TriangleStream
 		triStream.Append(input[2]);
 	}
 
-
-	//triStream.RestartStrip();
 }
 
 //PIXEL SHADER

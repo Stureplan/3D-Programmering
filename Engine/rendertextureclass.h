@@ -30,8 +30,6 @@ public:
 	void SetRenderTarget(ID3D10Device*);
 	void ClearRenderTarget(ID3D10Device*, float, float, float, float);
 	ID3D10ShaderResourceView* GetShaderResourceView(int);
-	//void GetProjectionMatrix(D3DXMATRIX&);	//deferred rendering makes it so
-	//void GetOrthoMatrix(D3DXMATRIX&);
 
 private:
 	int m_textureW, m_textureH;
@@ -41,8 +39,7 @@ private:
 	ID3D10Texture2D* m_depthStencilBuffer;
 	ID3D10DepthStencilView* m_depthStencilView;
 	D3D10_VIEWPORT m_viewport;
-	//D3DXMATRIX m_projectionMatrix;
-	//D3DXMATRIX m_orthoMatrix;
+
 };
 
 #endif

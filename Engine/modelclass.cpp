@@ -47,7 +47,7 @@ bool ModelClass::Initialize(ID3D10Device* device, WCHAR* model)
 {
 	bool result;
 
-	//Load in the model data
+	//Load the model data
 	result = LoadModel (model);
 	if (!result)
 	{
